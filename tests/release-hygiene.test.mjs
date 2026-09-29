@@ -149,7 +149,7 @@ test('documents-only builder emits every checksum asset at the declared relative
   assert.equal(JSON.parse(entries.get('MANIFEST.json')).videoReview,'excluded-pending-full-review');
 });
 
-test('branding preserves provenance and does not advertise a nonexistent fork release',async()=>{
+test('branding preserves provenance and uses explicit versioned release links',async()=>{
   for(const name of ['README.md','README.zh-CN.md','public/index.html','public/setup.html']){
     const text=await readFile(new URL('../'+name,import.meta.url),'utf8');
     assert.ok(text.includes('turbo998/gpt-live-1-demo'));
@@ -161,4 +161,21 @@ test('branding preserves provenance and does not advertise a nonexistent fork re
   const dockerIgnore=(await readFile(new URL('../.dockerignore',import.meta.url),'utf8')).split(/\r?\n/);
   assert.ok(!dockerIgnore.includes('LICENSE'));
   assert.ok(!dockerIgnore.includes('NOTICE.md'));
+});
+
+test('release versions agree and tagged automation remains draft-only',async()=>{
+  const pkg=JSON.parse(await readFile(new URL('../package.json',import.meta.url),'utf8'));
+  const lock=JSON.parse(await readFile(new URL('../package-lock.json',import.meta.url),'utf8'));
+  assert.equal(lock.version,pkg.version);
+  assert.equal(lock.packages[''].version,pkg.version);
+  for(const name of ['README.md','README.zh-CN.md']){
+    const text=await readFile(new URL('../'+name,import.meta.url),'utf8');
+    assert.ok(text.includes('/releases/tag/v'+pkg.version));
+    assert.ok(text.includes('gpt-live-1-demo-'+pkg.version+'-windows-x64.zip'));
+  }
+  const workflow=await readFile(new URL('../.github/workflows/windows-release.yml',import.meta.url),'utf8');
+  assert.match(workflow,/^\s+tags:/m);
+  assert.match(workflow,/gh release create [^\n]+--draft --verify-tag/);
+  assert.ok(workflow.indexOf('Audit exact final asset before any upload')<workflow.indexOf('actions/upload-artifact'));
+  assert.doesNotMatch(workflow,/--draft=false|--clobber/);
 });

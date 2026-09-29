@@ -14,12 +14,12 @@
 
 ## 普通用户最快开始
 
-**发行包待发布：** 本 fork 尚未发布 Windows ZIP。目前请从下方源码步骤启动，
-或按[发布指南](docs/RELEASE.zh-CN.md)在私有目录构建。
-继承的包版本 `0.3.1` 不代表本 fork 已有该版本可下载。
-待 [GitHub Releases](https://github.com/turbo998/gpt-live-1-demo/releases) 出现审核后的发行包，再按以下步骤使用：
+从 [GitHub Releases](https://github.com/turbo998/gpt-live-1-demo/releases/tag/v0.4.0)
+获取 **v0.4.0 Windows x64 ZIP**。发行资产还包括 Azure 应用 ZIP、中英文 Word 手册、
+纯文档 ZIP 和 `SHA256SUMS.txt`，**不包含视频**。
+也可从下方源码步骤启动，或按[发布指南](docs/RELEASE.zh-CN.md)构建。
 
-1. 下载完整 ZIP 并解压到新文件夹。请让 `Start.cmd`、`runtime` 和 `app` 保持在同一层级。
+1. 下载 `gpt-live-1-demo-0.4.0-windows-x64.zip`，用 `SHA256SUMS.txt` 核对哈希后解压到新文件夹。请让 `Start.cmd`、`runtime` 和 `app` 保持在同一层级。
 2. 双击 `Start.cmd`。
 3. 浏览器请求时允许麦克风权限。
 4. 在配置向导中填写实时语音服务地址、部署名或模型名和 API Key，然后测试连接。

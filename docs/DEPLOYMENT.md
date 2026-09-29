@@ -4,7 +4,7 @@
 
 Choose the path that matches the person using the application:
 
-- Windows end users: once a reviewed ZIP is released, run `Start.cmd`; until then use source or a private build.
+- Windows end users: extract the reviewed Windows ZIP and run `Start.cmd`.
 - Developers: run the Node.js service directly.
 - A local container: use `compose.yml`.
 - A shared server: use `compose.remote.yml` behind HTTPS.
@@ -12,9 +12,9 @@ Choose the path that matches the person using the application:
 
 ## Windows release
 
-This fork's Windows release is pending. The builder includes the official Node.js 24 runtime; the inherited package version is not a downloadable release.
+The v0.4.0 Windows x64 package includes the official Node.js 24 runtime.
 
-1. After publication, download the complete ZIP from [GitHub Releases](https://github.com/turbo998/gpt-live-1-demo/releases), or build it privately following [the release guide](RELEASE.md).
+1. Download the Windows ZIP and verify it against `SHA256SUMS.txt` from [v0.4.0](https://github.com/turbo998/gpt-live-1-demo/releases/tag/v0.4.0), or build it following [the release guide](RELEASE.md).
 2. Extract it without separating `Start.cmd`, `runtime`, or `app`.
 3. Double-click `Start.cmd`.
 4. Open the setup page if it does not open automatically.

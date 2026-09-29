@@ -4,7 +4,7 @@
 
 根据使用场景选择部署方式：
 
-- Windows 普通用户：待审核后的 ZIP 发布再运行 `Start.cmd`；此前使用源码或私有构建。
+- Windows 普通用户：解压审核后的 Windows ZIP，再运行 `Start.cmd`。
 - 开发者：直接运行 Node.js 服务。
 - 本机容器：使用 `compose.yml`。
 - 共享服务器：使用 `compose.remote.yml`，放在 HTTPS 反向代理后面。
@@ -12,9 +12,9 @@
 
 ## Windows 发行包
 
-本 fork 的 Windows 发行包待发布。构建器包含官方 Node.js 24 运行时；继承的包版本不代表已有可下载发行包。
+v0.4.0 Windows x64 包包含官方 Node.js 24 运行时。
 
-1. 发布后从 [GitHub Releases](https://github.com/turbo998/gpt-live-1-demo/releases) 下载完整 ZIP，或按[发布指南](RELEASE.zh-CN.md)私下构建。
+1. 从 [v0.4.0](https://github.com/turbo998/gpt-live-1-demo/releases/tag/v0.4.0) 下载 Windows ZIP 并用 `SHA256SUMS.txt` 核对哈希，或按[发布指南](RELEASE.zh-CN.md)构建。
 2. 解压时不要拆开 `Start.cmd`、`runtime` 和 `app`。
 3. 双击 `Start.cmd`。
 4. 如果浏览器没有自动打开，手动打开设置页。

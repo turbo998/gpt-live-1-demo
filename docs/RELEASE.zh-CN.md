@@ -2,8 +2,8 @@
 
 [English](RELEASE.md) | 简体中文
 
-turbo998 fork 尚未发布发行包。`0.3.1` 是继承的包基线，不是本 fork 已有下载。
-修改版本、推送标签或上传资产前，须确认版本与发布授权。
+当前发行系列为 **v0.4.0**，在继承的 `0.3.1` 基线上开发。
+修改版本、推送标签或上传资产前，须确认版本与发布授权；保留原有署名和 fork 关系。
 
 ## 相互独立的门槛
 
@@ -57,8 +57,8 @@ node .\scripts\check-release.mjs --archive $azureZip --receipt $azureReceipt
 
 ## Windows 冒烟与证据边界
 
-解压到一次性目录，从该进程 PATH 移除 Node，设新的私有 `APP_DATA_DIR`，
-运行 `Start.cmd`。检查健康、向导、中英草稿、合成本地媒体状态、合成设置保存及
+解压到一次性目录，从该进程 PATH 移除 Node，清除 `NODE_PATH`/`NODE_OPTIONS`，
+设新的私有 `APP_DATA_DIR` 和独立 `PORT`，运行 `.\Start.cmd`。检查健康、向导、中英草稿、合成本地媒体状态、合成设置保存及
 重启保留，确认包内没有 settings 文件。
 
 API Key 和托管身份 fixture 不证明真实供应商兼容。真实连接、打断、音频、
@@ -90,12 +90,25 @@ Word 为 `public-text-rendered-metadata-approved`，视频为
 ## 先草稿，后批准发布
 
 CI 审核源码与历史。Windows Actions 在 `upload-artifact` **之前**检查最终 ZIP，
-创建 Release 前再检查。只上传精确版本名 ZIP 和 `SHA256SUMS.txt`。
-匹配已批准版本的 `v*` 标签仅创建**草稿**；手动触发只构建 artifact。
+创建 Release 前再检查，仅上传精确版本名 ZIP 及其 `SHA256SUMS.txt`。
+匹配已批准版本的 `v*` 标签仅创建**草稿**，不自动公开；手动触发只构建 artifact。
 
-版本获批后同步 package/lockfile、发布说明和 README，重建并审查最终字节，再标记
-审核提交。核对 tag SHA、工作流结果、资产名、哈希和下载链接。最终批准后才公开草稿，
-媒体另需审核。保留 fork、MIT 声明和真实贡献历史。
+版本获批后同步 package/lockfile、发布说明和 README，重建并审查最终字节，
+main CI 通过后才标记该精确提交。必须等标签 Windows 工作流成功结束后，
+才修改其草稿或资产。下载并独立审核该 Windows ZIP，包括无系统 Node 的冒烟测试；
+使用该精确文件，不上传另一次同名构建。然后只添加已审核的其他资产。
+核对原单包校验文件后，仅删除该特定草稿资产，再上传包含完整资产名单的新校验文件。
+禁止并发发布任务、通配符上传或覆盖二进制资产。v0.4.0 完整名单为：
+
+- `gpt-live-1-demo-0.4.0-windows-x64.zip`
+- `gpt-live-1-demo-0.4.0-azure.zip`
+- `gpt-live-demo-documents-only.zip`
+- `presenter-guide.docx`
+- `presenter-guide.zh-CN.docx`
+- `SHA256SUMS.txt`，包含上述五个文件的哈希
+
+核对 tag SHA、工作流结果、确切资产名单，并独立下载比对哈希后才公开草稿。
+本次不含 MP4 或含视频归档；媒体另需审核。保留 fork、MIT 声明和真实贡献历史。
 
 Render/Azure 模板只是部署起点，不是已有在线服务声明。停止 App Service 应用
 不停止计划收费。本发布流程不授权任何云操作或付费模型调用。
