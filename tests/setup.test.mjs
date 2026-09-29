@@ -6,6 +6,7 @@ import {join,resolve,sep} from 'node:path';
 import {createSettingsStore,mergeSettings,emptySettings,publicSettings,normalizeBaseUrl} from '../settings-store.mjs';
 import {startServer} from '../server.mjs';
 import {request} from 'node:http';
+import {EventEmitter} from 'node:events';
 const voice={provider:'azure',baseUrl:'https://speech.example',model:'gpt-live-1',apiKey:'synthetic-voice-credential'};
 const candidate=()=>({voice,backend:{enabled:false},preferences:{timeZone:'UTC'}});
 const probes={voice:async()=>({ok:true,message:'fixture passed'}),backend:async()=>({ok:true,message:'fixture passed'})};
@@ -102,4 +103,64 @@ test('search tests run independently of chat checks and never cache evidence',as
  const candidateTest=await post(app.url,'/api/settings/test',{kind:'search',settings:input});assert.equal(candidateTest.status,200);assert.equal(calls,3);
  assert.equal((await post(app.url,'/api/search/test',{}, {Origin:'https://foreign.example'})).status,403);
  const pub=await(await fetch(app.url+'/api/settings')).json();assert.equal(pub.search,undefined);
+});
+
+test('remote startup refuses an absent setup token and never logs a supplied token',async t=>{
+ const before=process.env.SETUP_TOKEN;delete process.env.SETUP_TOKEN;
+ const dataDir=await mkdtemp(join(tmpdir(),'voice-demo-test-'));
+ try{await assert.rejects(startServer({port:0,dataDir,mode:'remote',publicOrigin:'https://demo.example',quiet:true}),/SETUP_TOKEN/);}
+ finally{await rm(dataDir,{recursive:true,force:true});if(before!==undefined)process.env.SETUP_TOKEN=before;}
+ const lines=[];t.mock.method(console,'log',line=>lines.push(line));
+ const token='synthetic-private-setup-token';
+ await fixture(t,{mode:'remote',publicOrigin:'https://demo.example',setupToken:token,quiet:false});
+ assert.match(lines.join('\n'),/Setup:/);assert.ok(!lines.join('\n').includes(token));
+});
+
+test('authenticated remote costly routes are rate limited, but health and close are not',async t=>{
+ let calls=0;
+ const token='synthetic-private-setup-token';
+ const app=await fixture(t,{mode:'remote',publicOrigin:'https://demo.example',setupToken:token,probes:{...probes,search:async()=>{calls++;return {ok:true};}}});
+ const base=`http://127.0.0.1:${app.port}`,headers={Host:'demo.example'};
+ const login=await post(base,'/api/auth/login',{setupToken:token},headers);
+ headers.Cookie=login.headers.get('set-cookie').split(';')[0];
+ for(let i=0;i<6;i++)assert.equal((await post(base,'/api/settings/test',{settings:candidate(),kind:'search'},headers)).status,200);
+ const rejected=await post(base,'/api/settings/test',{settings:candidate(),kind:'search'},{...headers,'Accept-Language':'en'});
+ assert.equal(rejected.status,429);assert.ok(Number(rejected.headers.get('retry-after'))>0);
+ assert.match((await rejected.json()).error,/too frequent/);assert.equal(calls,6);
+ assert.equal((await rawRequest(base+'/api/health',{headers})).status,200);
+ assert.equal((await post(base,'/api/session/synthetic/close',{},headers)).status,200);
+});
+
+test('session lifetime is enforced on the server without browser polling and concurrency stays one',async t=>{
+ const sent=[];
+ class Socket extends EventEmitter{
+   readyState=1;
+   constructor(){super();process.nextTick(()=>this.emit('open'));}
+   send(raw){const event=JSON.parse(raw);sent.push(event);if(event.type==='session.close')process.nextTick(()=>{this.emit('message',JSON.stringify({type:'session.closed',usage:{seconds:60},reason:'close_requested'}));});}
+   close(){this.readyState=3;this.emit('close');}
+   terminate(){this.close();}
+ }
+ const app=await fixture(t,{createVoiceSocket:()=>new Socket(),voiceFetch:async()=>({ok:true,json:async()=>({session:{id:'synthetic-session'},transport:{sdp:'v=0\r\nm=audio'}})})});
+ await post(app.url,'/api/settings',{settings:candidate()});
+ t.mock.timers.enable({apis:['setTimeout']});
+ const input={sdp:'v=0\r\nm=audio',config:{sessionMinutes:1}};
+ assert.equal((await post(app.url,'/api/session',input)).status,200);
+ assert.equal((await post(app.url,'/api/session',input)).status,409);
+ t.mock.timers.tick(60000);
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(sent.filter(event=>event.type==='session.close').length,1);
+ const diagnostics=await(await fetch(app.url+'/api/diagnostics')).json();
+ assert.equal(diagnostics.activeSessions,0);
+ t.mock.timers.reset();
+});
+
+test('remote session cap rejects client overrides without contacting voice provider',async t=>{
+ const token='synthetic-private-setup-token';
+ const app=await fixture(t,{mode:'remote',publicOrigin:'https://demo.example',setupToken:token,voiceFetch:async()=>assert.fail('over-limit session reached provider')});
+ const base=`http://127.0.0.1:${app.port}`,headers={Host:'demo.example'};
+ const login=await post(base,'/api/auth/login',{setupToken:token},headers);
+ headers.Cookie=login.headers.get('set-cookie').split(';')[0];
+ await post(base,'/api/settings',{settings:candidate(),adminPassword:'synthetic-admin-password'},headers);
+ const response=await post(base,'/api/session',{sdp:'v=0\r\nm=audio',config:{sessionMinutes:30}},{...headers,'Accept-Language':'en'});
+ assert.equal(response.status,400);assert.equal((await response.json()).maxSessionMinutes,10);
 });

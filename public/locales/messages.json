@@ -1,4 +1,9 @@
 {
+  "托管身份仅允许 Azure AI 服务地址": "Managed identity requires an Azure AI service endpoint.",
+  "托管身份认证失败，请检查应用身份及模型资源权限": "Managed identity authentication failed. Check the app identity and model resource permissions.",
+  "首次远程启动需要至少 24 个字符的 SETUP_TOKEN": "The first remote startup requires a SETUP_TOKEN of at least 24 characters.",
+  "演示请求过于频繁，请稍后重试": "Demo requests are too frequent. Wait and try again.",
+  "会话时长超过服务器允许的上限": "The session duration exceeds the server limit.",
   "地址格式不正确，请粘贴完整的 https:// 资源地址": "Enter a complete HTTPS service address.",
   "服务地址必须使用 HTTPS，且不能在地址中包含密钥": "Use an HTTPS service address without embedded credentials.",
   "请填写不含查询参数和密钥的服务地址": "Enter the service address without query parameters or credentials.",

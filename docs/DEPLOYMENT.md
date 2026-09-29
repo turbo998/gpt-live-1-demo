@@ -4,7 +4,7 @@
 
 Choose the path that matches the person using the application:
 
-- Windows end users: download the release ZIP and run `Start.cmd`.
+- Windows end users: once a reviewed ZIP is released, run `Start.cmd`; until then use source or a private build.
 - Developers: run the Node.js service directly.
 - A local container: use `compose.yml`.
 - A shared server: use `compose.remote.yml` behind HTTPS.
@@ -12,9 +12,9 @@ Choose the path that matches the person using the application:
 
 ## Windows release
 
-The public `v0.3.1` Windows x64 release includes the official Node.js 24 runtime.
+This fork's Windows release is pending. The builder includes the official Node.js 24 runtime; the inherited package version is not a downloadable release.
 
-1. Download the complete ZIP from [GitHub Releases](https://github.com/kylefu8/gpt-live-1-demo/releases/latest).
+1. After publication, download the complete ZIP from [GitHub Releases](https://github.com/turbo998/gpt-live-1-demo/releases), or build it privately following [the release guide](RELEASE.md).
 2. Extract it without separating `Start.cmd`, `runtime`, or `app`.
 3. Double-click `Start.cmd`.
 4. Open the setup page if it does not open automatically.
@@ -86,13 +86,13 @@ curl --fail https://voice.example.com/api/health
 
 On the first remote visit, enter `SETUP_TOKEN`. The application then asks for an administrator password of at least 10 characters. Later visits use that password. The setup token and password protect the settings and session endpoints; they do not replace the API keys entered in the wizard.
 
-The named volume keeps `/data` across container restarts. The settings file contains the API keys as plain text so the server can use them. It is written with mode `0600` where supported; protect the volume and its backups with the server account's filesystem permissions.
+The named volume keeps `/data` across container restarts. In API-key mode, the settings file contains keys as plain text so the server can use them; managed-identity mode stores no model key or access token. It is written with mode `0600` where supported; protect the volume and its backups with the server account's filesystem permissions.
 
 ## Render
 
 The repository's `render.yaml` creates a Docker Web Service with a `/data` persistent disk and a generated setup token. Render's template uses a paid Starter service and a persistent disk; review current pricing in Render before creating it.
 
-This repository does not claim that the template has been live deployed. After the service is created, confirm its HTTPS origin, set `PUBLIC_ORIGIN` for a custom domain, obtain the setup token from the deployment environment/logs, and run the complete setup and microphone checks.
+This repository does not claim that the template has been live deployed. After the service is created, confirm its HTTPS origin, set `PUBLIC_ORIGIN` for a custom domain, obtain the setup token privately from the deployment environment (never application logs), and run the complete setup and microphone checks.
 
 ## Environment variables
 
@@ -113,6 +113,12 @@ The browser wizard is preferred for ordinary users. These variables are useful f
 | `APP_DATA_DIR` | Settings and application data directory. |
 | `PUBLIC_ORIGIN` | Required HTTPS origin in remote mode. |
 | `SETUP_TOKEN` | Initial remote setup token. |
+| `MAX_SESSION_MINUTES` | Server ceiling 1–30; default remote 10/local 30. |
+| `LIVE_AUTH` | `api-key` (default) or Azure `managed-identity`. |
+
+First remote startup requires a privately supplied token of at least 24 characters.
+Azure managed identity and the dedicated single-instance B1 recipe are documented
+in [the Azure operator guide](AZURE-DEMO.md). Key mode remains supported locally.
 
 The service removes trailing API paths when saving a URL and rejects URLs that contain credentials or unsafe query parameters. Do not put a key in a URL.
 

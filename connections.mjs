@@ -1,9 +1,11 @@
 import WebSocket from 'ws';
 import {requestResponse,extractSources} from './backend.mjs';
-export function voiceHeaders(voice){return voice.provider==='azure'?{'api-key':voice.apiKey}:{Authorization:`Bearer ${voice.apiKey}`};}
+import {providerHeaders} from './provider-auth.mjs';
+export function voiceHeaders(voice){return providerHeaders({baseUrl:voice.baseUrl,auth:voice.auth==='managed-identity'?'managed-identity':voice.provider==='azure'?'api-key':'bearer',key:voice.apiKey});}
 export function backendConnection(settings){const b=settings.backend;return b.enabled?{baseUrl:b.baseUrl,auth:b.auth,key:b.apiKey,model:b.model}:null;}
 export function friendlyApiError(error,{kind='voice'}={}){
  const text=String(error?.message||error||'');
+ if(/托管身份/.test(text))return '托管身份认证失败，请检查应用身份及模型资源权限';
  if(kind==='search'&&error?.searchMessage)return error.searchMessage;
  const status=Number(error?.status);
  if(status===401||status===403||/401|403|unauthoriz|authenticat|invalid.*key/i.test(text))return '密钥未通过验证，请检查 Key 是否与服务地址匹配、是否仍然有效。';
@@ -25,8 +27,9 @@ export async function probeSearch(settings,{request=requestResponse}={}){
  return {ok:true,message:'联网搜索测试通过，已取得来源',sources,retrievedAt:new Date().toISOString()};
 }
 export async function probeVoice(voice){
+ const headers=await voiceHeaders(voice);
  return new Promise((resolve,reject)=>{
-  const ws=new WebSocket(voice.baseUrl.replace(/^https:/,'wss:')+'/live/sessions',{headers:voiceHeaders(voice),handshakeTimeout:12000,followRedirects:false});
+  const ws=new WebSocket(voice.baseUrl.replace(/^https:/,'wss:')+'/live/sessions',{headers,handshakeTimeout:12000,followRedirects:false});
   let started=false,settled=false;
   const finish=(error)=>{if(settled)return;settled=true;clearTimeout(timer);if(ws.readyState!==WebSocket.CLOSED)ws.terminate();if(error)reject(error);else resolve({ok:true,message:'语音部署可用'});};
   const timer=setTimeout(()=>finish(started?null:new Error('timeout')),15000);

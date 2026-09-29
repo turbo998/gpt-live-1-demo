@@ -1,9 +1,10 @@
 import {toolDefinitions,executeTool} from './tools.mjs';
+import {providerHeaders} from './provider-auth.mjs';
 
-export function authHeaders(backend){return {'Content-Type':'application/json',...(backend.auth==='api-key'?{'api-key':backend.key}:{Authorization:`Bearer ${backend.key}`})};}
+export async function authHeaders(backend){return {'Content-Type':'application/json',...await providerHeaders(backend)};}
 function redact(text,...keys){let value=String(text||'');for(const key of keys)if(key)value=value.split(key).join('[REDACTED]');return value.slice(0,400);}
 export async function requestResponse(backend,payload,signal){
-  const response=await fetch(`${backend.baseUrl}/responses`,{method:'POST',headers:authHeaders(backend),body:JSON.stringify({...payload,store:false}),signal,redirect:'error'});
+  const response=await fetch(`${backend.baseUrl}/responses`,{method:'POST',headers:await authHeaders(backend),body:JSON.stringify({...payload,store:false}),signal,redirect:'error'});
   const result=await response.json().catch(()=>({}));
   if(!response.ok)throw new Error(`后端 HTTP ${response.status}: ${redact(result.error?.message||'请求失败',backend.key)}`);
   if(result.error)throw new Error(redact(result.error.message,backend.key));

@@ -2,7 +2,9 @@
   "use strict";
 
   const dictionary = {
-    "setup.footer.author": { "zh-CN": "作者", en: "Author" },
+    "setup.auth.managedIdentity": { "zh-CN": "Azure 托管身份", en: "Azure managed identity" },
+    "setup.auth.managedHint": { "zh-CN": "使用服务器托管身份，无需填写或保存 API Key。管理员须先授予模型资源权限。", en: "Uses the server managed identity; no API key is stored. An administrator must first grant access to the model resource." },
+    "setup.footer.author": { "zh-CN": "维护者", en: "Maintainer" },
     "setup.footer.repository": { "zh-CN": "GitHub 项目仓库", en: "GitHub repository" },
     "setup.document.title": { "zh-CN": "连接设置 · 实时语音助手", en: "Connection setup · Real-time voice assistant" },
     "setup.eyebrow": { "zh-CN": "连接设置", en: "Connection setup" },
