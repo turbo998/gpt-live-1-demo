@@ -1,4 +1,4 @@
-# GPT Live 1 Demo
+# GPT Live 1 Demo · turbo998
 
 English | [简体中文](README.zh-CN.md)
 
@@ -6,7 +6,7 @@ A self-hosted browser demo for a realtime voice assistant. The browser handles m
 
 This is an unofficial example application. It expects a live voice deployment that supports the `/live/sessions` protocol. A normal chat endpoint or an unrelated realtime API cannot be substituted without an adapter.
 
-Project: <https://github.com/kylefu8/gpt-live-1-demo>
+Project: <https://github.com/turbo998/gpt-live-1-demo> · [Attribution](NOTICE.md)
 
 ![English interface: session controls, live transcripts, and voice settings](docs/images/interface-en.png)
 
@@ -14,7 +14,10 @@ Project: <https://github.com/kylefu8/gpt-live-1-demo>
 
 ## Try it as an end user
 
-The easiest path on Windows is the published Windows x64 ZIP from [GitHub Releases](https://github.com/kylefu8/gpt-live-1-demo/releases/latest). The current public release is `v0.3.1`.
+**Release pending:** this fork has not published a Windows ZIP yet. Start from
+source below, or build a private package using the [release guide](docs/RELEASE.md).
+The inherited package version is `0.3.1`, not an available release of this fork.
+After a reviewed release appears on [GitHub Releases](https://github.com/turbo998/gpt-live-1-demo/releases):
 
 1. Download the complete ZIP and extract it to a new folder. Keep `Start.cmd`, `runtime`, and `app` together.
 2. Double-click `Start.cmd`.
@@ -73,6 +76,9 @@ Local mode binds to `127.0.0.1` by default. The browser setup wizard is the norm
 
 ## Docker
 
+For Azure, see the [single-presenter deployment and operator guide](docs/AZURE-DEMO.md).
+It includes Bicep, explicit-subscription preflight, session limits and recording guidance.
+
 For a local container:
 
 ```text
@@ -91,11 +97,11 @@ SETUP_TOKEN=replace-with-a-long-random-value
 APP_DATA_DIR=/data
 ```
 
-Remote mode requires an HTTPS `PUBLIC_ORIGIN` and a reverse proxy that terminates TLS. Forward HTTP and WebSocket upgrades to the container's port `8767`. Protect the setup page with the generated or manually supplied setup token, then create an administrator password during the first setup. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+Remote mode requires an HTTPS `PUBLIC_ORIGIN` and a reverse proxy that terminates TLS. Forward HTTP and WebSocket upgrades to the container's port `8767`. Supply a private random setup token of at least 24 characters (not printed to logs), then create an administrator password during first setup. Remote sessions default to a server-enforced 10-minute ceiling; one session and six provider-facing HTTP operations per minute are allowed per instance. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## Render template
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/kylefu8/gpt-live-1-demo)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/turbo998/gpt-live-1-demo)
 
 The repository includes `render.yaml` for a Docker web service and a `/data` persistent disk. The template uses Render's paid Starter service and a persistent disk; check the price shown by Render before creating the service.
 
@@ -113,14 +119,16 @@ For troubleshooting, **Test web lookup** checks for a completed native search an
 
 Most users can leave `.env.example` alone and use the browser wizard. The variables below are available for automation and server deployments:
 
-- `LIVE_PROVIDER`, `LIVE_BASE_URL`, `LIVE_API_KEY`, `LIVE_MODEL`: live voice service.
+- `LIVE_PROVIDER`, `LIVE_BASE_URL`, `LIVE_API_KEY`, `LIVE_MODEL`, `LIVE_AUTH`: live voice service. On an authorized Azure host, `LIVE_AUTH=managed-identity` uses server-only tokens instead of a model key.
 - `REASONING_BASE_URL`, `REASONING_API_KEY`, `REASONING_MODEL`, `REASONING_AUTH`: optional Responses-compatible backend.
 - `APP_MODE`, `HOST`, `PORT`, `APP_DATA_DIR`: runtime mode and data location.
 - `PUBLIC_ORIGIN`, `SETUP_TOKEN`: required protections for a remote deployment.
+- `MAX_SESSION_MINUTES`: server ceiling, 1–30; remote default 10, local default 30.
 
 The server never sends a complete API key to the browser. Saved settings are kept in `settings.json` under the application data directory. The key is stored as plain text in that private file so the service can use it; the file is created with mode `0600` where the platform enforces POSIX modes. On Windows, protect the application data directory with the user account's filesystem permissions and keep backups private.
 
-Do not commit `.env`, settings files, logs, screenshots, audio, or test output. Run `npm run check:release` before publishing.
+Do not commit private `.env`, settings, logs, captures, audio, or test output.
+Only reviewed synthetic documentation images belong in source. Run `npm run check:release` before publishing.
 
 ## Costs and limits
 
@@ -136,4 +144,10 @@ The GitHub Actions checks run the test suite on Node.js 22 and 24, scan for priv
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE) and [NOTICE](NOTICE.md).
+
+## Demo materials
+
+[Public presenter guide, architecture and recording boundaries](docs/demo/README.md).
+The example `https://voice.example.com` is a placeholder, not a shared service.
+Word, video and customer ZIP assets require separate review and release approval.

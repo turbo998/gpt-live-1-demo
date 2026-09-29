@@ -12,6 +12,7 @@ import {createSettingsStore,mergeSettings,publicSettings,passwordHash} from './s
 import {createAuth} from './auth.mjs';
 import {probeVoice,probeBackend,probeSearch,voiceHeaders,backendConnection,friendlyApiError} from './connections.mjs';
 import {requestLanguage,localizeResponse,translateMessage,backendPhase} from './ui-messages.mjs';
+import {runtimePolicy,createModelRequestLimiter} from './runtime-policy.mjs';
 
 export async function startServer(options={}){
   try{process.loadEnvFile?.();}catch(error){if(error.code!=='ENOENT')throw new Error('无法读取 .env 配置文件');}
@@ -21,14 +22,20 @@ export async function startServer(options={}){
   const mode=options.mode||process.env.APP_MODE||'local';
   if(!['local','remote'].includes(mode))throw new Error('APP_MODE 只能是 local 或 remote');
   if(mode==='local'&&!['127.0.0.1','localhost','::1'].includes(host)&&process.env.ALLOW_LOCAL_NETWORK!=='1')throw new Error('本机模式只能监听回环地址。服务器部署请使用 remote 模式；本机 Docker 请使用提供的 compose 文件。');
-  let origin=options.publicOrigin||process.env.PUBLIC_ORIGIN||process.env.RENDER_EXTERNAL_URL||'';
+  let origin=options.publicOrigin||process.env.PUBLIC_ORIGIN||process.env.RENDER_EXTERNAL_URL||(process.env.WEBSITE_HOSTNAME?`https://${process.env.WEBSITE_HOSTNAME}`:'');
   if(mode==='remote'){
     let parsed;try{parsed=new URL(origin);}catch{throw new Error('服务器模式需要设置 PUBLIC_ORIGIN 为公开的 HTTPS 地址');}
     if(parsed.protocol!=='https:'||parsed.username||parsed.password||parsed.pathname!=='/'||parsed.search||parsed.hash)throw new Error('PUBLIC_ORIGIN 需要是 HTTPS 域名根地址');
     origin=parsed.origin;
   }
   const store=await createSettingsStore(options.dataDir);
-  const auth=createAuth({mode,store,setupToken:options.setupToken||process.env.SETUP_TOKEN});
+  const setupToken=options.setupToken||process.env.SETUP_TOKEN;
+  if(mode==='remote'&&!store.get().admin&&(!setupToken||setupToken.length<24))throw new Error('首次远程启动需要至少 24 个字符的 SETUP_TOKEN');
+  const auth=createAuth({mode,store,setupToken});
+  const policy=runtimePolicy(mode);
+  const rateLimit=createModelRequestLimiter(policy.modelRequestsPerMinute);
+  const voiceFetch=options.voiceFetch||fetch;
+  const createVoiceSocket=options.createVoiceSocket||((url,options)=>new WebSocket(url,options));
   const probes={voice:options.probes?.voice||probeVoice,backend:options.probes?.backend||probeBackend,search:options.probes?.search||probeSearch};
   const verified=new Map();
   const sessions=new Map(),recentStatuses=new Map();
@@ -107,7 +114,7 @@ async function handleDelegation(record,id,contextVersion){
   }
 }
 async function attach(id,config,backend,voice){
-  const socket=new WebSocket(`${voice.baseUrl.replace('https:','wss:')}/live/sessions/${encodeURIComponent(id)}/attach`,{headers:voiceHeaders(voice),handshakeTimeout:10000,followRedirects:false});
+  const socket=createVoiceSocket(`${voice.baseUrl.replace('https:','wss:')}/live/sessions/${encodeURIComponent(id)}/attach`,{headers:await voiceHeaders(voice),handshakeTimeout:10000,followRedirects:false});
   const record={id,socket,config,backend,closed:false,closing:false,history:[],lastInputAt:0,taskVersion:0,seen:new Set(),queue:Promise.resolve(),abort:new AbortController(),backendStatus:'就绪',tools:[],sources:[],usage:{voiceSeconds:0,backendInputTokens:0,backendOutputTokens:0}};
   record.delivery=new SpeechDelivery({send:event=>send(record,event),language:config.language,
     canNudge:answer=>!record.closing&&!record.closed&&(answer.forceSpeak||(answer.contextVersion===record.taskVersion&&Date.now()-record.lastInputAt>1500)),
@@ -134,7 +141,8 @@ async function attach(id,config,backend,voice){
     if(event.type==='error'){record.backendStatus=`会话事件错误：${safeMessage(event.error?.message)}`;}
     if(event.type==='session.closed'){
       record.usage.voiceSeconds=event.usage?.seconds??record.usage.voiceSeconds;
-      console.log(JSON.stringify({event:'session.closed',seconds:event.usage?.seconds,reason:event.reason,backendTokens:record.usage.backendInputTokens+record.usage.backendOutputTokens}));
+      const reason=['close_requested','expired','content','remote_hangup','connection_lost'].includes(event.reason)?event.reason:'unknown';
+      console.log(JSON.stringify({event:'session.closed',seconds:Number.isFinite(event.usage?.seconds)?event.usage.seconds:undefined,reason,backendTokens:record.usage.backendInputTokens+record.usage.backendOutputTokens}));
       cleanup(record);socket.close();
     }
   });
@@ -176,11 +184,19 @@ async function attach(id,config,backend,voice){
         if(!types[extname(file)])return reply(res,404,{error:'Not found'});
         try{res.setHeader('Content-Type',types[extname(file)]);return res.end(await readFile(file));}catch{return reply(res,404,{error:'Not found'});}
       }
-      if(req.method==='GET'&&path==='/api/config')return reply(res,200,{...publicConfig(store.get(),store.configured()),mode});
+      if(req.method==='GET'&&path==='/api/config'){
+        const config=publicConfig(store.get(),store.configured());
+        config.defaults.sessionMinutes=Math.min(config.defaults.sessionMinutes,policy.maxSessionMinutes);
+        return reply(res,200,{...config,mode,runtimePolicy:policy});
+      }
       if(req.method==='GET'&&path==='/api/settings')return reply(res,200,publicSettings(store.get()));
       if(req.method==='GET'&&path==='/api/diagnostics'){
         res.setHeader('Content-Disposition','attachment; filename="diagnostics.json"');
-        return reply(res,200,{application:'gpt-live-1-demo',node:process.versions.node,platform:process.platform,configured:store.configured(),backendEnabled:store.get().backend.enabled,activeSessions:sessions.size,mode});
+        return reply(res,200,{application:'gpt-live-1-demo',node:process.versions.node,platform:process.platform,configured:store.configured(),backendEnabled:store.get().backend.enabled,activeSessions:sessions.size,mode,runtimePolicy:policy});
+      }
+      if(req.method==='POST'&&['/api/settings','/api/settings/test','/api/search/test','/api/backend/test','/api/session'].includes(path)){
+        const retryAfter=rateLimit();
+        if(retryAfter){res.setHeader('Retry-After',retryAfter);return reply(res,429,{error:'演示请求过于频繁，请稍后重试'});}
       }
       if(req.method==='POST'&&['/api/settings','/api/settings/test'].includes(path)){
         if(!String(req.headers['content-type']).startsWith('application/json'))return reply(res,415,{error:'需要 JSON 请求'});
@@ -219,11 +235,12 @@ async function attach(id,config,backend,voice){
       const input=await body(req);const settings=store.get(),config=validateConfig(input.config||{},settings),backend=backendConnection(settings);
       if(path==='/api/backend/test')return reply(res,200,{...await verify('backend',settings),model:settings.backend.model,provider:'已配置后端'});
       if(creating||sessions.size)return reply(res,409,{error:'已有语音会话，请先断开'});
+      if(config.sessionMinutes>policy.maxSessionMinutes)return reply(res,400,{error:'会话时长超过服务器允许的上限',maxSessionMinutes:policy.maxSessionMinutes});
       if(typeof input.sdp!=='string'||!input.sdp.startsWith('v=0')||!input.sdp.includes('m=audio'))return reply(res,400,{error:'无效的音频连接请求'});
       creating=true;let sessionId;
       res.on('close',()=>{if(!res.writableEnded&&sessionId)closeSession(sessionId);});
       try{
-        const upstream=await fetch(`${settings.voice.baseUrl}/live/sessions`,{method:'POST',headers:{...voiceHeaders(settings.voice),'Content-Type':'application/json'},signal:AbortSignal.timeout(30000),redirect:'error',
+        const upstream=await voiceFetch(`${settings.voice.baseUrl}/live/sessions`,{method:'POST',headers:{...await voiceHeaders(settings.voice),'Content-Type':'application/json'},signal:AbortSignal.timeout(30000),redirect:'error',
           body:JSON.stringify({session:{model:settings.voice.model,instructions:liveInstructions(config),audio:{output:{voice:config.voice}},delegation:{type:'client'}},transport:{type:'webrtc',sdp:input.sdp}})});
         const result=await upstream.json().catch(()=>({}));
         if(!upstream.ok){const e=new Error(result.error?.message);e.status=upstream.status;throw new Error(friendlyApiError(e));}
@@ -241,7 +258,7 @@ async function attach(id,config,backend,voice){
     catch(error){if(error.code==='EADDRINUSE'&&options.autoPort&&!process.env.PORT&&attempt<20){port++;continue;}throw new Error(error.code==='EADDRINUSE'?'端口已被占用，请关闭旧实例或设置其他 PORT':'服务无法启动，请检查监听地址和端口');}
   }
   port=server.address().port;if(mode==='local')origin=`http://127.0.0.1:${port}`;
-  if(!options.quiet){console.log(`Ready: ${origin}`);if(auth.needsSetupToken())console.log(`Setup: ${origin}/setup#setup-token=${encodeURIComponent(auth.initialToken)}`);}
+  if(!options.quiet){console.log(`Ready: ${origin}`);if(auth.needsSetupToken())console.log(`Setup: ${origin}/setup (use the privately supplied SETUP_TOKEN)`);}
   let closing;
   async function close(){if(closing)return closing;closing=(async()=>{for(const id of sessions.keys())closeSession(id);const until=Date.now()+5500;while(sessions.size&&Date.now()<until)await delay(100);await new Promise(resolve=>{server.close(resolve);server.closeAllConnections?.();});})();return closing;}
   return {url:origin,port,dataDir:store.dataDir,close,server};

@@ -1,4 +1,4 @@
-# GPT Live 1 Demo
+# GPT Live 1 Demo · turbo998
 
 [English](README.md) | 简体中文
 
@@ -6,7 +6,7 @@
 
 这是非官方示例项目，需要一个支持 `/live/sessions` 协议的实时语音部署。普通聊天接口或其他不兼容的实时接口不能直接替代，除非另外提供适配器。
 
-项目地址：<https://github.com/kylefu8/gpt-live-1-demo>
+项目地址：<https://github.com/turbo998/gpt-live-1-demo> · [来源说明](NOTICE.md)
 
 ![中文界面：会话控制、实时转写与音色设置](docs/images/interface-zh-CN.png)
 
@@ -14,7 +14,10 @@
 
 ## 普通用户最快开始
 
-Windows 用户最省事的方式是从 [GitHub Releases](https://github.com/kylefu8/gpt-live-1-demo/releases/latest) 下载 Windows x64 ZIP。当前公开版本是 `v0.3.1`。
+**发行包待发布：** 本 fork 尚未发布 Windows ZIP。目前请从下方源码步骤启动，
+或按[发布指南](docs/RELEASE.zh-CN.md)在私有目录构建。
+继承的包版本 `0.3.1` 不代表本 fork 已有该版本可下载。
+待 [GitHub Releases](https://github.com/turbo998/gpt-live-1-demo/releases) 出现审核后的发行包，再按以下步骤使用：
 
 1. 下载完整 ZIP 并解压到新文件夹。请让 `Start.cmd`、`runtime` 和 `app` 保持在同一层级。
 2. 双击 `Start.cmd`。
@@ -73,6 +76,9 @@ npm run check:release
 
 ## Docker
 
+Azure 客户/合作伙伴演示请阅读[部署与运营手册](docs/AZURE-DEMO.zh-CN.md)，
+包含 Bicep、显式订阅预检、服务端会话保护、演示流程与录制说明。
+
 本机容器运行：
 
 ```text
@@ -91,11 +97,11 @@ SETUP_TOKEN=replace-with-a-long-random-value
 APP_DATA_DIR=/data
 ```
 
-服务器模式要求 `PUBLIC_ORIGIN` 使用 HTTPS，并由反向代理终止 TLS。将 HTTP 和 WebSocket 升级请求转发到容器的 `8767` 端口。使用生成的或手动设置的初始化口令保护设置页，并在首次设置时创建管理员密码。详见 [docs/DEPLOYMENT.zh-CN.md](docs/DEPLOYMENT.zh-CN.md)。
+服务器模式要求 `PUBLIC_ORIGIN` 使用 HTTPS，并由反向代理终止 TLS。将 HTTP 和 WebSocket 升级请求转发到容器的 `8767` 端口。私下提供至少24字符的随机初始化口令（不再打印到日志），首次设置时创建管理员密码。远程默认服务端会话上限10分钟；每实例1个会话、每分钟6次模型相关HTTP操作。详见 [docs/DEPLOYMENT.zh-CN.md](docs/DEPLOYMENT.zh-CN.md)。
 
 ## Render 模板
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/kylefu8/gpt-live-1-demo)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/turbo998/gpt-live-1-demo)
 
 仓库包含 `render.yaml`，用于创建 Docker Web 服务和 `/data` 持久磁盘。模板使用 Render 的付费 Starter 服务和持久磁盘；创建服务前请以 Render 页面显示的价格为准。
 
@@ -113,14 +119,16 @@ APP_DATA_DIR=/data
 
 大多数用户可以保持 `.env.example` 不变，直接使用浏览器向导。自动化和服务器部署可以使用以下变量：
 
-- `LIVE_PROVIDER`、`LIVE_BASE_URL`、`LIVE_API_KEY`、`LIVE_MODEL`：实时语音服务。
+- `LIVE_PROVIDER`、`LIVE_BASE_URL`、`LIVE_API_KEY`、`LIVE_MODEL`、`LIVE_AUTH`：实时语音服务。在获准的 Azure 主机上，`LIVE_AUTH=managed-identity` 使用仅保留在服务端的令牌，不需要模型 Key。
 - `REASONING_BASE_URL`、`REASONING_API_KEY`、`REASONING_MODEL`、`REASONING_AUTH`：可选的兼容 Responses API 的推理后端。
 - `APP_MODE`、`HOST`、`PORT`、`APP_DATA_DIR`：运行模式和数据位置。
 - `PUBLIC_ORIGIN`、`SETUP_TOKEN`：服务器部署需要的来源校验和初始化保护。
+- `MAX_SESSION_MINUTES`：服务端上限，允许 1–30；远程默认 10，本地默认 30。
 
 服务端不会把完整 API Key 返回给浏览器。设置保存在应用数据目录下的 `settings.json` 中。为了让服务能够使用，Key 会以明文保存在这个私有文件中；在执行 POSIX 权限的平台上，文件会以 `0600` 模式创建。Windows 用户应使用账户文件系统权限保护应用数据目录，并让备份保持私密。
 
-不要把 `.env`、设置文件、日志、截图、音频或测试输出提交到 Git。发布前运行 `npm run check:release`。
+不要把私有 `.env`、设置、日志、录屏、音频或测试输出提交到 Git。
+源码只接受审核后的合成文档图片。发布前运行 `npm run check:release`。
 
 ## 费用和限制
 
@@ -136,4 +144,10 @@ GitHub Actions 会在 Node.js 22 和 24 上运行测试，扫描本机路径和�
 
 ## 许可证
 
-MIT，见 [LICENSE](LICENSE)。
+MIT，见 [LICENSE](LICENSE)及[来源说明](NOTICE.md)。
+
+## 演示资料
+
+[公开讲解手册、架构及录像边界](docs/demo/README.zh-CN.md)。
+`https://voice.example.com` 只是占位示例，不是共享服务。
+Word、视频和客户 ZIP 须单独审核并获得发布批准。

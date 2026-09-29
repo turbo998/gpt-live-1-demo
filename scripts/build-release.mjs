@@ -5,6 +5,7 @@ import {tmpdir} from 'node:os';
 import {basename, dirname, join, resolve, sep} from 'node:path';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
+import {copyApplication as copyReviewedApplication, auditApplication, inventory, auditArchive, sha256 as hashBytes} from './release-policy.mjs';
 
 const PROJECT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const NODE_VERSION = 'v24.21.0';
@@ -12,17 +13,6 @@ const NODE_PLATFORM = 'win-x64';
 const NODE_ARCHIVE = 'node-' + NODE_VERSION + '-' + NODE_PLATFORM + '.zip';
 const NODE_SHA256 = '158f7685b44de51f6c0df1d153526cbcd3e1bc739a8dfc607721cef75de9e541';
 const NODE_BASE_URL = 'https://nodejs.org/dist/' + NODE_VERSION;
-
-// This is deliberately an allowlist. A release must never pick up tests, local
-// working files, credentials, logs, or an unreviewed file added to the project.
-const APP_FILES = [
-  'package.json', 'package-lock.json', 'launcher.mjs', 'server.mjs',
-  'backend.mjs', 'config.mjs', 'delivery.mjs', 'fast-time.mjs', 'tools.mjs',
-  'auth.mjs', 'connections.mjs', 'settings-store.mjs', 'ui-messages.mjs',
-  'README.md', 'README.zh-CN.md', 'LICENSE', '.env.example', 'Dockerfile', 'compose.yml',
-  'compose.remote.yml', 'render.yaml'
-];
-const APP_DIRECTORIES = ['public', 'docs'];
 
 const START_CMD = [
   '@echo off',
@@ -72,6 +62,9 @@ function parseArgs(argv) {
       throw new Error('未知参数：' + arg);
     }
   }
+  if ((options.skipRuntime || options.skipInstall) && !options.noZip) {
+    throw new Error('Incomplete development builds require --no-zip; they are not release assets.');
+  }
   return options;
 }
 
@@ -108,13 +101,6 @@ async function extractArchive(archive, destination) {
     const command = "Expand-Archive -LiteralPath '" + escapedArchive + "' -DestinationPath '" + escapedDestination + "' -Force";
     await run('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', command]);
   }
-}
-
-async function copyIfPresent(source, destination) {
-  if (!existsSync(source)) return false;
-  await mkdir(dirname(destination), {recursive: true});
-  await cp(source, destination, {recursive: true, force: true});
-  return true;
 }
 
 function ensureSafeOutput(projectRoot, output) {
@@ -158,11 +144,7 @@ async function makeRuntime(outDir, tempDir) {
 async function copyApplication(outDir) {
   const appDir = join(outDir, 'app');
   await mkdir(appDir, {recursive: true});
-  for (const file of APP_FILES) await copyIfPresent(join(PROJECT_ROOT, file), join(appDir, file));
-  for (const directory of APP_DIRECTORIES) await copyIfPresent(join(PROJECT_ROOT, directory), join(appDir, directory));
-  if (!existsSync(join(appDir, 'package.json')) || !existsSync(join(appDir, 'launcher.mjs'))) {
-    throw new Error('发布包缺少 package.json 或 launcher.mjs');
-  }
+  await copyReviewedApplication(PROJECT_ROOT, appDir, 'windows');
   await writeFile(join(outDir, 'Start.cmd'), START_CMD, 'ascii');
   return appDir;
 }
@@ -185,6 +167,8 @@ async function makeZip(outDir, archivePath) {
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const output = ensureSafeOutput(PROJECT_ROOT, options.outDir);
+  await run(process.execPath, [join(PROJECT_ROOT, 'scripts', 'check-release.mjs')]);
+  if (existsSync(output + '.audit.json')) throw new Error('Audit receipt already exists');
   const tempDir = await mkdtemp(join(tmpdir(), 'gpt-live-1-demo-release-'));
   assertSafeTemp(tempDir);
   try {
@@ -193,10 +177,17 @@ async function main() {
     let runtimeNode = process.execPath;
     if (!options.skipRuntime) runtimeNode = await makeRuntime(output, tempDir);
     if (!options.skipInstall) await installProductionDependencies(output, appDir, runtimeNode, !options.skipRuntime);
+    if (!options.skipInstall) await auditApplication(appDir, 'windows', PROJECT_ROOT);
     const packageJson = JSON.parse(await readFile(join(appDir, 'package.json'), 'utf8'));
     if (!options.noZip) {
       const archivePath = join(dirname(output), packageJson.name + '-' + packageJson.version + '-windows-x64.zip');
       await makeZip(output, archivePath);
+      const receiptPath = output + '.audit.json';
+      await writeFile(receiptPath, JSON.stringify({
+        schema: 1, kind: 'windows', nodeVersion: NODE_VERSION, nodeArchiveSha256: NODE_SHA256,
+        files: await inventory(output), archiveSha256: hashBytes(await readFile(archivePath))
+      }, null, 2) + '\n', {flag: 'wx'});
+      await auditArchive(archivePath, receiptPath, PROJECT_ROOT);
       console.log('已生成：' + archivePath);
     }
     console.log('发布目录：' + output);

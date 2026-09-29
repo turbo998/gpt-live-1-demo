@@ -214,6 +214,8 @@
               <input id="voiceModelInput" type="text" autocomplete="off" maxlength="160" required placeholder="例如：实时语音部署" data-i18n-placeholder="setup.voice.modelPlaceholder">
             </div>
             <div class="field">
+              <label for="voiceAuthInput" data-i18n="setup.backend.authLabel">鉴权方式</label>
+              <select id="voiceAuthInput"><option value="api-key">API Key</option><option value="managed-identity" data-i18n="setup.auth.managedIdentity">Azure 托管身份</option></select>
               <label for="voiceApiKeyInput" data-i18n="setup.voice.keyLabel">语音 API Key</label>
               <input id="voiceApiKeyInput" type="password" autocomplete="new-password" maxlength="4096" placeholder="首次填写，留空则沿用已保存凭据" data-i18n-placeholder="setup.voice.keyPlaceholder">
               <p class="field-help" id="voiceKeyHint" data-i18n="setup.voice.keyHint">密钥只在本次请求中提交给服务端。</p>
@@ -244,7 +246,7 @@
             </div>
             <div class="field" id="backendAuthField">
               <label for="backendAuthInput" data-i18n="setup.backend.authLabel">鉴权方式</label>
-              <select id="backendAuthInput"><option value="bearer">Bearer</option><option value="api-key">API Key</option></select>
+              <select id="backendAuthInput"><option value="bearer">Bearer</option><option value="api-key">API Key</option><option value="managed-identity" data-i18n="setup.auth.managedIdentity">Azure 托管身份</option></select>
             </div>
             <div class="field full" id="backendCustomFields" hidden>
               <label for="backendBaseUrlInput" data-i18n="setup.backend.baseUrlLabel">推理服务地址</label>
@@ -348,7 +350,7 @@
       </section>
     </main>
     <p class="footer-note" data-i18n="setup.footer">需要帮助时，请先确认服务地址和部署名称拼写正确，并用“测试连接”查看实际错误提示。</p>
-    <p class="footer-note project-credit"><span data-i18n="setup.footer.author">作者</span>：kylefu8 · <a href="https://github.com/kylefu8/gpt-live-1-demo" target="_blank" rel="noopener noreferrer" data-i18n="setup.footer.repository">GitHub 项目仓库</a></p>
+    <p class="footer-note project-credit"><span data-i18n="setup.footer.author">维护者</span>：turbo998 · <a href="https://github.com/turbo998/gpt-live-1-demo" target="_blank" rel="noopener noreferrer" data-i18n="setup.footer.repository">GitHub 项目仓库</a></p>
   </div>
 
   <script src="/i18n.js"></script>
@@ -381,6 +383,8 @@
       const voiceTestResult = $("#voiceTestResult");
       const backendModelInput = $("#backendModelInput");
       const backendAuthInput = $("#backendAuthInput");
+      $("#voiceAuthInput").addEventListener("change", updateVoiceHints);
+      backendAuthInput.addEventListener("change", updateBackendFields);
       const backendBaseUrlInput = $("#backendBaseUrlInput");
       const backendApiKeyInput = $("#backendApiKeyInput");
       const backendCustomFields = $("#backendCustomFields");
@@ -493,13 +497,14 @@
         voiceModelInput.value = text(voice.model, "", 160);
         voiceApiKeyInput.value = "";
         state.voiceKeyConfigured = voice.keyConfigured === true;
+        $("#voiceAuthInput").value = voice.auth === "managed-identity" ? "managed-identity" : "api-key";
         state.existingVoiceBaseUrl = text(voice.baseUrl, "", 300);
         voiceApiKeyInput.placeholder = voice.keyConfigured ? t("setup.voice.keyPlaceholder") : t("setup.voice.keyPlaceholderNew");
         voiceKeyHint.textContent = voice.keyConfigured ? t("setup.voice.keyHintSaved") : t("setup.voice.keyHint");
         const backendMode = backend.enabled === false ? "none" : backend.mode === "custom" ? "custom" : "same";
         $("input[name=backendMode][value=" + backendMode + "]").checked = true;
         backendModelInput.value = text(backend.model, "", 160);
-        backendAuthInput.value = backend.auth === "api-key" ? "api-key" : "bearer";
+        backendAuthInput.value = ["api-key", "managed-identity"].includes(backend.auth) ? backend.auth : "bearer";
         backendBaseUrlInput.value = text(backend.baseUrl, "", 300);
         backendApiKeyInput.value = "";
         state.backendKeyConfigured = backend.keyConfigured === true;
@@ -537,9 +542,10 @@
         const voiceKey = voiceApiKeyInput.value.trim();
         const backendMode = selectedRadio("backendMode", "same");
         const backendKey = backendApiKeyInput.value.trim();
-        const sameAuth = provider === "azure" ? "api-key" : "bearer";
+        const voiceAuth = $("#voiceAuthInput").value;
+        const sameAuth = voiceAuth === "managed-identity" ? "managed-identity" : provider === "azure" ? "api-key" : "bearer";
         return {
-          voice: { provider, baseUrl: voiceBaseUrlInput.value.trim(), model: voiceModelInput.value.trim(), apiKey: voiceKey },
+          voice: { provider, auth: voiceAuth, baseUrl: voiceBaseUrlInput.value.trim(), model: voiceModelInput.value.trim(), apiKey: voiceKey },
           backend: {
             enabled: backendMode !== "none",
             mode: backendMode === "custom" ? "custom" : "same",
@@ -569,7 +575,7 @@
         if (!settings.voice.baseUrl) return t("setup.error.voiceBaseUrlRequired");
         if (!settings.voice.model) return t("setup.error.voiceModelRequired");
         if (!/^https:\/\//i.test(settings.voice.baseUrl)) return t("setup.error.voiceHttps");
-        if (state.voiceKeyConfigured && !settings.voice.apiKey && endpointKey(settings.voice.baseUrl) !== endpointKey(state.existingVoiceBaseUrl)) return t("setup.error.voiceKeyChanged");
+        if (settings.voice.auth !== "managed-identity" && state.voiceKeyConfigured && !settings.voice.apiKey && endpointKey(settings.voice.baseUrl) !== endpointKey(state.existingVoiceBaseUrl)) return t("setup.error.voiceKeyChanged");
         if (kind === "backend" && settings.backend.enabled) {
           if (!settings.backend.model) return t("setup.error.backendModelRequired");
           if (settings.backend.mode === "custom" && !/^https:\/\//i.test(settings.backend.baseUrl)) return t("setup.error.backendHttps");
@@ -675,8 +681,10 @@
       }
       function updateVoiceHints() {
         const provider = selectedRadio("voiceProvider", "azure");
+        const managed = $("#voiceAuthInput").value === "managed-identity";
+        voiceApiKeyInput.disabled = managed;
         voiceBaseUrlHelp.textContent = t(provider === "azure" ? "setup.voice.baseUrlHelp.azure" : "setup.voice.baseUrlHelp.compatible");
-        voiceKeyHint.textContent = state.voiceKeyConfigured
+        voiceKeyHint.textContent = managed ? t("setup.auth.managedHint") : state.voiceKeyConfigured
           ? t("setup.voice.keyHintSaved")
           : t(provider === "azure" ? "setup.voice.keyHint" : "setup.voice.keyHintCompatible");
         voiceApiKeyInput.placeholder = state.voiceKeyConfigured ? t("setup.voice.keyPlaceholder") : t("setup.voice.keyPlaceholderNew");
@@ -687,7 +695,7 @@
         const custom = mode === "custom";
         const enabled = mode !== "none";
         backendCustomFields.hidden = !custom;
-        backendKeyField.hidden = !enabled || mode === "same";
+        backendKeyField.hidden = !enabled || mode === "same" || backendAuthInput.value === "managed-identity";
         backendModelInput.disabled = !enabled;
         backendAuthInput.disabled = !custom;
         backendBaseUrlInput.disabled = !custom;

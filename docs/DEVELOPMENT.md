@@ -2,9 +2,9 @@
 
 ## Project baseline / 项目基线
 
-GPT Live 1 Demo is a small, self-hosted project for developing and validating GPT-Live-1 voice interactions. The public application baseline is **v0.3.1**, under the MIT license.
+GPT Live 1 Demo is a small, self-hosted project maintained by turbo998 for developing and validating GPT-Live-1 voice interactions. The inherited package baseline is **0.3.1**, under the MIT license; this fork's release is pending.
 
-这是一个围绕 GPT-Live-1 实时语音交互进行开发与验证的开源项目，当前应用基线为 **v0.3.1**，采用 MIT 许可证。保留浏览器配置向导、中英文界面和自行部署能力，优先保证实际使用可靠。
+这是一个由 turbo998 维护、围绕 GPT-Live-1 实时语音交互进行开发与验证的开源项目，继承的包基线为 **0.3.1**，采用 MIT 许可证；本 fork 的发行版待发布。保留浏览器配置向导、中英文界面和自行部署能力，优先保证实际使用可靠。
 
 ## Start developing / 开始开发
 
@@ -35,6 +35,8 @@ Local `.env`, `work/`, dependencies, logs, and credentials are not source delive
 | `public/index.html`, `public/setup.html` | Conversation UI, device checks and setup wizard / 对话页、设备测试和配置向导 |
 | `public/i18n.js`, `public/locales/`, `ui-messages.mjs` | Chinese/English UI and application messages / 中英文界面及状态文案 |
 | `settings-store.mjs`, `config.mjs`, `auth.mjs`, `connections.mjs` | Private settings, validation, authentication and connection probes / 私有配置、校验、鉴权与连通性验证 |
+| `provider-auth.mjs`, `runtime-policy.mjs` | Server-only managed identity/API-key auth and bounded demo policy / 服务端托管身份或Key鉴权、演示限额 |
+| `infra/`, `scripts/azure-*.ps1`, `scripts/record-demo.mjs` | Scoped Azure deployment and application-only live recording / 限定范围Azure部署与仅应用真实录制 |
 | `backend.mjs` | Reasoning, tool execution and native web search / 推理、工具调用与原生联网搜索 |
 | `tools.mjs`, `fast-time.mjs` | Clock, weather, calculation and direct clock answers / 时间、天气、计算及时间问题快捷回答 |
 | `delivery.mjs` | Deliver text answers to voice and track acknowledgments / 答案语音回传及确认状态 |

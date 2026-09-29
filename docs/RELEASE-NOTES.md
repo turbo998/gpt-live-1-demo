@@ -1,5 +1,19 @@
 # Release notes / 发布说明
 
+## Unreleased / 尚未发布
+
+- Integrate server-only Azure managed identity, single-session policy, bounded duration and remote request limits, while retaining local API-key setup.
+- Add generic Bicep and guarded operator scripts, turbo998 maintainer branding, provenance notices and bilingual demo materials.
+- Separate source, history, reviewed images and final archive checks; require audited assets before upload and create tagged releases as drafts.
+- 整合 Azure 托管身份、单会话、时长与远程请求限制，保留本地 API Key 配置。
+- 增加通用 Bicep、防误操作脚本、turbo998 维护者品牌、来源说明及双语演示资料。
+- 源码、历史、审核图片和最终归档分别检查，上传前审计，标签发布先创建草稿。
+
+The entries below describe inherited project history, not existing releases of
+this fork. Version selection and media publication require separate approval.
+
+以下为继承的项目历史，不表示本 fork 已发布相应版本；版本与媒体公开须另行批准。
+
 ## v0.3.1 / 简化为原生自动搜索
 
 - Use only the existing reasoning service’s native web search, automatically when needed. New configurations enable it by default; existing saved choices are preserved.

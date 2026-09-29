@@ -21,3 +21,17 @@ coverage/
 tmp/
 .DS_Store
 Thumbs.db
+.azure/
+.copilot-tracking/
+credentials/
+private-evidence/
+*.private.*
+*.docx
+*.mp4
+*.wav
+*.webm
+*.m4a
+*.mp3
+*.har
+artifacts/
+staging/

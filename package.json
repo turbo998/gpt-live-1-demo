@@ -2,6 +2,12 @@
   "name": "gpt-live-1-demo",
   "version": "0.3.1",
   "description": "A self-hosted realtime voice assistant demo with a browser setup wizard.",
+  "author": "GPT Live 1 Demo contributors",
+  "maintainers": ["turbo998"],
+  "license": "MIT",
+  "repository": {"type": "git", "url": "https://github.com/turbo998/gpt-live-1-demo.git"},
+  "homepage": "https://github.com/turbo998/gpt-live-1-demo#readme",
+  "bugs": {"url": "https://github.com/turbo998/gpt-live-1-demo/issues"},
   "private": false,
   "type": "module",
   "engines": {
@@ -15,6 +21,7 @@
     "check:release": "node scripts/check-release.mjs"
   },
   "dependencies": {
+    "@azure/identity": "^4.13.0",
     "ws": "^8.18.3"
   }
 }

@@ -4,7 +4,7 @@
 
 根据使用场景选择部署方式：
 
-- Windows 普通用户：下载发行 ZIP，运行 `Start.cmd`。
+- Windows 普通用户：待审核后的 ZIP 发布再运行 `Start.cmd`；此前使用源码或私有构建。
 - 开发者：直接运行 Node.js 服务。
 - 本机容器：使用 `compose.yml`。
 - 共享服务器：使用 `compose.remote.yml`，放在 HTTPS 反向代理后面。
@@ -12,9 +12,9 @@
 
 ## Windows 发行包
 
-公开的 `v0.3.1` Windows x64 发行包已包含官方 Node.js 24 运行时。
+本 fork 的 Windows 发行包待发布。构建器包含官方 Node.js 24 运行时；继承的包版本不代表已有可下载发行包。
 
-1. 从 [GitHub Releases](https://github.com/kylefu8/gpt-live-1-demo/releases/latest) 下载完整 ZIP。
+1. 发布后从 [GitHub Releases](https://github.com/turbo998/gpt-live-1-demo/releases) 下载完整 ZIP，或按[发布指南](RELEASE.zh-CN.md)私下构建。
 2. 解压时不要拆开 `Start.cmd`、`runtime` 和 `app`。
 3. 双击 `Start.cmd`。
 4. 如果浏览器没有自动打开，手动打开设置页。
@@ -92,7 +92,7 @@ curl --fail https://voice.example.com/api/health
 
 仓库的 `render.yaml` 会创建 Docker Web Service、`/data` 持久磁盘和自动生成的初始化口令。模板使用 Render 的付费 Starter 服务和持久磁盘；创建前请在 Render 页面确认当前价格。
 
-本仓库不声称该模板已经完成线上部署。创建服务后，请确认 HTTPS 地址；使用自定义域名时设置 `PUBLIC_ORIGIN`；从部署环境或日志取得初始化口令，然后完整运行设置和麦克风检查。
+本仓库不声称该模板已经完成线上部署。创建服务后，请确认 HTTPS 地址；使用自定义域名时设置 `PUBLIC_ORIGIN`；从私有部署环境取得初始化口令（不再写入应用日志），然后完整运行设置和麦克风检查。
 
 ## 环境变量
 
@@ -113,6 +113,11 @@ curl --fail https://voice.example.com/api/health
 | `APP_DATA_DIR` | 设置和应用数据目录。 |
 | `PUBLIC_ORIGIN` | 服务器模式必需的 HTTPS 根地址。 |
 | `SETUP_TOKEN` | 远程首次设置口令。 |
+| `MAX_SESSION_MINUTES` | 服务端上限1–30；默认远程10/本机30分钟。 |
+| `LIVE_AUTH` | 默认 `api-key`，Azure可用 `managed-identity`。 |
+
+首次远程启动需要私下提供至少24字符的初始化口令。
+托管身份和独立单实例B1部署见 [Azure运营手册](AZURE-DEMO.zh-CN.md)；本机保留Key模式。
 
 服务保存地址时会去掉末尾的接口路径，并拒绝包含凭据或不安全查询参数的 URL。不要把 Key 放进 URL。
 

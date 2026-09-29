@@ -1,0 +1,10 @@
+[
+  {"path":"docs/images/interface-en.png","sha256":"fa29933779fd90477991194fe97a3f04c650c89a2eddc4f47c89e7486edf24e2","category":"unreviewed-image","reason":"Visually reviewed full synthetic disconnected UI; no private data."},
+  {"path":"docs/images/interface-zh-CN.png","sha256":"9fb6dfef777ef5014edbef00a1a7456cdbd0d520927f6ea6d85f6516dbd74fba","category":"unreviewed-image","reason":"Visually reviewed full synthetic disconnected UI; no private data."},
+  {"path":"docs/images/interface-en.png","sha256":"9d7c02da1aec2f0585a61d4c819e8ee19b7219102b96d30c8f93bea1f75da58f","category":"unreviewed-image","reason":"Visually reviewed earlier synthetic disconnected UI without footer."},
+  {"path":"docs/images/interface-zh-CN.png","sha256":"9fc088b12e580e061f476ca1c94183bb70399c6f1d08357ea247ceb99f36450c","category":"unreviewed-image","reason":"Visually reviewed earlier synthetic disconnected UI without footer."},
+  {"path":"scripts/check-release.mjs","sha256":"eb7522e5485d089f101b86b51cfd94b4b9e32a362731406a4741d86c9bf9ac9b","line":40,"category":"credential-material","reason":"Literal private-key header in the detector, not key contents."},
+  {"path":"scripts/check-release.mjs","sha256":"d7b51ce9c7642c6bf573e3effef0b9c1703502b56a664f0348b3d5802ebc9f39","line":40,"category":"credential-material","reason":"Literal private-key header in the detector, not key contents."},
+  {"path":"scripts/check-release.mjs","sha256":"5c2143c06648fa5074af17412f4cfe54dc3d500441f6cbddeb957681cd0acb1b","line":40,"category":"credential-material","reason":"Literal private-key header in the detector, not key contents."},
+  {"path":"tests/search.test.mjs","sha256":"aa82b1573227ed0c44c4140a665e9eace7a633caccb4fbbd7b221666cb4a437a","line":48,"category":"credential-url","reason":"Synthetic example.com URL used to assert credential URL rejection."}
+]

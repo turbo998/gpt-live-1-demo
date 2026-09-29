@@ -1,83 +1,122 @@
 # Release checklist
 
-[简体中文](RELEASE.zh-CN.md) | English
+English | [简体中文](RELEASE.zh-CN.md)
 
-This project publishes source on GitHub and can publish a self-contained Windows x64 ZIP. The current release is `v0.3.1`; use the same process for each new tag.
+The turbo998 fork has no published release yet. `0.3.1` is the inherited package
+baseline, not an available fork download. Confirm a version and publication
+authorization before changing versions, pushing tags or uploading assets.
 
-## Before a release
+## Independent gates
 
-From a clean checkout:
+Run `npm ci`, `npm test`, `npm run check:release`, `npm run check:release -- --history HEAD`
+and `git diff --check` in the isolated checkout. CI runs Node 22/24 and Docker
+empty-configuration health/setup checks. Compile all three Bicep files offline
+and parse PowerShell scripts without running cloud operations.
 
-1. Run `npm ci`.
-2. Run `npm test`.
-3. Run `npm run check:release`.
-4. Check `git status` and `git diff --check`.
-5. Confirm that `.env`, settings files, logs, screenshots, audio, tests, and local paths are absent from the files to be published.
-6. Check that the README language links, deployment links, license, and release notes describe the same version and behavior.
+The source checker covers tracked files plus non-ignored candidates, including
+dotfiles, tests, workflows and IaC. Findings report paths, line numbers and
+categories, not secret values. Exact hashes bind reviewed images and narrowly
+reviewed historical fixtures; there is no blanket tests/Azure-domain exemption.
+Review any proposed change to these approvals rather than auto-generating trust.
 
-The source and release package must not contain service keys, setup tokens, administrator passwords, personal endpoints, private paths, or local conversation data.
+History checks require full ancestry (not a shallow checkout). Audit every ref
+intended for publication separately. Do not merge a private source commit and
+delete its sensitive file afterward: the ancestor remains public. Review remote
+refs, About, Pages/wiki, Releases and Actions artifacts/logs as applicable.
+Unavailable surfaces remain incomplete. Confirmed exposure blocks upload;
+credential revocation and history remediation require explicit authorization.
 
-## Build the Windows ZIP
+Text scans do not certify pictures, Word or video. Visually inspect all published
+images and metadata before updating `scripts/reviewed-images.json`. Word needs
+rendering, text parity, relationship and hidden-content review. Video needs
+**all frames and the entire audio**, plus metadata/track and final playback checks.
+Never replace real model responses with synthetic answers.
 
-Run this from the project root. Use a new empty output location for every build:
+## Application packages
 
-```text
-npm run build:release -- --out-dir ../releases/gpt-live-1-demo-vX.Y.Z
+Use a fresh private output directory:
+
+```powershell
+npm run build:release -- --out-dir $newPrivateWindowsDirectory
+.\scripts\azure-package.ps1 -OutputDirectory $newPrivateAzureDirectory
 ```
 
-The builder:
+Both builders share explicit per-file runtime/public allowlists in
+`scripts/release-policy.mjs`; Windows also includes explicitly listed docs.
+Unknown nested docs/public files are not recursively copied. Missing modules,
+production dependencies or license notices fail the build. Locked production
+dependencies are installed with lifecycle scripts disabled.
 
-- Copies only the reviewed application allowlist, `public`, and `docs`.
-- Downloads the pinned official Node.js 24 Windows x64 runtime.
-- Checks the downloaded archive against the official `SHASUMS256.txt` and the pinned SHA-256.
-- Installs production dependencies with the bundled runtime.
-- Writes the root-level `Start.cmd` launcher.
-- Creates `<package-name>-<package-version>-windows-x64.zip` beside the output directory.
+Windows downloads the fixed official Node.js 24 x64 archive, checks both the
+official checksum list and pinned SHA-256, and preserves its license notices.
+Keep `Start.cmd`, `runtime` and `app` together. Settings belong in the operating
+system's private data directory, never the ZIP. `--skip-runtime`/`--skip-install`
+require `--no-zip` and produce development directories, not release assets.
 
-The package must keep `Start.cmd`, `runtime`, and `app` together. Do not upload `app` by itself and do not copy a local `.env` or application-data directory into the package. The builder refuses to reuse an existing output directory or archive so that an old package cannot be silently overwritten.
+Builds create private audit receipts binding every final file and the archive
+hash. The checker reads ZIP entries without extracting paths; it rejects
+traversal, duplicate paths, unsupported/encrypted entries, oversized expansion,
+bad checksums, missing modules/dependencies and content mismatches:
 
-Inspect the archive before uploading. For a package built with version `0.2.0`, the filename will be `gpt-live-1-demo-0.2.0-windows-x64.zip`:
-
-```text
-tar -tf ../releases/gpt-live-1-demo-0.2.0-windows-x64.zip
+```powershell
+node .\scripts\check-release.mjs --archive $windowsZip --receipt $windowsReceipt
+node .\scripts\check-release.mjs --archive $azureZip --receipt $azureReceipt
 ```
 
-The exact relative path depends on the output directory chosen above. The listing should contain `Start.cmd`, `runtime`, and `app`, and must not contain `.env`, tests, logs, or user data.
+Keep receipts private; they are evidence, not independently signed approvals.
+Inspect the final inventories as well as the source lists. Never upload a
+partial directory, arbitrary wildcard ZIPs, private settings, recordings or receipts.
 
-## Windows smoke test
+## Windows smoke and evidence boundaries
 
-Use a Windows machine or clean user directory without Node.js installed:
+Extract a complete ZIP in a disposable directory. Remove Node from that process's
+PATH, set a fresh private `APP_DATA_DIR`, and run `Start.cmd`. Check health,
+setup, EN/ZH drafts, local synthetic media state, synthetic saved settings and
+restart preservation. Ensure no settings appear under the package.
 
-1. Extract the complete ZIP.
-2. Double-click `Start.cmd`.
-3. Confirm the browser opens the local setup page.
-4. Enter a test live voice service and run the connection test.
-5. Select a microphone and confirm input-level and playback tests.
-6. Connect, speak, receive audio, inspect timestamped transcript lines, mute, disconnect, and reconnect.
-7. Close and reopen the app; confirm settings remain in the system application-data directory rather than the ZIP directory.
+API-key and managed-identity fixtures are not provider compatibility proof.
+Real connection, interruption, audio delivery, search sources and cloud restart
+checks require separate environment/cost authorization. Record them separately;
+never reinterpret a fixture, model discovery or old recording as a new live pass.
 
-Use test credentials that can be revoked. Do not save a real personal key in a screenshot, log, issue, or release asset.
+## Customer documents and video
 
-## GitHub Actions release
+Rebuild both Word handbooks from reviewed `docs/demo/presenter-guide*.md` and
+the new diagram. Use `turbo998` for approved author metadata; remove private
+properties, comments, revisions, hidden text, embedded originals and thumbnails.
+Render and inspect every page. Do not reuse the original customer ZIP.
 
-The CI workflow runs on pushes and pull requests. It tests Node.js 22 and 24, runs the release scan, builds the Docker image, starts an empty local container, and checks health and the setup page.
+Place only `presenter-guide.docx`, `presenter-guide.zh-CN.docx` and (when cleared)
+`GPT-Live-Azure-demo.mp4` in an outside-repository staging directory. A separate
+private approval JSON has `schema: 1` and an `assets` object keyed by each exact
+filename with `sha256` and `review`. Word review is
+`public-text-rendered-metadata-approved`; video review is
+`full-visual-and-audio-approved`. Only record these after review of those exact bytes.
 
-The Windows release workflow runs for a `v*` tag or manual dispatch. It installs dependencies, runs tests and the release scan, builds the Windows package, uploads the ZIP artifact, calculates `SHA256SUMS.txt`, and creates the tagged GitHub Release with `docs/RELEASE-NOTES.md` as its notes when a tag is pushed.
+```powershell
+.\scripts\build-demo-materials.ps1 -StagingDirectory $privateStage `
+  -ApprovalFile $privateApproval -OutputDirectory $newPrivateOutput
+```
 
-Before pushing a tag:
+If video is not cleared, explicitly use `-DocumentsOnly` and a stage containing
+only the two Word files. The archive is labeled documents-only, never a completed
+video delivery. The builder refuses unexpected inputs/overwrite and writes a
+payload manifest, final audit receipt and `SHA256SUMS.txt`. Recheck links, Word
+metadata and final archive contents. Never upload original owner-private files.
 
-1. Update `package.json` and `package-lock.json` to the intended version.
-2. Update `docs/RELEASE-NOTES.md` and both README language versions if user-visible behavior changed.
-3. Commit and push the source changes.
-4. Create and push the exact tag, for example `v0.3.1`.
-5. Check the workflow logs, uploaded ZIP, SHA-256 file, and release page.
+## Draft-first publication
 
-The Docker CI smoke test proves that an empty local container starts and serves its health/setup endpoints. It does not prove that a provider account works, that browser microphone permissions work on a deployed host, or that the Render template has been live deployed.
+CI audits source/history. Windows Actions audits the exact ZIP **before**
+`upload-artifact` and again before Release creation. Only the exact versioned ZIP
+and `SHA256SUMS.txt` are uploaded. A matching approved `v*` tag creates a **draft**,
+not a published Release. Manual dispatch builds an artifact only.
 
-## Render note
+After version approval, synchronize package/lockfile, notes and README, rebuild
+and re-audit exact final bytes, then tag the reviewed commit. Verify the tag SHA,
+workflow results, asset names, hashes and download links. Publish the draft only
+after final approval; staged media require their separate clearance. Keep the
+fork relationship, MIT attribution and real contributor history.
 
-`render.yaml` is a deployment template with a paid Starter service and a persistent disk. It is not part of the Windows release smoke test. If a maintainer deploys it, record the actual deployment result separately and verify HTTPS, setup authentication, persistent `/data`, and microphone access before describing it as live.
-
-## Version changes
-
-When changing the pinned Node.js runtime, update its version and fixed SHA-256 in `scripts/build-release.mjs`, then rebuild and inspect a fresh archive. When dependencies change, commit the regenerated lockfile. Every release needs a new privacy scan, test run, Docker smoke test, and Windows package smoke test.
+Render/Azure templates are deployment starting points, not hosted-service claims.
+Stopping an App Service app does not stop plan billing. This release process
+does not authorize any cloud operation or paid model call.
