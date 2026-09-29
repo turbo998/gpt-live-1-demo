@@ -158,4 +158,7 @@ test('branding preserves provenance and does not advertise a nonexistent fork re
   }
   assert.match(await readFile(new URL('../NOTICE.md',import.meta.url),'utf8'),/kylefu8/);
   assert.match(await readFile(new URL('../LICENSE',import.meta.url),'utf8'),/GPT Live 1 Demo contributors/);
+  const dockerIgnore=(await readFile(new URL('../.dockerignore',import.meta.url),'utf8')).split(/\r?\n/);
+  assert.ok(!dockerIgnore.includes('LICENSE'));
+  assert.ok(!dockerIgnore.includes('NOTICE.md'));
 });

@@ -24,7 +24,6 @@ tests/
 scripts/
 docs/
 README.md
-LICENSE
 *.zip
 .azure/
 .copilot-tracking/
@@ -40,4 +39,3 @@ private-evidence/
 *.har
 artifacts/
 staging/
-NOTICE.md
