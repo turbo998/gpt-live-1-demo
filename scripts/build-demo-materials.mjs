@@ -66,7 +66,10 @@ async function main() {
     await mkdir(dirname(join(payload,name)),{recursive:true});
     await copyFile(join(root,name),join(payload,name));
   }
-  for (const name of assets) await copyFile(join(stage,name),join(payload,name));
+  for (const name of assets) {
+    await copyFile(join(stage,name),join(payload,name));
+    await copyFile(join(stage,name),join(output,name));
+  }
   const manifest = {
     schema:1,maintainer:'turbo998',videoReview:documentsOnly ? 'excluded-pending-full-review' : 'full-visual-and-audio-approved',
     files:await inventory(payload)

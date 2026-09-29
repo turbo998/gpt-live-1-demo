@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import {mkdtemp, mkdir, writeFile, rm, readFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
+import {spawnSync} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
 import {
   scanFile, scanText, sha256, crc32, readZip, compareInventory,
   appFiles, copyApplication, auditApplication, auditArchive
@@ -124,6 +126,27 @@ test('Word review rejects hidden parts, private metadata and unreviewed media',(
   assert.throws(()=>auditDocx(zip(parts.map(([name,text])=>[name,name==='docProps/core.xml'?text.replaceAll('turbo998','synthetic-owner'):text])),[]),/author metadata/);
   assert.throws(()=>auditDocx(zip([...parts,['word/media/image.png','unreviewed']]),[]),/unreviewed media/);
   assert.throws(()=>auditDocx(zip([...parts,['word/_rels/document.xml.rels','<Relationships><Relationship TargetMode=\"External\" Target=\"https://private.example/\"/></Relationships>']]),[]),/external relationship/);
+});
+
+test('documents-only builder emits every checksum asset at the declared relative path', {skip:process.platform!=='win32'}, async t=>{
+  const directory=await mkdtemp(join(tmpdir(),'materials-fixture-'));t.after(()=>rm(directory,{recursive:true,force:true}));
+  const stage=join(directory,'stage'),output=join(directory,'output'),approvalFile=join(directory,'approval.json');
+  await mkdir(stage);
+  const document=zip([
+    ['[Content_Types].xml','<Types/>'],['word/document.xml','<w:document><w:t>Synthetic fixture</w:t></w:document>'],
+    ['docProps/core.xml','<cp:coreProperties><dc:creator>turbo998</dc:creator><cp:lastModifiedBy>turbo998</cp:lastModifiedBy></cp:coreProperties>']
+  ]);
+  const names=['presenter-guide.docx','presenter-guide.zh-CN.docx'];
+  for(const name of names)await writeFile(join(stage,name),document);
+  await writeFile(approvalFile,JSON.stringify({schema:1,assets:Object.fromEntries(names.map(name=>[name,{sha256:sha256(document),review:'public-text-rendered-metadata-approved'}]))}));
+  const result=spawnSync(process.execPath,[fileURLToPath(new URL('../scripts/build-demo-materials.mjs',import.meta.url)),stage,approvalFile,output,'--documents-only'],{encoding:'utf8'});
+  assert.equal(result.status,0,result.stderr);
+  const sums=(await readFile(join(output,'SHA256SUMS.txt'),'utf8')).trim().split('\n');
+  assert.equal(sums.length,3);
+  for(const line of sums){const [hash,name]=line.split('  ');assert.equal(sha256(await readFile(join(output,name))),hash);}
+  const entries=readZip(await readFile(join(output,'gpt-live-demo-documents-only.zip')));
+  assert.ok(!entries.has('GPT-Live-Azure-demo.mp4'));
+  assert.equal(JSON.parse(entries.get('MANIFEST.json')).videoReview,'excluded-pending-full-review');
 });
 
 test('branding preserves provenance and does not advertise a nonexistent fork release',async()=>{
