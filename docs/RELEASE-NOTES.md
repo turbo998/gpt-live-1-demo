@@ -1,18 +1,33 @@
 # Release notes / 发布说明
 
-## Unreleased / 尚未发布
+## v0.4.0 / Azure integration and reviewed portable packages
 
-- Integrate server-only Azure managed identity, single-session policy, bounded duration and remote request limits, while retaining local API-key setup.
-- Add generic Bicep and guarded operator scripts, turbo998 maintainer branding, provenance notices and bilingual demo materials.
-- Separate source, history, reviewed images and final archive checks; require audited assets before upload and create tagged releases as drafts.
-- 整合 Azure 托管身份、单会话、时长与远程请求限制，保留本地 API Key 配置。
-- 增加通用 Bicep、防误操作脚本、turbo998 维护者品牌、来源说明及双语演示资料。
-- 源码、历史、审核图片和最终归档分别检查，上传前审计，标签发布先创建草稿。
+### English
+
+- First release of the turbo998 fork, building on the inherited v0.3.1 project. MIT, upstream attribution in `NOTICE.md`, and the original contributor history are preserved.
+- Azure managed identity keeps tokens on the server. Single-session, duration and remote request limits protect the demo; local API-key setup remains supported. Generic Bicep and guarded operator scripts are included in source.
+- Windows x64 ZIP bundles the verified official Node.js 24.21.0 runtime. Extract the complete package and run `Start.cmd`; no separate Node.js installation is needed. Settings stay in the private application-data directory and survive upgrades.
+- English/Chinese browser setup covers compatible live voice and optional Responses reasoning services, microphone and playback checks, voice and preferences. UI language changes preserve drafts and active local media.
+- Direct clock answers work without the reasoning backend. Calculation, weather and delegated questions use the configured backend; native web search uses that same service, with source links and visible failures. Provider support depends on the configured deployment.
+- Run locally from source with Node.js 22+ using `npm ci` and `npm start`, or use Docker. The Azure ZIP is an application deployment payload, not a provisioned or live-verified Azure service.
+- Release assets: Windows ZIP, Azure ZIP, documents-only ZIP, English/Chinese Word handbooks, and `SHA256SUMS.txt`. Verify the five file hashes before use. No MP4 or video-containing customer ZIP is included.
+- Verification covers Node 22/24 tests, real Docker empty-configuration startup, bilingual browser flows, no-system-Node Windows startup/restart, source/history and final archive checks. No real provider call, cloud deployment or new live recording was performed for this release. Fixtures and historical recordings are not live compatibility evidence.
+
+### 简体中文
+
+- turbo998 fork 的首个发行版，在继承的 v0.3.1 项目基础上整合；保留 MIT、`NOTICE.md` 上游来源和真实贡献历史。
+- Azure 托管身份的令牌仅留在服务端，增加单会话、时长和远程请求限制，保留本地 API Key 配置；源码包含通用 Bicep 与防误操作脚本。
+- Windows x64 ZIP 包含经官方校验的 Node.js 24.21.0，完整解压后运行 `Start.cmd`，无需单独安装 Node.js。设置保存在私有应用数据目录，升级时保留。
+- 中英文浏览器向导支持兼容语音服务、可选 Responses 推理服务、麦克风与播放测试、音色和偏好；切换界面语言保留草稿和活动本地媒体。
+- 独立时间问题无需推理后端；计算、天气与委托问题使用已配置后端，原生搜索复用该服务并显示来源及失败。实际能力取决于部署和权限。
+- 源码本地运行需要 Node.js 22+，执行 `npm ci` 和 `npm start`；也支持 Docker。Azure ZIP 是应用部署内容，不是已开通或经真实部署验证的云服务。
+- 发行资产为 Windows ZIP、Azure ZIP、纯文档 ZIP、中英文 Word 和 `SHA256SUMS.txt`，使用前核对五个文件哈希；不含 MP4 或含视频客户 ZIP。
+- 验证覆盖 Node 22/24、真实 Docker 空配置启动、双语浏览器、无系统 Node 的 Windows 启动与重启、源码/历史及最终归档。本次未调用真实 provider、部署云资源或新录 live 视频；fixture 和历史录像不作为真实兼容证据。
 
 The entries below describe inherited project history, not existing releases of
-this fork. Version selection and media publication require separate approval.
+this fork. Media publication requires its own full review.
 
-以下为继承的项目历史，不表示本 fork 已发布相应版本；版本与媒体公开须另行批准。
+以下为继承的项目历史，不表示本 fork 已发布相应版本；媒体公开仍须完整审核。
 
 ## v0.3.1 / 简化为原生自动搜索
 

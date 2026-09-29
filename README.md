@@ -14,12 +14,13 @@ Project: <https://github.com/turbo998/gpt-live-1-demo> · [Attribution](NOTICE.m
 
 ## Try it as an end user
 
-**Release pending:** this fork has not published a Windows ZIP yet. Start from
-source below, or build a private package using the [release guide](docs/RELEASE.md).
-The inherited package version is `0.3.1`, not an available release of this fork.
-After a reviewed release appears on [GitHub Releases](https://github.com/turbo998/gpt-live-1-demo/releases):
+Get the **v0.4.0 Windows x64 ZIP** from
+[GitHub Releases](https://github.com/turbo998/gpt-live-1-demo/releases/tag/v0.4.0).
+The release also provides an Azure application ZIP, English/Chinese Word guides,
+a documents-only ZIP and `SHA256SUMS.txt`; it does **not** include a video.
+You can also start from source below or follow the [release guide](docs/RELEASE.md).
 
-1. Download the complete ZIP and extract it to a new folder. Keep `Start.cmd`, `runtime`, and `app` together.
+1. Download `gpt-live-1-demo-0.4.0-windows-x64.zip`, verify its hash against `SHA256SUMS.txt`, and extract it to a new folder. Keep `Start.cmd`, `runtime`, and `app` together.
 2. Double-click `Start.cmd`.
 3. Allow microphone access when the browser asks.
 4. In the setup wizard, enter the live voice service URL, deployment/model name, and API key, then run the connection test.

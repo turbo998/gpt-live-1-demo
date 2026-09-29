@@ -2,9 +2,9 @@
 
 English | [简体中文](RELEASE.zh-CN.md)
 
-The turbo998 fork has no published release yet. `0.3.1` is the inherited package
-baseline, not an available fork download. Confirm a version and publication
-authorization before changing versions, pushing tags or uploading assets.
+The current release line is **v0.4.0**, built on the inherited `0.3.1` baseline.
+Confirm a version and publication authorization before changing versions, pushing
+tags or uploading assets. Retain original attribution and the fork relationship.
 
 ## Independent gates
 
@@ -70,7 +70,8 @@ partial directory, arbitrary wildcard ZIPs, private settings, recordings or rece
 ## Windows smoke and evidence boundaries
 
 Extract a complete ZIP in a disposable directory. Remove Node from that process's
-PATH, set a fresh private `APP_DATA_DIR`, and run `Start.cmd`. Check health,
+PATH, clear `NODE_PATH`/`NODE_OPTIONS`, set a fresh private `APP_DATA_DIR` and independent
+`PORT`, and run `.\Start.cmd`. Check health,
 setup, EN/ZH drafts, local synthetic media state, synthetic saved settings and
 restart preservation. Ensure no settings appear under the package.
 
@@ -108,13 +109,30 @@ metadata and final archive contents. Never upload original owner-private files.
 
 CI audits source/history. Windows Actions audits the exact ZIP **before**
 `upload-artifact` and again before Release creation. Only the exact versioned ZIP
-and `SHA256SUMS.txt` are uploaded. A matching approved `v*` tag creates a **draft**,
-not a published Release. Manual dispatch builds an artifact only.
+and its `SHA256SUMS.txt` are uploaded. A matching approved `v*` tag creates a
+**draft**, never a published Release. Manual dispatch builds an artifact only.
 
 After version approval, synchronize package/lockfile, notes and README, rebuild
-and re-audit exact final bytes, then tag the reviewed commit. Verify the tag SHA,
-workflow results, asset names, hashes and download links. Publish the draft only
-after final approval; staged media require their separate clearance. Keep the
+and re-audit exact final bytes, then tag the exact tested main commit after its CI
+passes. Wait for the tagged Windows workflow to finish successfully before changing
+its draft or assets. Download and independently audit its Windows ZIP, including
+the no-system-Node smoke; use that exact file rather than upload a second build with
+the same name. Then add only the reviewed additional assets. Replace the workflow's
+Windows-only checksum file with a checksum file covering the complete set, after
+verifying the old file's contents and removing only that specific draft asset.
+Do not run competing release jobs, use wildcard uploads or overwrite binary assets.
+For v0.4.0 the complete list is:
+
+- `gpt-live-1-demo-0.4.0-windows-x64.zip`
+- `gpt-live-1-demo-0.4.0-azure.zip`
+- `gpt-live-demo-documents-only.zip`
+- `presenter-guide.docx`
+- `presenter-guide.zh-CN.docx`
+- `SHA256SUMS.txt` covering those five files
+
+Verify the tag SHA, workflow results, exact asset set and independently downloaded
+hashes before publishing the draft. This release excludes MP4 and video-containing
+archives. Staged media require their separate clearance. Keep the
 fork relationship, MIT attribution and real contributor history.
 
 Render/Azure templates are deployment starting points, not hosted-service claims.

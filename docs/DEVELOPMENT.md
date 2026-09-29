@@ -2,9 +2,9 @@
 
 ## Project baseline / 项目基线
 
-GPT Live 1 Demo is a small, self-hosted project maintained by turbo998 for developing and validating GPT-Live-1 voice interactions. The inherited package baseline is **0.3.1**, under the MIT license; this fork's release is pending.
+GPT Live 1 Demo is a small, self-hosted project maintained by turbo998 for developing and validating GPT-Live-1 voice interactions. The current package version is **0.4.0**, under the MIT license, building on the inherited **0.3.1** baseline.
 
-这是一个由 turbo998 维护、围绕 GPT-Live-1 实时语音交互进行开发与验证的开源项目，继承的包基线为 **0.3.1**，采用 MIT 许可证；本 fork 的发行版待发布。保留浏览器配置向导、中英文界面和自行部署能力，优先保证实际使用可靠。
+这是一个由 turbo998 维护、围绕 GPT-Live-1 实时语音交互进行开发与验证的开源项目，当前包版本为 **0.4.0**，在继承的 **0.3.1** 基线上开发，采用 MIT 许可证。保留浏览器配置向导、中英文界面和自行部署能力，优先保证实际使用可靠。
 
 ## Start developing / 开始开发
 
