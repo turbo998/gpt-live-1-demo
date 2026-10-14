@@ -1,0 +1,3337 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GPT-Live (gpt-live-1) &amp; Azure Voice Live API · Partner Engineer Technical Training H5</title>
+  <style>
+
+    :root {
+      --azure-blue: #0078d4;
+      --azure-blue-light: #50e6ff;
+      --azure-blue-dark: #004578;
+      --foundry-teal: #39cba3;
+      --bg-deep: #06101e;
+      --bg-card: #0c1c31;
+      --bg-card-elevated: #112642;
+      --bg-surface-light: #f6f4ef;
+      --ink-light: #eef6ff;
+      --ink-muted: #9eb4cc;
+      --ink-dim: #6e86a0;
+      --border-subtle: rgba(148, 189, 232, 0.16);
+      --border-strong: rgba(80, 230, 255, 0.38);
+      --green: #39cba3;
+      --amber: #f5c66b;
+      --red: #ff8d9d;
+      --font-sans: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+      --font-serif: Georgia, "Noto Serif SC", "Source Han Serif SC", serif;
+      --font-mono: "Cascadia Code", "JetBrains Mono", Consolas, ui-monospace, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg-deep);
+      color: var(--ink-light);
+      font-family: var(--font-sans);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(0, 120, 212, 0.24), transparent 36rem),
+        radial-gradient(circle at 92% 6%, rgba(57, 203, 163, 0.16), transparent 34rem),
+        linear-gradient(180deg, #06101e 0%, #09172a 55%, #06101e 100%);
+      color: var(--ink-light);
+    }
+
+    /* Sticky Top Navigation */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 24px;
+      background: rgba(6, 16, 30, 0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .brand-cluster {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .azure-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 10px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #0078d4, #005a9e);
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+
+    .brand-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .brand-sub {
+      font-size: 11.5px;
+      color: var(--ink-muted);
+    }
+
+    .chapter-links {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chapter-link {
+      padding: 6px 11px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      color: var(--ink-muted);
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 150ms ease;
+    }
+
+    .chapter-link:hover, .chapter-link.active {
+      color: #ffffff;
+      background: rgba(0, 120, 212, 0.22);
+      border-color: rgba(80, 230, 255, 0.35);
+    }
+
+    .action-cluster {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 13px;
+      border-radius: 9px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(17, 38, 66, 0.8);
+      color: var(--ink-light);
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 150ms ease;
+    }
+
+    .btn:hover {
+      border-color: var(--border-strong);
+      background: rgba(0, 120, 212, 0.25);
+    }
+
+    .btn.primary {
+      background: var(--foundry-teal);
+      color: #05231c;
+      border-color: transparent;
+      font-weight: 700;
+    }
+
+    .btn.primary:hover {
+      background: #5ce0bc;
+    }
+
+    /* Slide Mode Bar */
+    .slide-hud {
+      display: none;
+      position: fixed;
+      bottom: 18px;
+      right: 24px;
+      z-index: 120;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(6, 16, 30, 0.92);
+      border: 1px solid var(--border-strong);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    body[data-mode="slide"] .slide-hud {
+      display: inline-flex;
+    }
+
+    body[data-mode="slide"] .module-section {
+      display: none;
+      min-height: calc(100vh - 80px);
+    }
+
+    body[data-mode="slide"] .module-section.active-slide {
+      display: block;
+    }
+
+    .container {
+      width: min(1320px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 28px 0 72px;
+    }
+
+    .module-section {
+      margin-bottom: 42px;
+      padding: 32px;
+      border-radius: 24px;
+      border: 1px solid var(--border-subtle);
+      background: linear-gradient(160deg, rgba(14, 31, 54, 0.92), rgba(8, 20, 36, 0.88));
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+    }
+
+    .module-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .module-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--azure-blue-light);
+    }
+
+    .module-title {
+      margin: 8px 0 6px;
+      font-size: clamp(1.65rem, 3vw, 2.35rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+    }
+
+    .module-desc {
+      margin: 0;
+      max-width: 880px;
+      color: var(--ink-muted);
+      font-size: 14.5px;
+      line-height: 1.6;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--ink-muted);
+    }
+
+    .tag.blue { color: #8cc8ff; border-color: rgba(0, 120, 212, 0.45); background: rgba(0, 120, 212, 0.16); }
+    .tag.teal { color: var(--foundry-teal); border-color: rgba(57, 203, 163, 0.4); background: rgba(57, 203, 163, 0.12); }
+    .tag.amber { color: var(--amber); border-color: rgba(245, 198, 107, 0.4); background: rgba(245, 198, 107, 0.12); }
+    .tag.red { color: var(--red); border-color: rgba(255, 141, 157, 0.4); background: rgba(255, 141, 157, 0.12); }
+
+    /* Grids & Cards */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .info-card {
+      padding: 18px 20px;
+      border-radius: 16px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(17, 38, 66, 0.58);
+    }
+
+    .info-card h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .info-card p, .info-card ul {
+      margin: 0;
+      color: var(--ink-muted);
+      font-size: 13.2px;
+      line-height: 1.6;
+    }
+
+    .info-card ul {
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .kpi-tile {
+      padding: 16px 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(80, 230, 255, 0.22);
+      background: linear-gradient(145deg, rgba(0, 120, 212, 0.16), rgba(12, 28, 49, 0.8));
+    }
+
+    .kpi-num {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--foundry-teal);
+      line-height: 1.1;
+    }
+
+    .kpi-title {
+      margin-top: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .kpi-sub {
+      margin-top: 4px;
+      font-size: 11.5px;
+      color: var(--ink-muted);
+      line-height: 1.45;
+    }
+
+    /* Interactive 3-Diagram Architecture Deep-Dive */
+    .arch-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .arch-tab-btn {
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(12, 28, 49, 0.75);
+      color: var(--ink-muted);
+      cursor: pointer;
+      transition: all 160ms ease;
+    }
+
+    .arch-tab-btn:hover {
+      border-color: rgba(80, 230, 255, 0.4);
+      color: #ffffff;
+    }
+
+    .arch-tab-btn.active {
+      background: linear-gradient(135deg, rgba(0, 120, 212, 0.32), rgba(57, 203, 163, 0.16));
+      border-color: var(--foundry-teal);
+      color: #ffffff;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+    }
+
+    .arch-tab-step {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--foundry-teal);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .arch-tab-name {
+      font-size: 15px;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .arch-tab-summary {
+      font-size: 12px;
+      color: var(--ink-muted);
+      line-height: 1.4;
+    }
+
+    .arch-pane {
+      display: none;
+    }
+
+    .arch-pane.active {
+      display: block;
+    }
+
+    .arch-showcase {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 20px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .arch-figure {
+      margin: 0;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--border-subtle);
+      background: #071222;
+      text-align: center;
+    }
+
+    .arch-figure img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      cursor: zoom-in;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #ffffff;
+    }
+
+    .arch-figcaption {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--ink-muted);
+      text-align: left;
+    }
+
+    .value-4d {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .value-box {
+      padding: 14px 16px;
+      border-radius: 13px;
+      border-left: 4px solid var(--azure-blue);
+      background: rgba(17, 38, 66, 0.68);
+    }
+
+    .value-box.pain { border-left-color: var(--amber); }
+    .value-box.mech { border-left-color: var(--azure-blue-light); }
+    .value-box.biz { border-left-color: var(--foundry-teal); }
+    .value-box.redline { border-left-color: var(--red); background: rgba(68, 20, 34, 0.38); }
+
+    .value-box h4 {
+      margin: 0 0 6px;
+      font-size: 13.5px;
+      color: #ffffff;
+    }
+
+    .value-box p, .value-box ul {
+      margin: 0;
+      font-size: 12.6px;
+      line-height: 1.56;
+      color: var(--ink-muted);
+    }
+
+    .value-box ul {
+      padding-left: 17px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    /* Data Tables */
+    .data-table-wrap {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(7, 17, 30, 0.65);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+
+    .data-table th, .data-table td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(148, 189, 232, 0.12);
+    }
+
+    .data-table th {
+      background: rgba(17, 38, 66, 0.85);
+      color: #9ec8f5;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .data-table tr.highlight-row td {
+      background: rgba(57, 203, 163, 0.12);
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    /* Embedded 7-Card Viewer */
+    .embedded-report-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(17, 38, 66, 0.72);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .homophone-wall {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .homo-chip {
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(7, 17, 30, 0.68);
+      border: 1px solid var(--border-subtle);
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .homo-bad {
+      color: var(--red);
+      text-decoration: line-through;
+      font-size: 11px;
+    }
+
+    .homo-good {
+      color: var(--foundry-teal);
+      font-weight: 700;
+    }
+
+    /* Live Runbook Timeline */
+    .script-timeline {
+      display: grid;
+      gap: 12px;
+    }
+
+    .script-step {
+      display: grid;
+      grid-template-columns: 130px 1fr auto;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 18px;
+      border-radius: 14px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(17, 38, 66, 0.55);
+    }
+
+    .script-time {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--foundry-teal);
+    }
+
+    .script-quote {
+      margin-top: 5px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: rgba(6, 16, 30, 0.75);
+      border-left: 3px solid var(--azure-blue-light);
+      color: #ffffff;
+      font-size: 13px;
+    }
+
+    /* FinOps Calculator */
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 20px;
+    }
+
+    .calc-control {
+      margin-bottom: 14px;
+    }
+
+    .calc-control label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #ffffff;
+    }
+
+    .calc-control input[type="range"], .calc-control select {
+      width: 100%;
+      accent-color: var(--foundry-teal);
+    }
+
+    .calc-control select {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background: #0b1c31;
+      color: #ffffff;
+      font: inherit;
+      font-size: 13px;
+    }
+
+    .calc-result-box {
+      padding: 20px;
+      border-radius: 16px;
+      background: linear-gradient(150deg, rgba(0, 120, 212, 0.22), rgba(57, 203, 163, 0.14));
+      border: 1px solid var(--foundry-teal);
+    }
+
+    .calc-total {
+      font-family: var(--font-serif);
+      font-size: 38px;
+      font-weight: 700;
+      color: var(--foundry-teal);
+      margin: 6px 0 14px;
+    }
+
+    .calc-line {
+      display: flex;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+      font-size: 13px;
+    }
+
+    /* Lightbox Modal */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(3, 9, 18, 0.92);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .lightbox img {
+      max-width: 95vw;
+      max-height: 84vh;
+      border-radius: 12px;
+      background: #ffffff;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7);
+    }
+
+    .lightbox-bar {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: #ffffff;
+      font-size: 14px;
+    }
+
+    @media (max-width: 980px) {
+      .grid-3, .grid-2, .grid-4, .kpi-strip, .arch-tabs, .arch-showcase, .calc-grid, .homophone-wall {
+        grid-template-columns: 1fr;
+      }
+      .script-step {
+        grid-template-columns: 1fr;
+      }
+      .module-section {
+        padding: 20px;
+      }
+    }
+  
+
+    .lang-switch {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(12, 28, 49, 0.9);
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      padding: 2px;
+      gap: 2px;
+    }
+    .lang-btn {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: var(--ink-muted);
+      font-family: var(--font-sans);
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 140ms ease;
+    }
+    .lang-btn:hover {
+      color: #ffffff;
+    }
+    .lang-btn.active {
+      background: var(--azure-blue);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 120, 212, 0.4);
+    }
+
+  </style>
+</head>
+<body data-mode="scroll" data-lang="zh-CN">
+
+  <!-- Top Navigation -->
+  <nav class="top-nav" aria-label="Training Module Navigation">
+    <div class="brand-cluster">
+      <span class="azure-mark">MICROSOFT FOUNDRY × AZURE SPEECH</span>
+      <div>
+        <div class="brand-title" id="navBrandTitle">GPT-Live (`gpt-live-1`) &amp; Voice Live API 合作伙伴工程师技术培训</div>
+        <div class="brand-sub" id="navBrandSub">FY27 产品更新 · 三大架构图价值深潜 · 7-Card 权威评测基准 · 6 分钟现场实操手册</div>
+      </div>
+    </div>
+
+    <div class="chapter-links" id="navChapterLinks">
+      <a class="chapter-link active" href="#mod-exec" data-mod-base="mod-exec">01 定位与演进</a>
+      <a class="chapter-link" href="#mod-arch" data-mod-base="mod-arch">02 三大架构图深潜</a>
+      <a class="chapter-link" href="#mod-bench" data-mod-base="mod-bench">03 引用测试报告</a>
+      <a class="chapter-link" href="#mod-playbooks" data-mod-base="mod-playbooks">04 行业样板与容器规范</a>
+      <a class="chapter-link" href="#mod-runbook" data-mod-base="mod-runbook">05 现场 Demo 剧本与 FAQ</a>
+      <a class="chapter-link" href="#mod-finops" data-mod-base="mod-finops">06 成本测算与资源</a>
+    </div>
+
+    <div class="action-cluster">
+      <div class="lang-switch" role="group" aria-label="Language Switcher">
+        <button type="button" class="lang-btn active" data-lang-btn="zh-CN">简体</button>
+        <button type="button" class="lang-btn" data-lang-btn="zh-TW">繁體</button>
+        <button type="button" class="lang-btn" data-lang-btn="en">EN</button>
+      </div>
+      <button class="btn" id="toggleSlideModeBtn" type="button">🖥️ 投屏幻灯片模式</button>
+      <a class="btn" id="navBenchBtn" href="benchmark-cards.html?lang=zh-CN">📊 7-Card 4:5 评测卡</a>
+      <a class="btn primary" id="navDemoBtn" href="/?lang=zh-CN">🎙️ 启动增强版语音 Demo</a>
+    </div>
+  </nav>
+
+  <!-- Slide HUD (visible in Slide Mode) -->
+  <div class="slide-hud" id="slideHud">
+    <button class="btn" id="prevSlideBtn" type="button">◀ 上一节</button>
+    <span id="slideCounter" style="font-family:var(--font-mono);font-size:12px;padding:0 8px;">1 / 6</span>
+    <button class="btn" id="nextSlideBtn" type="button">下一节 ▶</button>
+    <button class="btn" id="exitSlideBtn" type="button">退出幻灯片</button>
+  </div>
+
+  <div class="container" id="lang-container-zh-CN" data-lang-container="zh-CN">
+<!-- MODULE 01: EXECUTIVE SUMMARY -->
+    <section class="module-section active-slide" id="mod-exec" data-slide-index="0">
+      <header class="module-header">
+        <div>
+          <span class="module-kicker">MODULE 01 · EXECUTIVE SUMMARY &amp; PARADIGM SHIFT</span>
+          <h1 class="module-title">从“串行语音机器人”到“全双工自然交谈 + 旁路受控执行”</h1>
+          <p class="module-desc">为什么传统级联语音机器人在真实门店、座舱和客服热线中屡屡受挫？本节帮助合作伙伴工程师用三句话建立对 <strong>Azure Voice Live API</strong> 与 <strong>GPT-Live-1</strong> 的准确架构认知。</p>
+        </div>
+        <div class="badge-row">
+          <span class="tag teal">全双工边说边听</span>
+          <span class="tag blue">137 Locales · 30+ Regions (含中国区)</span>
+          <span class="tag amber">快慢双脑解耦</span>
+        </div>
+      </header>
+
+      <div class="grid-3">
+        <article class="info-card">
+          <h3><span>1. 传统语音机器人的三大工程顽疾</span><span class="tag red">Legacy Pain</span></h3>
+          <ul>
+            <li><strong>机械抢话与误打断</strong>：传统能量阈值 VAD 把用户的自然附和（“嗯哼、对”）、思考停顿、咳嗽或旁人说话全部当作打断指令，导致对话支离破碎。</li>
+            <li><strong>级联交接损耗与副语言丢失</strong>：`STT ➔ LLM ➔ TTS` 三段串行不仅累加延迟，还在转文字瞬间丢失了用户的情绪、迟疑与语调重音。</li>
+            <li><strong>模型幻觉与业务失控</strong>：若让端到端语音大模型直接口头承诺库存、算账或改单，极易出现算错价格或口头“假取消”。</li>
+          </ul>
+        </article>
+
+        <article class="info-card">
+          <h3><span>2. Azure Voice Live API 的核心定义</span><span class="tag blue">Realtime Interface</span></h3>
+          <ul>
+            <li><strong>它是什么</strong>：一个高性能、生产级的 <strong>Realtime LLM 接口层</strong>，让云上任意大模型（Foundry 1000+ 模型与自建 BYOM）即插即用获得“能听会说”的实时语音交互与 Agent 编排能力。</li>
+            <li><strong>它不是什么</strong>：它<strong>不是</strong>单一 LLM、<strong>不是</strong>封闭的成品对话机器人、<strong>不是</strong>呼叫中心（CCaaS）系统，不会与合作伙伴的行业应用争抢业务层。</li>
+            <li><strong>四档可演进管线</strong>：在同一套 API 契约下支持 <strong>全双工 (`GPT-Live-1`)、语音到语音 (`GPT Realtime`)、混合式 (`Hybrid`)、级联式 (`Cascaded`)</strong> 灵活选型。</li>
+          </ul>
+        </article>
+
+        <article class="info-card">
+          <h3><span>3. GPT-Live 参考架构的“快慢双脑”哲学</span><span class="tag teal">Reference Pattern</span></h3>
+          <ul>
+            <li><strong>快脑（WebRTC 媒体直连 `gpt-live-1`）</strong>：负责毫秒级全双工倾听、自然口语应答、附和承接与中途打断刹停。</li>
+            <li><strong>慢脑（旁路 WSS + `gpt-4.1-mini` Responses）</strong>：负责确定性时间短路、安全算式、Open-Meteo 天气消歧、饮品菜单同音词检索与 Bing 联网溯源。</li>
+            <li><strong>受控交接（`SpeechDelivery` 状态机）</strong>：后台结果按 220 字分片注入 `commentary`，待用户安静后触发 `instructions` 口播，超时自动降级文字重播。</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="kpi-strip">
+        <div class="kpi-tile">
+          <div class="kpi-num">20 / 21 (95%)</div>
+          <div class="kpi-title">GPT-Live-1 真实抗扰通过率</div>
+          <div class="kpi-sub">8 项干扰探针 × 3 轮实测对比 GPT-Realtime-2 的 11/21 (52%)，消除附和/思考/咳嗽/背景音四大误触发（Slide 6）</div>
+        </div>
+        <div class="kpi-tile">
+          <div class="kpi-num">P50 590ms</div>
+          <div class="kpi-title">Paytm 生产环境实测延迟</div>
+          <div class="kpi-sub">混合式架构支撑印度 Paytm &gt;20 万通/天、1200+ 峰值并发，P90 仅 840ms（Slide 21）</div>
+        </div>
+        <div class="kpi-tile">
+          <div class="kpi-num">4.34 MOS / #1</div>
+          <div class="kpi-title">DragonHDFlash &amp; Open ASR 榜首</div>
+          <div class="kpi-sub">呼叫中心多轮盲测 4.34 超越豆包与真人录音 (4.08)；Azure LLM Speech 多语言 WER 排名全球第 1（Slide 12/17）</div>
+        </div>
+        <div class="kpi-tile">
+          <div class="kpi-num">360x · $0.10/h</div>
+          <div class="kpi-title">MAI-Transcribe-2 极致性价比</div>
+          <div class="kpi-sub">新一代多模态语音转写吞吐达 360 倍实时速率，目录价低至 $0.10/小时；GPT-Live-1 为 $0.05/分钟（Slide 10 &amp; Retail API）</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 02: 3-DIAGRAM ARCHITECTURE VALUE DEEP-DIVE -->
+    <section class="module-section" id="mod-arch" data-slide-index="1">
+      <header class="module-header">
+        <div>
+          <span class="module-kicker">MODULE 02 · COMPLETE ARCHITECTURE VALUE DEEP-DIVE (核心重头戏)</span>
+          <h2 class="module-title">三张核心架构图的工程价值、协议机制与选型红线</h2>
+          <p class="module-desc">点击下方三个架构视图标签，逐层拆解从<strong>「产品全景定位」➔「四层语音管线与统一任务委派」➔「GPT-Live Azure 三平面生产落地」</strong>的完整工程逻辑。点击任意架构图可全屏高清放大。</p>
+        </div>
+        <div class="badge-row">
+          <span class="tag blue">点击图片可全屏放大</span>
+          <span class="tag teal">痛点 ➔ 机制 ➔ 价值 ➔ 红线</span>
+        </div>
+      </header>
+
+      <!-- 3 Architecture Tabs -->
+      <div class="arch-tabs" role="tablist">
+        <button class="arch-tab-btn active" type="button" data-arch-tab="arch1">
+          <span class="arch-tab-step">DIAGRAM 01 · 全景定位与接入层</span>
+          <span class="arch-tab-name">Azure Voice Live API 一页全景图</span>
+          <span class="arch-tab-summary">ONE MODULE · THREE PROTOCOLS · TWO MODEL PATHS：全渠道接入、内置音频 DSP、Agent Harness 与双模型路径</span>
+        </button>
+        <button class="arch-tab-btn" type="button" data-arch-tab="arch2">
+          <span class="arch-tab-step">DIAGRAM 02 · 四层管线与任务委派</span>
+          <span class="arch-tab-name">Voice Live 四档语音管线 + 统一任务委派</span>
+          <span class="arch-tab-summary">全双工 GPT-Live-1 / 语音到语音 / 混合式 / 级联式 四档对比，以及右侧快慢双脑解耦价值</span>
+        </button>
+        <button class="arch-tab-btn" type="button" data-arch-tab="arch3">
+          <span class="arch-tab-step">DIAGRAM 03 · 生产级 Demo 落地架构</span>
+          <span class="arch-tab-name">GPT-Live 三平面参考架构 (West US 2 + East US 2)</span>
+          <span class="arch-tab-summary">Managed Identity 零密钥握手、浏览器 WebRTC 媒体直连、Node.js 旁路 WSS 挂载与 SpeechDelivery 状态机</span>
+        </button>
+      </div>
+
+      <!-- PANE 1: Voice Live One Pager -->
+      <div class="arch-pane active" id="arch1">
+        <div class="arch-showcase">
+          <figure class="arch-figure">
+            <img src="assets/arch-1-voice-live-overview.png" alt="Azure Voice Live API 全景定位一页图" data-zoom-src="assets/arch-1-voice-live-overview.png" data-zoom-caption="架构图一：Azure Voice Live API 全景定位（One Module · Three Protocols · Two Model Paths）">
+            <figcaption class="arch-figcaption">
+              <span><strong>图 1：Azure Voice Live API 全景定位图</strong>（137 种语言 · &lt;1s 延迟 · 1000+ LLMs · 3 种协议 · 2 条模型路径）</span>
+              <button class="btn" type="button" data-zoom-btn="assets/arch-1-voice-live-overview.png">🔍 全屏查看原图</button>
+            </figcaption>
+          </figure>
+
+          <div class="value-4d">
+            <div class="value-box pain">
+              <h4>① 解决什么合作伙伴工程痛点？</h4>
+              <p>企业客户往往同时拥有网页、App、SIP 呼叫中心（Genesys/Twilio/ACS）与车载/IoT 硬件。过去每增加一种终端或更换底层大模型，合作伙伴都要重写一套音频流编解码、回声消除、断句 VAD 和工具调用胶水代码。</p>
+            </div>
+            <div class="value-box mech">
+              <h4>② 架构图核心机制拆解（自左向右）</h4>
+              <ul>
+                <li><strong>全渠道与三协议（`WebSocket / WebRTC / SIP` + 4 语言 SDK）</strong>：浏览器/App 走 WebRTC 享低延迟与端侧 AEC；服务端走 WebSocket；传统电话网通过与 M365 同源的 <strong>IC3 Media Gateway</strong> 原生对接 SIP/RTP。</li>
+                <li><strong>实时音频 DSP 层</strong>：云端内置<strong>全双工语义轮次检测（Semantic VAD / EoU）</strong>、播放参考回声消除与环境降噪。</li>
+                <li><strong>`VOICE LIVE AGENT` 运行时 Harness</strong>：原生提供 `Sub-agent`、`Function Calling`、`MCP 工具`、`Foundry Agent`、`主动消息` 与 `上下文静默管理`。</li>
+                <li><strong>两条模型路径</strong>：既可直连 <strong>Foundry 模型目录（1000+ 开源与商业模型）</strong>，也可通过 <strong>BYOM</strong> 接入客户自建/微调模型。</li>
+              </ul>
+            </div>
+            <div class="value-box biz">
+              <h4>③ 面向客户的商业与交付价值</h4>
+              <p><strong>一次集成，全球复用</strong>：覆盖 <strong>137 种地区语言</strong>与全球 30+ 区域（<strong>含中国大陆世纪互联 China East 2 / North 2 / North 3</strong>），提供照片级/视频级 Avatar 数字人同步驱动，将多渠道语音 Agent 交付周期从数月缩短至数周。</p>
+            </div>
+            <div class="value-box redline">
+              <h4>④ 售前与架构师必讲定位边界</h4>
+              <p>向客户强调：Voice Live API <strong>不是单一 LLM，也不是用来替代客户现有 CRM/呼叫中心平台的封闭黑盒</strong>，而是赋能任意业务系统“听得懂、说得自然、调得动工具”的标准实时语音底座。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANE 2: 4-Tier Pipeline + Unified Task Delegation -->
+      <div class="arch-pane" id="arch2">
+        <div class="arch-showcase">
+          <figure class="arch-figure">
+            <img src="assets/arch-2-voice-live-4tier-pipeline.png" alt="Azure Voice Live API 四层语音管线与统一任务委派架构" data-zoom-src="assets/arch-2-voice-live-4tier-pipeline.png" data-zoom-caption="架构图二：Azure Voice Live API 四层语音管线（全双工 / S2S / 混合式 / 级联式）+ 右侧统一任务委派平面">
+            <figcaption class="arch-figcaption">
+              <span><strong>图 2：Azure Voice Live 四档语音管线与右侧统一任务委派架构</strong>（Slide 7 核心架构图）</span>
+              <button class="btn" type="button" data-zoom-btn="assets/arch-2-voice-live-4tier-pipeline.png">🔍 全屏查看原图</button>
+            </figcaption>
+          </figure>
+
+          <div class="value-4d">
+            <div class="value-box pain">
+              <h4>① 解决什么架构选型痛点？</h4>
+              <p>不同业务对“拟人交互度、品牌专属音色、垂直领域生僻词准确率、单分钟成本”的权重截然不同。单一端到端模型无法同时满足“0.1美元/小时超低成本”和“企业定制品牌音色”，单一级联架构又无法实现“边说边听自然附和”。</p>
+            </div>
+            <div class="value-box mech">
+              <h4>② 左侧四层语音管线（Four-Tier Pipeline）如何选型？</h4>
+              <ul>
+                <li><strong>① 全双工 (`GPT-Live-1`)</strong>：单模型同时对输入与输出音频联合推理（边说边听），抗干扰探针通过率 <strong>95% (20/21)</strong>，适合旗舰导购、座舱免唤醒与高拟人陪练。</li>
+                <li><strong>② 语音到语音 (`GPT Realtime · Azure Realtime`)</strong>：原生多模态端到端语音交互。</li>
+                <li><strong>③ 混合式 (`Semantic VAD·EoU + GPT Realtime 2.1/1.5 + Azure Speech TTS`)</strong>：用多模态模型直接听懂语音，用 <strong>DragonHDFlash / Custom Voice</strong> 发出品牌定制声音（印度 Paytm 20万通/天生产验证，P50 590ms）。</li>
+                <li><strong>④ 级联式 (`Semantic VAD·EoU + Azure STT + Foundry/BYO LLM + Azure TTS`)</strong>：最高术语可控性（Custom Speech 饮品同音词 12/12 修正）+ 最低 STT 成本（`MAI-Transcribe-2` $0.10/h）+ 任意大模型（GPT/Claude/Gemini/OSS）。</li>
+              </ul>
+            </div>
+            <div class="value-box biz">
+              <h4>③ 右侧「统一任务委派（Task Delegation）」的核心架构价值</h4>
+              <p>无论左侧采用哪一档语音管线，右侧均通过统一的 <strong>Task Delegation</strong> 将深度推理、RAG、搜索与工具调用委派给 <strong>Foundry 智能体、GPT/Claude/Gemini、OSS 或客户自有后端</strong>——真正实现<strong>“快脑管实时语音交互，慢脑管严谨业务逻辑”</strong>。</p>
+            </div>
+            <div class="value-box redline">
+              <h4>④ 合作伙伴架构设计黄金法则</h4>
+              <p>不要在客户立项第一天争论“端到端还是级联”：基于 Voice Live API 统一契约，<strong>高端顾问场景用 Tier ① 全双工，高并发客服热线用 Tier ③ 混合式，强专有名词/成本敏感场景用 Tier ④ 级联式</strong>，后台工具层代码 100% 复用。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANE 3: GPT-Live Three-Plane Reference Demo Architecture -->
+      <div class="arch-pane" id="arch3">
+        <div class="arch-showcase">
+          <figure class="arch-figure">
+            <img src="assets/arch-3-gpt-live-three-plane.png" alt="GPT-Live 演示架构：三平面职责分离" data-zoom-src="assets/arch-3-gpt-live-three-plane.png" data-zoom-caption="架构图三：GPT-Live 生产级参考演示架构（West US 2 Linux App Service B1 + East US 2 Foundry gpt-live-1 & gpt-4.1-mini）">
+            <figcaption class="arch-figcaption">
+              <span><strong>图 3：GPT-Live 三平面参考架构图</strong>（浏览器 WebRTC 媒体直连 + 托管身份握手 + Node.js 旁路 WSS 委派）</span>
+              <button class="btn" type="button" data-zoom-btn="assets/arch-3-gpt-live-three-plane.png">🔍 全屏查看原图</button>
+            </figcaption>
+          </figure>
+
+          <div class="value-4d">
+            <div class="value-box pain">
+              <h4>① 为什么初版 Demo 要这样设计？（解决三大落地难题）</h4>
+              <p>1) `gpt-live-1` 不签发浏览器临时客户端密钥，如何保证前端零密钥泄露？<br>
+                 2) 如果音频流经过应用服务器转发，Node.js 带宽与抖动如何承受？<br>
+                 3) 后台工具查出长答案后，如何安全交还给正在说话或倾听的语音模型？</p>
+            </div>
+            <div class="value-box mech">
+              <h4>② 三平面职责分离机制（Three-Plane Separation）</h4>
+              <ul>
+                <li><strong>平面 1 · 会话握手与托管身份面（HTTPS + SDP）</strong>：浏览器向受保护的 Linux App Service B1 (`West US 2`) 提交 SDP；后端通过 <strong>Azure Managed Identity (`Cognitive Services OpenAI User`)</strong> 动态获取 Entra 令牌创建会话，<strong>云端不存模型 API Key，浏览器端零凭据暴露</strong>。</li>
+                <li><strong>平面 2 · 实时媒体直连面（Browser ⇄ WebRTC ⇄ `gpt-live-1`）</strong>：SDP 建连后，浏览器麦克风/扬声器与 `East US 2` 的 `gpt-live-1` 建立点对点 WebRTC 音频与 `oai-events` 数据通道，<strong>音频流不绕行应用服务器</strong>。</li>
+                <li><strong>平面 3 · 旁路控制与受控委派面（WSS `/live/sessions/{id}/attach`）</strong>：Node.js 挂载旁路 WebSocket，监听 `session.delegation.created`；独立时钟走 `fastTimeAnswer`（0 Token），天气/算式/菜单/Bing 联网走 `gpt-4.1-mini` (`/responses`, `store:false`)，再由 `SpeechDelivery` 分片注入并择机 Nudge 口播。</li>
+              </ul>
+            </div>
+            <div class="value-box biz">
+              <h4>③ 跨区域拓扑说明（West US 2 应用 + East US 2 模型）</h4>
+              <p>由于音频流在浏览器与 `East US 2` 模型间直连，App Service 仅在建连与旁路工具触发时参与；因此<strong>缩短 Web 应用与用户的距离只加速页面加载与握手，不改变浏览器到语音模型区域的物理网络延迟</strong>。</p>
+            </div>
+            <div class="value-box redline">
+              <h4>④ 必须向伙伴工程师讲透的四大工程红线</h4>
+              <ul>
+                <li><strong>语音打断 ≠ 业务事务回滚</strong>：Barge-in 仅停止语音播放，不会撤销已发往后端的请求。</li>
+                <li><strong>口头回答 ≠ 权威业务状态</strong>：必须以“查询来源与工具记录”面板中的结构化结果为准。</li>
+                <li><strong>GlobalStandard ≠ 区域数据驻留承诺</strong>：有严格驻留要求需评估区域级或合规部署。</li>
+                <li><strong>停止 Web App ≠ 停止 App Service Plan 计费</strong>：B1 Plan ($0.017/h) 需缩容或清理才停计费。</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4-Tier Architecture Comparison Matrix -->
+      <div class="data-table-wrap" style="margin-top:16px;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>管线层级 (Pipeline Tier)</th>
+              <th>核心组件组合</th>
+              <th>端到端延迟与抗扰表现</th>
+              <th>音色与领域词表可控性</th>
+              <th>目录成本基准 (USD)</th>
+              <th>首选适用场景</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="highlight-row">
+              <td><strong>① 全双工 (Full-Duplex)</strong></td>
+              <td>Foundry `GPT-Live-1` + 旁路任务委派</td>
+              <td>边说边听 · 8 探针通过率 <strong>95% (20/21)</strong></td>
+              <td>13 种内置音色 (Marin 等) · 旁路工具纠错</td>
+              <td><strong>$3.00 / 小时 ($0.05/min)</strong> + 旁路推理 Token</td>
+              <td>旗舰门店顾问、智能座舱免唤醒、高拟人陪练</td>
+            </tr>
+            <tr>
+              <td><strong>② 语音到语音 (S2S)</strong></td>
+              <td>`GPT Realtime` / `Azure Realtime`</td>
+              <td>亚秒级端到端 · 8 探针通过率 52% (11/21)</td>
+              <td>内置多模态音色</td>
+              <td>按 Realtime 音频输入/输出 Token 计费</td>
+              <td>通用低延迟语音对话与多模态情绪感知</td>
+            </tr>
+            <tr>
+              <td><strong>③ 混合式 (Hybrid)</strong></td>
+              <td>`Semantic VAD·EoU` + `GPT Realtime` + `Azure TTS (DragonHDFlash / Custom)`</td>
+              <td>Paytm 生产实测 <strong>P50 590ms / P90 840ms</strong></td>
+              <td>支持 <strong>700+ 音色 / HD Flash (MOS 4.34) / 品牌定制音色</strong></td>
+              <td>Realtime 输入 + TTS <strong>$15–$22 / 1M 字符</strong></td>
+              <td>高并发品牌客服热线（如 Paytm 20万通/天）</td>
+            </tr>
+            <tr>
+              <td><strong>④ 级联式 (Cascaded)</strong></td>
+              <td>`Semantic VAD·EoU` + `Azure STT (Custom / MAI-2)` + `任意 LLM` + `Azure TTS`</td>
+              <td>依赖分段策略 · STT 吞吐高达 <strong>360x RTFx</strong></td>
+              <td>最高可控：<strong>Custom Speech 同音词表 (CER 降 &gt;10%)</strong> + BYOM</td>
+              <td>STT 低至 <strong>$0.10/小时 (`MAI-2`)</strong> + 文本 Token + TTS</td>
+              <td>新茶饮/医疗/工业强专有名词、大批量低成本语音Agent</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- MODULE 03: CITED BENCHMARK REPORTS -->
+    <section class="module-section" id="mod-bench" data-slide-index="2">
+      <header class="module-header">
+        <div>
+          <span class="module-kicker">MODULE 03 · CITED TEST &amp; BENCHMARK REPORTS (权威测试报告引用)</span>
+          <h2 class="module-title">四组核心评测报告：全双工抗扰、Open ASR 榜首、Custom Speech 同音词与 TTS 盲测</h2>
+          <p class="module-desc">所有引用数据严格区分 <strong>REPORTED（源自 FY27 Product Updates 官方评测页码）</strong> 与 <strong>MEASURED（源自本仓库自动化测试与 Retail API 实测）</strong>，已同步封装为 7-Card 4:5 视觉评测卡片。</p>
+        </div>
+        <div class="badge-row">
+          <a class="btn primary" href="benchmark-cards.html">🃏 打开独立 7-Card 4:5 评测报告页</a>
+        </div>
+      </header>
+
+      
+      <!-- Benchmark Harness Engineering 7-Card 4:5 Quick Preview Strip -->
+      <div class="info-card" style="margin-bottom:16px;border-color:rgba(99,102,241,0.45);background:linear-gradient(145deg, rgba(30,41,59,0.92), rgba(15,23,42,0.95));">
+        <h3>
+          <span>📐 7-Card 4:5 视觉评测卡片速览（对齐 <code>turbo998/benchmark-harness-engineering</code> 规范）</span>
+          <span class="tag blue">4:5 Carousel Deck · 7 Cards</span>
+        </h3>
+        <p style="margin-bottom:12px;">测试报告已严格按照 <a href="https://github.com/turbo998/benchmark-harness-engineering/blob/main/docs/research/visual-report-card-format.md" target="_blank" rel="noopener noreferrer" style="color:var(--azure-blue-light);"><code>visual-report-card-format.md</code></a> 与 <a href="https://github.com/turbo998/benchmark-harness-engineering/blob/main/src/benchmark_harness/cards.py" target="_blank" rel="noopener noreferrer" style="color:var(--azure-blue-light);"><code>src/benchmark_harness/cards.py</code></a> 渲染规范重构为 7 页 4:5 视觉卡片（冷灰高对比底色 <code>#f8fafc</code>、顶部 10px 靛蓝渐变条、结论先行标题、<code>Auto / Confirm / Human</code> 置信度动作胶囊、底部内嵌完整 JSON 数据集）：</p>
+        <div class="grid-4" style="grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;">
+          <a href="benchmark-cards.html?lang=zh-CN#card-1" data-bench-link="#card-1" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#818cf8;font-weight:700;">1 / 7 · OVERVIEW (HANDS-ON)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">把 GPT-Live-1 跑在真实语音基准里</div>
+            <div style="font-size:11px;color:var(--ink-muted);">工作台总览：20/21 (95%) vs 52% · 三种探针形态与动作带</div>
+          </a>
+          <a href="benchmark-cards.html?lang=zh-CN#card-2" data-bench-link="#card-2" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#34d399;font-weight:700;">2 / 7 · DEEP_DIVE (CASE BREAKDOWN)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">同一通语音会话，三种截然不同的置信度形态</div>
+            <div style="font-size:11px;color:var(--ink-muted);">NOUL 原生抗扰 (98%) · CHOICE 同音词归一 (92%) · SCORE 长静音 (67%)</div>
+          </a>
+          <a href="benchmark-cards.html?lang=zh-CN#card-3" data-bench-link="#card-3" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#60a5fa;font-weight:700;">3 / 7 · SCORECARD (8 PROBES)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">8 个全双工探针 × 3 轮：23/24 命中</div>
+            <div style="font-size:11px;color:var(--ink-muted);">附和/停顿/背景人声/咳嗽 100% 命中，仅 Explicit Hold 标 ✕ 走 Confirm</div>
+          </a>
+          <a href="benchmark-cards.html?lang=zh-CN#card-4" data-bench-link="#card-4" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#fbbf24;font-weight:700;">4 / 7 · PROTOCOL (UNDER THE HOOD)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">一次旁路挂载，完整快慢双脑追踪</div>
+            <div style="font-size:11px;color:var(--ink-muted);">深色协议框：<code>session.delegation.created</code> ➔ <code>SpeechDelivery</code></div>
+          </a>
+          <a href="benchmark-cards.html?lang=zh-CN#card-5" data-bench-link="#card-5" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#34d399;font-weight:700;">5 / 7 · ROBUSTNESS (HOMOPHONES)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">测试茶饮同音词：12 款生僻品名全数归一</div>
+            <div style="font-size:11px;color:var(--ink-muted);">Baseline vs Voice Live：星尘厚乳拿铁 +78.0 pts、岩韵大红袍 +77.0 pts</div>
+          </a>
+          <a href="benchmark-cards.html?lang=zh-CN#card-6" data-bench-link="#card-6" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#60a5fa;font-weight:700;">6 / 7 · LATENCY (590ms P50)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">生产级亚秒响应：Paytm P50 590ms，HDFlash 155ms</div>
+            <div style="font-size:11px;color:var(--ink-muted);">横向双色条对比：较传统串行管线提速 2.8x，TTS 盲测 4.34 MOS</div>
+          </a>
+          <a href="benchmark-cards.html?lang=zh-CN#card-7" data-bench-link="#card-7" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#f87171;font-weight:700;">7 / 7 · TAKEAWAYS (MY TAKE)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">把 GPT-Live 当作快慢双脑运行时，而非裸语音玩具</div>
+            <div style="font-size:11px;color:var(--ink-muted);">✅ 适用场景 vs ⛔ 禁用场景 + 配套数据集 <code>data/reported/voice-live-gpt-live-1/</code></div>
+          </a>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Benchmark 1: GPT-Live-1 vs GPT-Realtime-2 -->
+        <div class="info-card">
+          <h3>
+            <span>报告一：GPT-Live-1 vs GPT-Realtime-2 全双工评测</span>
+            <span class="tag teal">REPORTED · Slide 6</span>
+          </h3>
+          <p style="margin-bottom:10px;"><strong>测试方法</strong>：5 维主观交互评分（1–5 分）+ 8 类真实环境干扰探针（每类探针连续执行 3 轮试验，共 24 轮；不含附和项为 21 轮）。</p>
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>评测项 (Metric / Probe)</th>
+                  <th>GPT-Live-1</th>
+                  <th>GPT-Realtime-2</th>
+                  <th>结论</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>主观：自然度 / 轮次 / 长度适配 / 适应性 / 共情</td>
+                  <td><strong>4.7 / 5.0 / 5.0 / 4.7 / 4.7</strong></td>
+                  <td>4.0 / 5.0 / 3.3 / 3.0 / 3.3</td>
+                  <td>长度适配与适应性大幅领先 +1.7 分</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td>探针 1：Backchannel *（用户轻声附和“嗯哼/对”）</td>
+                  <td><strong>3 / 3 通过</strong></td>
+                  <td>0 / 3 失败</td>
+                  <td>Realtime-2 误停；Live-1 边说边听不断句</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td>探针 2：Thinking pause（用户话中思考停顿）</td>
+                  <td><strong>3 / 3 通过</strong></td>
+                  <td>0 / 3 失败</td>
+                  <td>Realtime-2 抢话；Live-1 等待用户说完</td>
+                </tr>
+                <tr>
+                  <td>探针 3：Explicit hold（用户要求“稍等一下”）</td>
+                  <td>2 / 3 通过</td>
+                  <td>2 / 3 通过</td>
+                  <td>唯一边界项：长静音需配合应用层 Hold</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td>探针 4：Background speech（旁人背景聊天）</td>
+                  <td><strong>3 / 3 通过</strong></td>
+                  <td>0 / 3 失败</td>
+                  <td>Live-1 有效过滤非主讲人背景人声</td>
+                </tr>
+                <tr>
+                  <td>探针 5 / 6 / 7：Barge-in / Delegation hold / Rapid exchange</td>
+                  <td><strong>3/3 · 3/3 · 3/3</strong></td>
+                  <td>3/3 · 3/3 · 3/3</td>
+                  <td>打断改向、工具等待与快问快答均满分</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td>探针 8：Cough（通话中突然咳嗽/清嗓）</td>
+                  <td><strong>3 / 3 通过</strong></td>
+                  <td>0 / 3 失败</td>
+                  <td>Realtime-2 误识为指令；Live-1 原生忽略</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td><strong>总通过率 (Pass Rate excl. Backchannel)</strong></td>
+                  <td><strong>20 / 21 (95%)</strong></td>
+                  <td>11 / 21 (52%)</td>
+                  <td><strong>+43% 绝对提升（含附和 23/24 vs 11/24）</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Benchmark 2: TTS Call Center MOS & STT Matrix -->
+        <div class="info-card">
+          <h3>
+            <span>报告二：呼叫中心 TTS 多轮盲测 MOS vs 豆包 &amp; 真人</span>
+            <span class="tag blue">REPORTED · Slide 15–17</span>
+          </h3>
+          <p style="margin-bottom:10px;"><strong>测试方法</strong>：真实呼叫中心多轮客服对话盲测（5 维 MOS 打分），对比 Azure `DragonHDFlash`（Cloud GPU 首包 <strong>FBL &lt; 160ms</strong>，$15/1M 字符）与头部竞品（豆包 Vendor1/Vendor2）及真人客服录音。</p>
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>模型 / 音色</th>
+                  <th>音质</th>
+                  <th>整体印象</th>
+                  <th>情感贴合</th>
+                  <th>韵律控制</th>
+                  <th>自然拟人</th>
+                  <th>总均分</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="highlight-row">
+                  <td><strong>hdflash_xiaoqi (Azure)</strong></td>
+                  <td>4.28</td>
+                  <td><strong>4.25</strong></td>
+                  <td><strong>4.37</strong></td>
+                  <td><strong>4.39</strong></td>
+                  <td><strong>4.40</strong></td>
+                  <td><strong>4.34 🏆</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>hdflash_xiaoke (Azure)</strong></td>
+                  <td><strong>4.32</strong></td>
+                  <td>4.17</td>
+                  <td>4.33</td>
+                  <td>4.32</td>
+                  <td>4.26</td>
+                  <td><strong>4.28</strong></td>
+                </tr>
+                <tr>
+                  <td>Vendor 1 (豆包主力音色)</td>
+                  <td>4.23</td>
+                  <td>4.17</td>
+                  <td>4.32</td>
+                  <td>4.35</td>
+                  <td>4.29</td>
+                  <td>4.27</td>
+                </tr>
+                <tr>
+                  <td>Vendor 2 (竞品对照)</td>
+                  <td>4.30</td>
+                  <td>3.93</td>
+                  <td>3.99</td>
+                  <td>4.18</td>
+                  <td>4.09</td>
+                  <td>4.10</td>
+                </tr>
+                <tr>
+                  <td>真人录音 (Human Baseline)</td>
+                  <td>3.45</td>
+                  <td>3.89</td>
+                  <td>4.29</td>
+                  <td>4.37</td>
+                  <td>4.42</td>
+                  <td>4.08</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin-top:10px;font-size:12px;">
+            💡 <strong>报告三（STT 全球榜单 · Slide 10 &amp; 12）</strong>：Microsoft Azure LLM Speech 在 HuggingFace <strong>Open ASR Leaderboard 多语言平均 WER 排名全球第 1</strong>；最新 <strong>`MAI-Transcribe-2`</strong> 实现 <strong>360x RTFx 吞吐与 $0.10/小时</strong> 目录价（较 $0.36/h 降低 72%）。
+          </p>
+        </div>
+      </div>
+
+      <!-- Benchmark 4: Custom Speech 12 Beverage Homophones -->
+      <div class="info-card" style="margin-top:16px;">
+        <h3>
+          <span>报告四：新茶饮/连锁零售 12 款生僻同音商品名 Custom Speech 实测（CER 降低 &gt;10%）</span>
+          <span class="tag teal">REPORTED · Slide 32 + MEASURED Demo Tool</span>
+        </h3>
+        <p>通用大模型与标准 ASR 在面对新茶饮、潮玩与垂直零售自造词时极易同音误识。通过 Azure Speech <strong>Custom Speech / Phrase List</strong>（在级联/混合层）以及本 Demo 新增的 <strong>`lookup_beverage_menu` 同音词归一工具</strong>（在全双工旁路层），12 款高频误识饮品实现 100% 准确归一：</p>
+        <div class="homophone-wall">
+          <div class="homo-chip"><span class="homo-bad">✗ 星辰厚乳拿铁</span><span class="homo-good">✓ 星尘厚乳拿铁</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 盐运大红袍</span><span class="homo-good">✓ 岩韵大红袍</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 青提青干冰</span><span class="homo-good">✓ 青提青柑冰</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 减脂小奶沫</span><span class="homo-good">✓ 减脂小奶茉</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 青汁红茶椰青</span><span class="homo-good">✓ 轻芝红茶椰青</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 粒粒兰香</span><span class="homo-good">✓ 荔荔兰香</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 富贵酒酿芋圆</span><span class="homo-good">✓ 富桂酒酿芋圆</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 淘淘气泡饮</span><span class="homo-good">✓ 桃桃气泡饮</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 仙气杨梅手摇冰茶</span><span class="homo-good">✓ 鲜气杨梅手摇冰茶</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 讨喜奶屋</span><span class="homo-good">✓ 桃喜奶乌</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 百香茫茫</span><span class="homo-good">✓ 百香芒芒</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 三拼爸爸奶茶</span><span class="homo-good">✓ 三拼霸霸奶茶</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 04: INDUSTRY PLAYBOOKS & CONTAINER COMPLIANCE -->
+    <section class="module-section" id="mod-playbooks" data-slide-index="3">
+      <header class="module-header">
+        <div>
+          <span class="module-kicker">MODULE 04 · PARTNER SOLUTION PLAYBOOKS &amp; CONTAINER RULES</span>
+          <h2 class="module-title">四大行业落地样板与本地容器网络/延迟测量红线</h2>
+          <p class="module-desc">我们将前三个样板直接内置到了增强版 `gpt-live-1-demo` 的<strong>「培训场景预设」</strong>中，讲师明天可在现场一键切换体验；第四个样板解答政企/金融客户最常问的本地容器部署与延迟口径问题。</p>
+        </div>
+        <div class="badge-row">
+          <span class="tag teal">3 大 Demo 预设已内置</span>
+          <span class="tag amber">2026-09-17 容器专项说明</span>
+        </div>
+      </header>
+
+      <div class="grid-2">
+        <article class="info-card">
+          <h3><span>样板 A：新茶饮/连锁咖啡门店智能顾问 (`coffee_retail`)</span><span class="tag teal">Demo Preset 1</span></h3>
+          <ul>
+            <li><strong>核心痛点</strong>：门店环境嘈杂、顾客点单常中途改主意（“换燕麦奶、去冰”）、商品名含大量自造同音字（星尘、岩韵、小奶茉）。</li>
+            <li><strong>推荐架构</strong>：`GPT-Live-1` 全双工 + 旁路 `lookup_beverage_menu`（12 款同音词归一）+ `calculate`（团餐折扣）+ `preview_service_order`（草稿确认）。</li>
+            <li><strong>现场演示亮点</strong>：在助手播报咖啡推荐中途直接插话改查“星辰厚乳拿铁”并计算 18 杯拼单总价，展示零抢话打断与精准查表。</li>
+          </ul>
+        </article>
+
+        <article class="info-card">
+          <h3><span>样板 B：智能座舱多意图车载语音助手 (`smart_cockpit`)</span><span class="tag blue">Demo Preset 2 · Slide 33</span></h3>
+          <ul>
+            <li><strong>核心痛点</strong>：驾车时主副驾闲聊干扰多，且驾驶员习惯一句话包含多个跨领域指令（车控 + 天气 + 里程计算 + 餐饮预约）。</li>
+            <li><strong>推荐架构</strong>：`GPT-Live-1` 全双工抗噪（Background Speech 3/3）+ 旁路多工具编排（`get_weather` + `calculate` + `preview_service_order`）。</li>
+            <li><strong>现场演示亮点（还原 Slide 33）</strong>：一句话说出<em>“帮我把空调调到24度并打开天窗，另外查一下上海今天天气和当前时间”</em>，验证多意图拆解与车控确认边界。</li>
+          </ul>
+        </article>
+
+        <article class="info-card">
+          <h3><span>样板 C：中国企业出海全球联络中心 (`contact_center`)</span><span class="tag blue">Demo Preset 3 · Slide 8/9</span></h3>
+          <ul>
+            <li><strong>核心痛点</strong>：东南亚/欧美多语种客服成本高、用户查单号时常有长时间翻找停顿（Explicit Hold）、退换货政策需实时查考。</li>
+            <li><strong>推荐架构</strong>：SIP/IC3 媒体网关或 WebRTC 接入 + `Voice Live API`（137 语种）+ 旁路售后工单预览与 Bing 联网查询。</li>
+            <li><strong>现场演示亮点</strong>：先用中文报修并测试咳嗽/停顿不误断，随后说<em>“Please switch to English and summarize my ticket”</em>，展示无缝双语切换。</li>
+          </ul>
+        </article>
+
+        <article class="info-card">
+          <h3><span>样板 D：政企本地容器部署白名单与延迟测量规范</span><span class="tag amber">FDE Compliance Guide</span></h3>
+          <ul>
+            <li><strong>Connected 容器必开 443 白名单</strong>：计费与遥测域名 `*.cognitive.microsoft.com`、`*.cognitiveservices.azure.com`（每 <strong>10–15 分钟</strong>上报用量，连续 10 次失败将拒绝服务；<strong>绝不上传客户原始音频与识别文本</strong>）；镜像拉取域名 `mcr.microsoft.com`、`*.data.mcr.microsoft.com`。</li>
+            <li><strong>Disconnected 完全离线容器</strong>：仅限向微软提交白名单审批并签署离线承诺协议的受限客户。</li>
+            <li><strong>两大延迟口径防坑铁律</strong>：① 默认 `Speech_SegmentationSilenceTimeoutMs = 500ms`（可调 100–5000ms）是句末静音分段阈值，<strong>不是 STT 平均识别延迟</strong>；② NTTS 单路 `10x 实时`（5 并发 `3x`）是合成速率，<strong>不是首包延迟 (`SynthesisFirstByteLatencyMs`)</strong>。</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- MODULE 05: 6-MINUTE LIVE DEMO RUNBOOK & FAQ -->
+    <section class="module-section" id="mod-runbook" data-slide-index="4">
+      <header class="module-header">
+        <div>
+          <span class="module-kicker">MODULE 05 · 6-MINUTE LIVE DEMO RUNBOOK, BACKUP VIDEO &amp; FAQ</span>
+          <h2 class="module-title">明日现场 6 分钟标准演示剧本、一键提词与 6 大高频问答</h2>
+          <p class="module-desc">严格遵循“先声明边界 ➔ 再秀全双工打断 ➔ 再核验旁路工具与联网来源 ➔ 最后收尾三平面架构与成本”的节奏。点击任一话术可一键复制。</p>
+        </div>
+        <div class="badge-row">
+          <span class="tag teal">点击话术一键复制</span>
+          <span class="tag blue">内置离线录像兜底</span>
+        </div>
+      </header>
+
+      <!-- Preflight Checklist -->
+      <div class="info-card" style="margin-bottom:16px;">
+        <h3><span>✅ 课前 5 分钟讲师预检清单（点击可勾选）</span><span class="tag teal">Preflight Check</span></h3>
+        <div class="grid-4" style="margin-top:10px;font-size:12.5px;">
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer;"><input type="checkbox" checked> 1. 佩戴有线耳机或启用硬件 AEC，避免会场音箱回声自激</label>
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer;"><input type="checkbox" checked> 2. 确认无其他浏览器标签页占用单会话并发锁 (409 保护)</label>
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer;"><input type="checkbox" checked> 3. 先点“测试麦克风”确认音量条跳动，再点“连接会话”</label>
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer;"><input type="checkbox" checked> 4. 展开下方“真实环境演示录像”随时应对会场 UDP/WebRTC 阻断</label>
+        </div>
+      </div>
+
+      <!-- 6-Minute Script Timeline -->
+      <div class="script-timeline">
+        <div class="script-step">
+          <div class="script-time">00:00 – 00:45<br><span class="tag amber">Step 1 · 边界开场</span></div>
+          <div>
+            <strong>架构定位声明（必讲）</strong>：指着页面顶部的 `WebRTC` 与 `凭据只在服务端` 徽章说明：浏览器只负责麦克风音频与信令，模型凭据由服务端托管身份管理；语音层负责低延迟全双工听说，确定性工具走旁路后端。
+          </div>
+          <a class="btn" href="./?lang=zh-CN" data-demo-link>打开 Demo 台</a>
+        </div>
+
+        <div class="script-step">
+          <div class="script-time">00:45 – 01:45<br><span class="tag teal">Step 2 · 自然对话</span></div>
+          <div>
+            <strong>建立全双工基线与附和体验</strong>：选择「连锁咖啡与新茶饮顾问」预设，点击连接会话，等助手说话时轻声附和“嗯哼、对”，观察助手不被误打断。
+            <div class="script-quote" id="prompt1">你好，我是门店新来的店长，帮我推荐一款今天适合下午提神的招牌饮品，再搭配一款甜点。</div>
+          </div>
+          <button class="btn" type="button" data-copy-target="prompt1">📋 复制话术</button>
+        </div>
+
+        <div class="script-step">
+          <div class="script-time">01:45 – 02:45<br><span class="tag teal">Step 3 · 中途打断+同音词</span></div>
+          <div>
+            <strong>核心高潮：Barge-in 中途打断改向 + Slide 32 新茶饮同音词检索</strong>：不等助手把上一段说完，直接插话提问（故意带同音字“星辰/盐运”）：
+            <div class="script-quote" id="prompt2">等一下，我顾客有乳糖不耐受，帮我查一下菜单里的“星辰厚乳拿铁”和“盐运大红袍”多少钱、能不能换燕麦奶？</div>
+          </div>
+          <button class="btn" type="button" data-copy-target="prompt2">📋 复制话术</button>
+        </div>
+
+        <div class="script-step">
+          <div class="script-time">02:45 – 03:45<br><span class="tag blue">Step 4 · 时钟短路+算式</span></div>
+          <div>
+            <strong>验证旁路确定性工具与事务确认边界</strong>：观察“后端答案”卡片与“查询来源与工具记录”中的 `lookup_beverage_menu`、`calculate (575)` 与 `preview_service_order (preview_requires_confirmation)`：
+            <div class="script-quote" id="prompt3">现在几点了？顺便帮我算一下 18 乘 25 加 125 等于多少，再帮我生成一份 18 杯星尘厚乳拿铁的预订草稿。</div>
+          </div>
+          <button class="btn" type="button" data-copy-target="prompt3">📋 复制话术</button>
+        </div>
+
+        <div class="script-step">
+          <div class="script-time">03:45 – 04:45<br><span class="tag blue">Step 5 · 天气+联网溯源</span></div>
+          <div>
+            <strong>验证 Open-Meteo 天气与 Bing 原生 `web_search` 来源链接</strong>：引导现场工程师查看可点击的来源 URL，强调“口头回答不读长 URL，页面沉淀可核查来源”：
+            <div class="script-quote" id="prompt4">帮我查一下上海未来两天的天气，再联网搜索一条最近关于 Microsoft Foundry 或 Azure AI Speech 的公开动态并附上来源。</div>
+          </div>
+          <button class="btn" type="button" data-copy-target="prompt4">📋 复制话术</button>
+        </div>
+
+        <div class="script-step">
+          <div class="script-time">04:45 – 06:00<br><span class="tag teal">Step 6 · 双语切换与收尾</span></div>
+          <div>
+            <strong>验证跨语种自适应 + 断开释放计费</strong>：直接用英文要求总结，展示结束后立即点击<strong>「断开」</strong>，向伙伴说明 `$0.05/min` 会话时长计费护栏：
+            <div class="script-quote" id="prompt5">Please switch to English and give me a two-sentence summary of our order draft and weather check.</div>
+          </div>
+          <button class="btn" type="button" data-copy-target="prompt5">📋 复制话术</button>
+        </div>
+      </div>
+
+      <!-- Offline Backup Video + 6 FAQs -->
+      <div class="grid-2" style="margin-top:18px;">
+        <div class="info-card">
+          <h3><span>🎬 现场网络降级兜底：真实环境端到端演示录像</span><span class="tag amber">Offline Backup</span></h3>
+          <p style="margin-bottom:10px;">若培训会场防火墙拦截 WebRTC UDP 端口，可直接在下方播放已录制的 Azure 真实环境演示视频（`GPT-Live-Azure-demo.mp4`），包含完整打断、天气、算式、联网与双语切换实况：</p>
+          <video controls preload="metadata" style="width:100%;border-radius:12px;border:1px solid var(--border-subtle);background:#000;" src="GPT-Live-Azure-demo.mp4">
+            您的浏览器不支持内嵌视频播放，请直接打开同目录下的 GPT-Live-Azure-demo.mp4。
+          </video>
+        </div>
+
+        <div class="info-card">
+          <h3><span>💬 合作伙伴与客户最常问的 6 大尖锐问题（标准应答口径）</span><span class="tag blue">6 Core FAQs</span></h3>
+          <ul style="font-size:12.4px;gap:8px;">
+            <li><strong>Q1：这和普通级联语音机器人有什么本质区别？</strong><br>A：`GPT-Live-1` 是原生全双工边说边听（8 探针 95% vs 52%），同时通过旁路 WSS 把时间、算式、天气和搜索交给受控后端，兼顾拟人交互与事实准确。</li>
+            <li><strong>Q2：用户在语音里说“取消订单”，订单真的取消了吗？</strong><br>A：<strong>没有。</strong>本 Demo 不连接真实订单写库；工具 `preview_service_order` 显式返回 `preview_requires_confirmation`，生产环境必须接审批与幂等状态机。</li>
+            <li><strong>Q3：浏览器直连 WebRTC，会不会泄露 Azure 模型密钥？</strong><br>A：<strong>不会。</strong>`gpt-live-1` 不下发客户端临时 Key；由 App Service 通过 Managed Identity 在后端完成 `/live/sessions` 握手，浏览器仅交换 SDP。</li>
+            <li><strong>Q4：用户中途打断助手，后台正在跑的工具会自动回滚吗？</strong><br>A：<strong>不会。</strong>语音打断只停止客户端播报，已发出的后端请求需靠 `taskVersion` 与事务确认边界保护。</li>
+            <li><strong>Q5：`GlobalStandard` 是否代表数据 100% 物理留在资源组所在区域？</strong><br>A：<strong>不是。</strong>`GlobalStandard` 提供全球高吞吐调度；如有严格数据驻留合规要求，需选用区域级部署、DataZone 或中国区（CN North 3）。</li>
+            <li><strong>Q6：演示结束后把 Web App 停掉，是不是就不花钱了？</strong><br>A：语音会话断开即停止 `$0.05/min` 计费；但 <strong>停止 Web App 不会停止 App Service Plan (B1 $0.017/h) 计费</strong>，长期不用需删除或缩容 Plan。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 06: INTERACTIVE FINOPS CALCULATOR & RESOURCE HUB -->
+    <section class="module-section" id="mod-finops" data-slide-index="5">
+      <header class="module-header">
+        <div>
+          <span class="module-kicker">MODULE 06 · INTERACTIVE FINOPS CALCULATOR &amp; RESOURCE HUB</span>
+          <h2 class="module-title">交互式语音方案成本测算器与工程资源速查</h2>
+          <p class="module-desc">基于 2026-09-22 官方 Azure Retail Prices API 实测单价与 FY27 Deck 目录价，拖动滑块即可为客户现场测算不同语音管线层级的月度 TCO。</p>
+        </div>
+        <div class="badge-row">
+          <span class="tag teal">Retail API 已核验单价</span>
+          <span class="tag amber">估算仅供架构规划，非账单承诺</span>
+        </div>
+      </header>
+
+      
+      <div class="calc-grid" data-calc-root="zh-CN">
+        <div class="info-card">
+          <h3><span>🎛️ 调整业务量与架构层级参数</span><span class="tag blue">Interactive Sliders</span></h3>
+          <div class="calc-control" style="margin-top:12px;">
+            <label><span>选择 Voice Live 语音管线层级</span></label>
+            <select data-calc-tier>
+              <option value="tier1">Tier ① 全双工旗舰：GPT-Live-1 ($3.00/h = $0.05/min) + gpt-4.1-mini 旁路</option>
+              <option value="tier3">Tier ③ 混合式客服：GPT Realtime 音频理解 + DragonHDFlash TTS ($15/1M chars)</option>
+              <option value="tier4">Tier ④ 级联式高性价比：MAI-Transcribe-2 ($0.10/h) + gpt-4.1-mini + DragonHDFlash</option>
+            </select>
+          </div>
+          <div class="calc-control">
+            <label><span>月度通话 / 演示总场次 (Sessions / Month)</span><span data-calc-sessions-val>300 场</span></label>
+            <input type="range" data-calc-sessions min="10" max="10000" step="10" value="300">
+          </div>
+          <div class="calc-control">
+            <label><span>平均单场通话时长 (Minutes / Session)</span><span data-calc-minutes-val>6 分钟</span></label>
+            <input type="range" data-calc-minutes min="1" max="30" step="1" value="6">
+          </div>
+          <div class="calc-control">
+            <label><span>平均单场后端推理 Tokens (`gpt-4.1-mini` Input+Output)</span><span data-calc-tokens-val>6,000 Tokens</span></label>
+            <input type="range" data-calc-tokens min="1000" max="50000" step="1000" value="6000">
+          </div>
+          <div class="calc-control">
+            <label><span>App Service Linux B1 运行时长 ($0.017/h)</span><span data-calc-hours-val>730 小时</span></label>
+            <input type="range" data-calc-hours min="20" max="730" step="10" value="730">
+          </div>
+        </div>
+        <div class="calc-result-box">
+          <div style="font-family:var(--font-mono);font-size:11px;color:#ffffff;text-transform:uppercase;letter-spacing:0.08em;">Estimated Monthly TCO (USD · Retail Baseline)</div>
+          <div class="calc-total" data-calc-total>$103.52 / 月</div>
+          <div class="calc-line"><span>1. 实时语音通道费用 (Voice Session / STT+TTS)</span><strong data-calc-voice>$90.00</strong></div>
+          <div class="calc-line"><span>2. 旁路推理与工具调用 (`gpt-4.1-mini` Global)</span><strong data-calc-llm>$1.26</strong></div>
+          <div class="calc-line"><span>3. 应用托管底座 (Linux App Service B1)</span><strong data-calc-host>$12.41</strong></div>
+          <div class="calc-line"><span>4. 折合单场演示 / 通话平均成本</span><strong data-calc-per-session>$0.345 / 场 ($0.058 / 分钟)</strong></div>
+          <p style="margin:12px 0 0;font-size:11.5px;color:#d6ecff;line-height:1.5;">
+            📌 <strong>计费核验说明</strong>：`gpt-live-1` 对应 Azure Retail Meter `Live 1 Gl Unit`（East US 2 公开单价 $3.00/h）；级联式采用 `MAI-Transcribe-2` ($0.10/h) 时，同等 1,800 分钟（30 小时）语音转写加 TTS 成本可降至约 <strong>$27.30/月</strong>。
+          </p>
+        </div>
+      </div>
+
+      <!-- Official Repositories & Links -->
+      <div class="grid-3" style="margin-top:18px;">
+        <div class="info-card">
+          <h3><span>🔗 官方代码库与评测套件</span><span class="tag blue">GitHub Repos</span></h3>
+          <ul>
+            <li><strong>本培训配套 GPT-Live Demo</strong>：<a href="https://github.com/turbo998/gpt-live-1-demo" target="_blank" rel="noopener noreferrer" style="color:var(--foundry-teal);">turbo998/gpt-live-1-demo</a></li>
+            <li><strong>Voice Live 官方示例集</strong>：<a href="https://github.com/Azure-Samples/voicelive-samples" target="_blank" rel="noopener noreferrer" style="color:var(--azure-blue-light);">Azure-Samples/voicelive-samples</a></li>
+            <li><strong>ASR 准确率与延迟评测工具</strong>：<a href="https://github.com/Azure-Samples/test-copilot-asr-benchmarking" target="_blank" rel="noopener noreferrer" style="color:var(--azure-blue-light);">test-copilot-asr-benchmarking</a></li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h3><span>🧭 微软内部与伙伴体验入口</span><span class="tag teal">Playgrounds</span></h3>
+          <ul>
+            <li><strong>Microsoft Foundry Portal</strong>：`ai.azure.com`（模型目录、Voice Live 与 Agent 编排）</li>
+            <li><strong>Azure Voice Playground</strong>：包含 `GPT-Live-1` 全双工、多语言 ASR 与 HD Flash TTS 在线试听</li>
+            <li><strong>7-Card 4:5 评测卡独立页</strong>：<a href="benchmark-cards.html" style="color:var(--foundry-teal);">点击打开 `benchmark-cards.html`</a></li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h3><span>📦 明日培训交付物清单</span><span class="tag amber">Ready to Present</span></h3>
+          <ul>
+            <li><strong>`training.html`</strong>：本交互式培训主页面（支持幻灯片投屏模式）</li>
+            <li><strong>`benchmark-cards.html`</strong>：7-Card 4:5 竖版高密度评测报告卡</li>
+            <li><strong>增强版实时语音工作台 (`/`)</strong>：含 3 大行业预设、同音词菜单工具、三平面透视与 8 探针打卡器</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="container" id="lang-container-zh-TW" data-lang-container="zh-TW" hidden>
+<!-- MODULE 01: EXECUTIVE SUMMARY -->
+    <section class="module-section active-slide" id="mod-exec-tw" data-slide-index="0">
+      <header class="module-header">
+        <div>
+          <span class="module-kicker">MODULE 01 · EXECUTIVE SUMMARY &amp; PARADIGM SHIFT</span>
+          <h1 class="module-title">從“串列語音機器人”到“全雙工自然交談 + 旁路受控執行”</h1>
+          <p class="module-desc">為什麼傳統串接級聯語音機器人在真實門店、座艙和客服熱線中屢屢受挫？本節幫助合作夥伴工程師用三句話建立對 <strong>Azure Voice Live API</strong> 與 <strong>GPT-Live-1</strong> 的準確架構認知。</p>
+        </div>
+        <div class="badge-row">
+          <span class="tag teal">全雙工邊說邊聽</span>
+          <span class="tag blue">137 Locales · 30+ Regions (含中國區)</span>
+          <span class="tag amber">快慢雙腦解耦</span>
+        </div>
+      </header>
+
+      <div class="grid-3">
+        <article class="info-card">
+          <h3><span>1. 傳統語音機器人的三大工程頑疾</span><span class="tag red">Legacy Pain</span></h3>
+          <ul>
+            <li><strong>機械搶話與誤打斷</strong>：傳統能量閾值 VAD 把用戶的自然附和（“嗯哼、對”）、思考停頓、咳嗽或旁人說話全部當作打斷指令，導致對話支離破碎。</li>
+            <li><strong>串接級聯交接損耗與副語言丟失</strong>：`STT ➔ LLM ➔ TTS` 三段串列不僅累加延遲，還在轉文字瞬間丢失了用戶的情緒、遲疑與語調重音。</li>
+            <li><strong>模型幻覺與業務失控</strong>：若讓端到端語音大模型直接口頭承諾庫存、算帳或改單，極易出現算錯價格或口頭“假取消”。</li>
+          </ul>
+        </article>
+
+        <article class="info-card">
+          <h3><span>2. Azure Voice Live API 的核心定義</span><span class="tag blue">Realtime Interface</span></h3>
+          <ul>
+            <li><strong>它是什麼</strong>：一個高性能、生產級的 <strong>Realtime LLM 介面層</strong>，讓雲上任意大模型（Foundry 1000+ 模型與自建 BYOM）即插即用獲得“能聽會說”的即時語音互動與 Agent 編排能力。</li>
+            <li><strong>它不是什麼</strong>：它<strong>不是</strong>單一 LLM、<strong>不是</strong>封閉的成品對話機器人、<strong>不是</strong>聯絡中心（CCaaS）系統，不會與合作夥伴的行業應用爭搶業務層。</li>
+            <li><strong>四檔可演進管線</strong>：在同一套 API 契約下支援 <strong>全雙工 (`GPT-Live-1`)、語音到語音 (`GPT Realtime`)、混合式 (`Hybrid`)、串接級聯式 (`Cascaded`)</strong> 靈活選型。</li>
+          </ul>
+        </article>
+
+        <article class="info-card">
+          <h3><span>3. GPT-Live 參考架構的“快慢雙腦”哲學</span><span class="tag teal">Reference Pattern</span></h3>
+          <ul>
+            <li><strong>快腦（WebRTC 媒體直連 `gpt-live-1`）</strong>：負責毫秒級全雙工傾聽、自然口語應答、附和承接與中途打斷剎停。</li>
+            <li><strong>慢腦（旁路 WSS + `gpt-4.1-mini` Responses）</strong>：負責確定性時間短路、安全算式、Open-Meteo 天氣消歧、飲品菜單同音詞檢索與 Bing 聯網溯源。</li>
+            <li><strong>受控交接（`SpeechDelivery` 狀態機）</strong>：後臺結果按 220 字分片注入 `commentary`，待用戶安靜後觸發 `instructions` 口播，超時自動降級文字重播。</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="kpi-strip">
+        <div class="kpi-tile">
+          <div class="kpi-num">20 / 21 (95%)</div>
+          <div class="kpi-title">GPT-Live-1 真實抗擾通過率</div>
+          <div class="kpi-sub">8 項干擾探針 × 3 輪實測對比 GPT-Realtime-2 的 11/21 (52%)，消除附和/思考/咳嗽/背景音四大誤觸發（Slide 6）</div>
+        </div>
+        <div class="kpi-tile">
+          <div class="kpi-num">P50 590ms</div>
+          <div class="kpi-title">Paytm 生產環境實測延遲</div>
+          <div class="kpi-sub">混合式架構支撐印度 Paytm &gt;20 萬通/天、1200+ 峰值併發，P90 僅 840ms（Slide 21）</div>
+        </div>
+        <div class="kpi-tile">
+          <div class="kpi-num">4.34 MOS / #1</div>
+          <div class="kpi-title">DragonHDFlash &amp; Open ASR 榜首</div>
+          <div class="kpi-sub">聯絡中心多輪盲測 4.34 超越豆包與真人錄音 (4.08)；Azure LLM Speech 多語言 WER 排名全球第 1（Slide 12/17）</div>
+        </div>
+        <div class="kpi-tile">
+          <div class="kpi-num">360x · $0.10/h</div>
+          <div class="kpi-title">MAI-Transcribe-2 極致性價比</div>
+          <div class="kpi-sub">新一代多模態語音轉寫吞吐達 360 倍即時速率，目錄價低至 $0.10/小時；GPT-Live-1 為 $0.05/分鐘（Slide 10 &amp; Retail API）</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 02: 3-DIAGRAM ARCHITECTURE VALUE DEEP-DIVE -->
+    <section class="module-section" id="mod-arch-tw" data-slide-index="1">
+      <header class="module-header">
+        <div>
+          <span class="module-kicker">MODULE 02 · COMPLETE ARCHITECTURE VALUE DEEP-DIVE (核心重頭戲)</span>
+          <h2 class="module-title">三張核心架構圖的工程價值、協議機製與選型紅線</h2>
+          <p class="module-desc">點擊下方三個架構視圖標籤，逐層拆解從<strong>「產品全景定位」➔「四層語音管線與統一任務委派」➔「GPT-Live Azure 三平面生產落地」</strong>的完整工程邏輯。點擊任意架構圖可全屏高畫質放大。</p>
+        </div>
+        <div class="badge-row">
+          <span class="tag blue">點擊圖片可全螢幕放大</span>
+          <span class="tag teal">痛點 ➔ 機製 ➔ 價值 ➔ 紅線</span>
+        </div>
+      </header>
+
+      <!-- 3 Architecture Tabs -->
+      <div class="arch-tabs" role="tablist">
+        <button class="arch-tab-btn active" type="button" data-arch-tab="arch1-tw">
+          <span class="arch-tab-step">DIAGRAM 01 · 全景定位與接入層</span>
+          <span class="arch-tab-name">Azure Voice Live API 一頁全景圖</span>
+          <span class="arch-tab-summary">ONE MODULE · THREE PROTOCOLS · TWO MODEL PATHS：全通路接入、內建音訊 DSP、Agent Harness 與雙模型路徑</span>
+        </button>
+        <button class="arch-tab-btn" type="button" data-arch-tab="arch2-tw">
+          <span class="arch-tab-step">DIAGRAM 02 · 四層管線與任務委派</span>
+          <span class="arch-tab-name">Voice Live 四檔語音管線 + 統一任務委派</span>
+          <span class="arch-tab-summary">全雙工 GPT-Live-1 / 語音到語音 / 混合式 / 串接級聯式 四檔對比，以及右側快慢雙腦解耦價值</span>
+        </button>
+        <button class="arch-tab-btn" type="button" data-arch-tab="arch3-tw">
+          <span class="arch-tab-step">DIAGRAM 03 · 生產級 Demo 落地架構</span>
+          <span class="arch-tab-name">GPT-Live 三平面參考架構 (West US 2 + East US 2)</span>
+          <span class="arch-tab-summary">Managed Identity 零金鑰握手、瀏覽器 WebRTC 媒體直連、Node.js 旁路 WSS 掛載與 SpeechDelivery 狀態機</span>
+        </button>
+      </div>
+
+      <!-- PANE 1: Voice Live One Pager -->
+      <div class="arch-pane active" id="arch1-tw">
+        <div class="arch-showcase">
+          <figure class="arch-figure">
+            <img src="assets/arch-1-voice-live-overview.png" alt="Azure Voice Live API 全景定位一頁圖" data-zoom-src="assets/arch-1-voice-live-overview.png" data-zoom-caption="架構圖一：Azure Voice Live API 全景定位（One Module · Three Protocols · Two Model Paths）">
+            <figcaption class="arch-figcaption">
+              <span><strong>圖 1：Azure Voice Live API 全景定位圖</strong>（137 種語言 · &lt;1s 延遲 · 1000+ LLMs · 3 種協議 · 2 條模型路徑）</span>
+              <button class="btn" type="button" data-zoom-btn="assets/arch-1-voice-live-overview.png">🔍 全螢幕查看原圖</button>
+            </figcaption>
+          </figure>
+
+          <div class="value-4d">
+            <div class="value-box pain">
+              <h4>① 解決什麼合作夥伴工程痛點？</h4>
+              <p>企業客戶往往同時擁有網頁、App、SIP 聯絡中心（Genesys/Twilio/ACS）與車載/IoT 硬體。過去每增加一種終端或更換底層大模型，合作夥伴都要重寫一套音訊流編解碼、回聲消除、斷句 VAD 和工具調用膠水程式碼。</p>
+            </div>
+            <div class="value-box mech">
+              <h4>② 架構圖核心機製拆解（自左向右）</h4>
+              <ul>
+                <li><strong>全通路與三協議（`WebSocket / WebRTC / SIP` + 4 語言 SDK）</strong>：瀏覽器/App 走 WebRTC 享低延遲與端側 AEC；伺服端走 WebSocket；傳統電話網通過與 M365 同源的 <strong>IC3 Media Gateway</strong> 原生對接 SIP/RTP。</li>
+                <li><strong>即時音訊 DSP 層</strong>：雲端內建<strong>全雙工語義輪次檢測（Semantic VAD / EoU）</strong>、播放參考回聲消除與環境降噪。</li>
+                <li><strong>`VOICE LIVE AGENT` 運行時 Harness</strong>：原生提供 `Sub-agent`、`Function Calling`、`MCP 工具`、`Foundry Agent`、`主動訊息` 與 `上下文靜默管理`。</li>
+                <li><strong>兩條模型路徑</strong>：既可直連 <strong>Foundry 模型目錄（1000+ 開源與商業模型）</strong>，也可通過 <strong>BYOM</strong> 接入客戶自建/微調模型。</li>
+              </ul>
+            </div>
+            <div class="value-box biz">
+              <h4>③ 面向客戶的商業與交付價值</h4>
+              <p><strong>一次集成，全球複用</strong>：覆蓋 <strong>137 種地區語言</strong>與全球 30+ 區域（<strong>含中國大陸世紀互聯 China East 2 / North 2 / North 3</strong>），提供照片級/視訊級 Avatar 數位人同步驅動，將多渠道語音 Agent 交付週期從數月縮短至數週。</p>
+            </div>
+            <div class="value-box redline">
+              <h4>④ 售前與架構師必講定位邊界</h4>
+              <p>向客戶強調：Voice Live API <strong>不是單一 LLM，也不是用來替代客戶現有 CRM/聯絡中心平臺的封閉黑盒</strong>，而是賦能任意業務系統“聽得懂、說得自然、調得動工具”的標準即時語音底座。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANE 2: 4-Tier Pipeline + Unified Task Delegation -->
+      <div class="arch-pane" id="arch2-tw">
+        <div class="arch-showcase">
+          <figure class="arch-figure">
+            <img src="assets/arch-2-voice-live-4tier-pipeline.png" alt="Azure Voice Live API 四層語音管線與統一任務委派架構" data-zoom-src="assets/arch-2-voice-live-4tier-pipeline.png" data-zoom-caption="架構圖二：Azure Voice Live API 四層語音管線（全雙工 / S2S / 混合式 / 串接級聯式）+ 右側統一任務委派平面">
+            <figcaption class="arch-figcaption">
+              <span><strong>圖 2：Azure Voice Live 四檔語音管線與右側統一任務委派架構</strong>（Slide 7 核心架構圖）</span>
+              <button class="btn" type="button" data-zoom-btn="assets/arch-2-voice-live-4tier-pipeline.png">🔍 全螢幕查看原圖</button>
+            </figcaption>
+          </figure>
+
+          <div class="value-4d">
+            <div class="value-box pain">
+              <h4>① 解決什麼架構選型痛點？</h4>
+              <p>不同業務對“擬人互動度、品牌專屬音色、垂直領域生僻詞準確率、單分鐘成本”的權重截然不同。單一端到端模型無法同時滿足“0.1美元/小時超低成本”和“企業定製品牌音色”，單一串接級聯架構又無法實現“邊說邊聽自然附和”。</p>
+            </div>
+            <div class="value-box mech">
+              <h4>② 左側四層語音管線（Four-Tier Pipeline）如何選型？</h4>
+              <ul>
+                <li><strong>① 全雙工 (`GPT-Live-1`)</strong>：單模型同時對輸入與輸出音訊聯合推理（邊說邊聽），抗干擾探針通過率 <strong>95% (20/21)</strong>，適合旗艦導購、座艙免喚醒與高擬人陪練。</li>
+                <li><strong>② 語音到語音 (`GPT Realtime · Azure Realtime`)</strong>：原生多模態端到端語音交互。</li>
+                <li><strong>③ 混合式 (`Semantic VAD·EoU + GPT Realtime 2.1/1.5 + Azure Speech TTS`)</strong>：用多模態模型直接聽懂語音，用 <strong>DragonHDFlash / Custom Voice</strong> 發出品牌定製聲音（印度 Paytm 20萬通/天生產驗證，P50 590ms）。</li>
+                <li><strong>④ 串接級聯式 (`Semantic VAD·EoU + Azure STT + Foundry/BYO LLM + Azure TTS`)</strong>：最高術語可控性（Custom Speech 飲品同音詞 12/12 修正）+ 最低 STT 成本（`MAI-Transcribe-2` $0.10/h）+ 任意大模型（GPT/Claude/Gemini/OSS）。</li>
+              </ul>
+            </div>
+            <div class="value-box biz">
+              <h4>③ 右側「統一任務委派（Task Delegation）」的核心架構價值</h4>
+              <p>無論左側採用哪一檔語音管線，右側均通過統一的 <strong>Task Delegation</strong> 將深度推理、RAG、搜尋與工具調用委派給 <strong>Foundry 智能體、GPT/Claude/Gemini、OSS 或客戶自有後端</strong>——真正實現<strong>“快腦管即時語音互動，慢腦管嚴謹業務邏輯”</strong>。</p>
+            </div>
+            <div class="value-box redline">
+              <h4>④ 合作夥伴架構設計黃金法則</h4>
+              <p>不要在客戶立項第一天爭論“端到端還是串接級聯”：基於 Voice Live API 統一契約，<strong>高端顧問場景用 Tier ① 全雙工，高併發客服熱線用 Tier ③ 混合式，強專有名詞/成本敏感場景用 Tier ④ 串接級聯式</strong>，後臺工具層程式碼 100% 復用。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANE 3: GPT-Live Three-Plane Reference Demo Architecture -->
+      <div class="arch-pane" id="arch3-tw">
+        <div class="arch-showcase">
+          <figure class="arch-figure">
+            <img src="assets/arch-3-gpt-live-three-plane.png" alt="GPT-Live 演示架構：三平面職責分離" data-zoom-src="assets/arch-3-gpt-live-three-plane.png" data-zoom-caption="架構圖三：GPT-Live 生產級參考演示架構（West US 2 Linux App Service B1 + East US 2 Foundry gpt-live-1 & gpt-4.1-mini）">
+            <figcaption class="arch-figcaption">
+              <span><strong>圖 3：GPT-Live 三平面參考架構圖</strong>（瀏覽器 WebRTC 媒體直連 + 受控識別 (Managed Identity)握手 + Node.js 旁路 WSS 委派）</span>
+              <button class="btn" type="button" data-zoom-btn="assets/arch-3-gpt-live-three-plane.png">🔍 全螢幕查看原圖</button>
+            </figcaption>
+          </figure>
+
+          <div class="value-4d">
+            <div class="value-box pain">
+              <h4>① 為什麼初版 Demo 要這樣設計？（解決三大落地難題）</h4>
+              <p>1) `gpt-live-1` 不簽發瀏覽器臨時用戶端金鑰，如何保證前端零金鑰洩露？<br>
+                 2) 如果音訊流經過應用伺服器轉發，Node.js 頻寬與抖動如何承受？<br>
+                 3) 後臺工具查出長答案後，如何安全交還給正在說話或傾聽的語音模型？</p>
+            </div>
+            <div class="value-box mech">
+              <h4>② 三平面職責分離機製（Three-Plane Separation）</h4>
+              <ul>
+                <li><strong>平面 1 · 工作階段握手與受控識別 (Managed Identity)面（HTTPS + SDP）</strong>：瀏覽器向受保護的 Linux App Service B1 (`West US 2`) 提交 SDP；後端通過 <strong>Azure Managed Identity (`Cognitive Services OpenAI User`)</strong> 動態獲取 Entra 令牌建立會話，<strong>雲端不存模型 API Key，瀏覽器端零憑據暴露</strong>。</li>
+                <li><strong>平面 2 · 即時媒體直連面（Browser ⇄ WebRTC ⇄ `gpt-live-1`）</strong>：SDP 建連後，瀏覽器麥克風/揚聲器與 `East US 2` 的 `gpt-live-1` 建立點對點 WebRTC 音訊與 `oai-events` 資料通道，<strong>音訊流不繞行應用伺服器</strong>。</li>
+                <li><strong>平面 3 · 旁路控製與受控委派面（WSS `/live/sessions/{id}/attach`）</strong>：Node.js 掛載旁路 WebSocket，監聽 `session.delegation.created`；獨立時鐘走 `fastTimeAnswer`（0 Token），天氣/算式/菜單/Bing 聯網走 `gpt-4.1-mini` (`/responses`, `store:false`)，再由 `SpeechDelivery` 分片注入并擇機 Nudge 口播。</li>
+              </ul>
+            </div>
+            <div class="value-box biz">
+              <h4>③ 跨區域拓撲說明（West US 2 應用 + East US 2 模型）</h4>
+              <p>由於音訊流在瀏覽器與 `East US 2` 模型間直連，App Service 僅在建連與旁路工具觸發時參與；因此<strong>縮短 Web 應用與用戶的距離隻加速頁面載入與握手，不改變瀏覽器到語音模型區域的物理網路延遲</strong>。</p>
+            </div>
+            <div class="value-box redline">
+              <h4>④ 必須向夥伴工程師講透的四大工程紅線</h4>
+              <ul>
+                <li><strong>語音打斷 ≠ 業務事務回滾</strong>：Barge-in 僅停止語音播放，不會撤銷已發往後端的請求。</li>
+                <li><strong>口頭回答 ≠ 權威業務狀態</strong>：必須以“查詢來源與工具記錄”面板中的結構化結果為準。</li>
+                <li><strong>GlobalStandard ≠ 區域資料駐留承諾</strong>：有嚴格駐留要求需評估區域級或合規部署。</li>
+                <li><strong>停止 Web App ≠ 停止 App Service Plan 計費</strong>：B1 Plan ($0.017/h) 需縮容或清理才停計費。</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4-Tier Architecture Comparison Matrix -->
+      <div class="data-table-wrap" style="margin-top:16px;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>管線層級 (Pipeline Tier)</th>
+              <th>核心組件組合</th>
+              <th>端到端延遲與抗擾表現</th>
+              <th>音色與領域詞表可控性</th>
+              <th>目錄成本基準 (USD)</th>
+              <th>首選適用場景</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="highlight-row">
+              <td><strong>① 全雙工 (Full-Duplex)</strong></td>
+              <td>Foundry `GPT-Live-1` + 旁路任務委派</td>
+              <td>邊說邊聽 · 8 探針通過率 <strong>95% (20/21)</strong></td>
+              <td>13 種內建音色 (Marin 等) · 旁路工具糾錯</td>
+              <td><strong>$3.00 / 小時 ($0.05/min)</strong> + 旁路推理 Token</td>
+              <td>旗艦門店顧問、智能座艙免喚醒、高擬人陪練</td>
+            </tr>
+            <tr>
+              <td><strong>② 語音到語音 (S2S)</strong></td>
+              <td>`GPT Realtime` / `Azure Realtime`</td>
+              <td>亞秒級端到端 · 8 探針通過率 52% (11/21)</td>
+              <td>內建多模態音色</td>
+              <td>按 Realtime 音訊輸入/輸出 Token 計費</td>
+              <td>通用低延遲語音對話與多模態情緒感知</td>
+            </tr>
+            <tr>
+              <td><strong>③ 混合式 (Hybrid)</strong></td>
+              <td>`Semantic VAD·EoU` + `GPT Realtime` + `Azure TTS (DragonHDFlash / Custom)`</td>
+              <td>Paytm 生產實測 <strong>P50 590ms / P90 840ms</strong></td>
+              <td>支援 <strong>700+ 音色 / HD Flash (MOS 4.34) / 品牌定製音色</strong></td>
+              <td>Realtime 輸入 + TTS <strong>$15–$22 / 1M 字元</strong></td>
+              <td>高併發品牌客服熱線（如 Paytm 20萬通/天）</td>
+            </tr>
+            <tr>
+              <td><strong>④ 串接級聯式 (Cascaded)</strong></td>
+              <td>`Semantic VAD·EoU` + `Azure STT (Custom / MAI-2)` + `任意 LLM` + `Azure TTS`</td>
+              <td>依賴分段策略 · STT 吞吐高達 <strong>360x RTFx</strong></td>
+              <td>最高可控：<strong>Custom Speech 同音詞表 (CER 降 &gt;10%)</strong> + BYOM</td>
+              <td>STT 低至 <strong>$0.10/小時 (`MAI-2`)</strong> + 文本 Token + TTS</td>
+              <td>新茶飲/醫療/工業強專有名詞、大批量低成本語音Agent</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- MODULE 03: CITED BENCHMARK REPORTS -->
+    <section class="module-section" id="mod-bench-tw" data-slide-index="2">
+      <header class="module-header">
+        <div>
+          <span class="module-kicker">MODULE 03 · CITED TEST &amp; BENCHMARK REPORTS (權威測試報告引用)</span>
+          <h2 class="module-title">四組核心評測報告：全雙工抗擾、Open ASR 榜首、Custom Speech 同音詞與 TTS 盲測</h2>
+          <p class="module-desc">所有引用數據嚴格區分 <strong>REPORTED（源自 FY27 Product Updates 官方評測頁碼）</strong> 與 <strong>MEASURED（源自本倉庫自動化測試與 Retail API 實測）</strong>，已同步封裝為 7-Card 4:5 視覺評測卡片。</p>
+        </div>
+        <div class="badge-row">
+          <a class="btn primary" href="benchmark-cards.html">🃏 打開獨立 7-Card 4:5 評測報告頁</a>
+        </div>
+      </header>
+
+      
+      <!-- Benchmark Harness Engineering 7-Card 4:5 Quick Preview Strip -->
+      <div class="info-card" style="margin-bottom:16px;border-color:rgba(99,102,241,0.45);background:linear-gradient(145deg, rgba(30,41,59,0.92), rgba(15,23,42,0.95));">
+        <h3>
+          <span>📐 7-Card 4:5 視覺評測卡片速覽（對齊 <code>turbo998/benchmark-harness-engineering</code> 規範）</span>
+          <span class="tag blue">4:5 Carousel Deck · 7 Cards</span>
+        </h3>
+        <p style="margin-bottom:12px;">測試報告已嚴格按照 <a href="https://github.com/turbo998/benchmark-harness-engineering/blob/main/docs/research/visual-report-card-format.md" target="_blank" rel="noopener noreferrer" style="color:var(--azure-blue-light);"><code>visual-report-card-format.md</code></a> 與 <a href="https://github.com/turbo998/benchmark-harness-engineering/blob/main/src/benchmark_harness/cards.py" target="_blank" rel="noopener noreferrer" style="color:var(--azure-blue-light);"><code>src/benchmark_harness/cards.py</code></a> 渲染規範重構為 7 頁 4:5 視覺卡片（冷灰高對比底色 <code>#f8fafc</code>、頂部 10px 靛藍漸變條、結論先行標題、<code>Auto / Confirm / Human</code> 置信度動作膠囊、底部內嵌完整 JSON 資料集）：</p>
+        <div class="grid-4" style="grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;">
+          <a href="benchmark-cards.html?lang=zh-TW#card-1" data-bench-link="#card-1" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#818cf8;font-weight:700;">1 / 7 · OVERVIEW (HANDS-ON)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">把 GPT-Live-1 跑在真實語音基準裡</div>
+            <div style="font-size:11px;color:var(--ink-muted);">工作臺總覽：20/21 (95%) vs 52% · 三種探針形態與動作帶</div>
+          </a>
+          <a href="benchmark-cards.html?lang=zh-TW#card-2" data-bench-link="#card-2" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#34d399;font-weight:700;">2 / 7 · DEEP_DIVE (CASE BREAKDOWN)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">同一通語音會話，三種截然不同的置信度形態</div>
+            <div style="font-size:11px;color:var(--ink-muted);">NOUL 原生抗擾 (98%) · CHOICE 同音詞歸一 (92%) · SCORE 長靜音 (67%)</div>
+          </a>
+          <a href="benchmark-cards.html?lang=zh-TW#card-3" data-bench-link="#card-3" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#60a5fa;font-weight:700;">3 / 7 · SCORECARD (8 PROBES)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">8 個全雙工探針 × 3 輪：23/24 命中</div>
+            <div style="font-size:11px;color:var(--ink-muted);">附和/停頓/背景人聲/咳嗽 100% 命中，僅 Explicit Hold 標 ✕ 走 Confirm</div>
+          </a>
+          <a href="benchmark-cards.html?lang=zh-TW#card-4" data-bench-link="#card-4" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#fbbf24;font-weight:700;">4 / 7 · PROTOCOL (UNDER THE HOOD)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">一次旁路掛載，完整快慢雙腦追蹤</div>
+            <div style="font-size:11px;color:var(--ink-muted);">深色協議框：<code>session.delegation.created</code> ➔ <code>SpeechDelivery</code></div>
+          </a>
+          <a href="benchmark-cards.html?lang=zh-TW#card-5" data-bench-link="#card-5" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#34d399;font-weight:700;">5 / 7 · ROBUSTNESS (HOMOPHONES)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">測試茶飲同音詞：12 款生僻品名全數歸一</div>
+            <div style="font-size:11px;color:var(--ink-muted);">Baseline vs Voice Live：星塵厚乳拿鐵 +78.0 pts、岩韻大紅袍 +77.0 pts</div>
+          </a>
+          <a href="benchmark-cards.html?lang=zh-TW#card-6" data-bench-link="#card-6" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#60a5fa;font-weight:700;">6 / 7 · LATENCY (590ms P50)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">生產級亞秒響應：Paytm P50 590ms，HDFlash 155ms</div>
+            <div style="font-size:11px;color:var(--ink-muted);">橫向雙色條對比：較傳統串列管線提速 2.8x，TTS 盲測 4.34 MOS</div>
+          </a>
+          <a href="benchmark-cards.html?lang=zh-TW#card-7" data-bench-link="#card-7" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#f87171;font-weight:700;">7 / 7 · TAKEAWAYS (MY TAKE)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">把 GPT-Live 當作快慢雙腦運行時，而非裸語音玩具</div>
+            <div style="font-size:11px;color:var(--ink-muted);">✅ 適用場景 vs ⛔ 禁用場景 + 配套資料集 <code>data/reported/voice-live-gpt-live-1/</code></div>
+          </a>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Benchmark 1: GPT-Live-1 vs GPT-Realtime-2 -->
+        <div class="info-card">
+          <h3>
+            <span>報告一：GPT-Live-1 vs GPT-Realtime-2 全雙工評測</span>
+            <span class="tag teal">REPORTED · Slide 6</span>
+          </h3>
+          <p style="margin-bottom:10px;"><strong>測試方法</strong>：5 維主觀交互評分（1–5 分）+ 8 類真實環境干擾探針（每類探針連續執行 3 輪試驗，共 24 輪；不含附和項為 21 輪）。</p>
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>評測項 (Metric / Probe)</th>
+                  <th>GPT-Live-1</th>
+                  <th>GPT-Realtime-2</th>
+                  <th>結論</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>主觀：自然度 / 輪次 / 長度適配 / 適應性 / 共情</td>
+                  <td><strong>4.7 / 5.0 / 5.0 / 4.7 / 4.7</strong></td>
+                  <td>4.0 / 5.0 / 3.3 / 3.0 / 3.3</td>
+                  <td>長度適配與適應性大幅領先 +1.7 分</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td>探針 1：Backchannel *（用戶輕聲附和“嗯哼/對”）</td>
+                  <td><strong>3 / 3 通過</strong></td>
+                  <td>0 / 3 失敗</td>
+                  <td>Realtime-2 誤停；Live-1 邊說邊聽不斷句</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td>探針 2：Thinking pause（用戶話中思考停頓）</td>
+                  <td><strong>3 / 3 通過</strong></td>
+                  <td>0 / 3 失敗</td>
+                  <td>Realtime-2 搶話；Live-1 等待用戶說完</td>
+                </tr>
+                <tr>
+                  <td>探針 3：Explicit hold（用戶要求“稍等一下”）</td>
+                  <td>2 / 3 通過</td>
+                  <td>2 / 3 通過</td>
+                  <td>唯一邊界項：長靜音需配合應用層 Hold</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td>探針 4：Background speech（旁人背景聊天）</td>
+                  <td><strong>3 / 3 通過</strong></td>
+                  <td>0 / 3 失敗</td>
+                  <td>Live-1 有效過濾非主講人背景人聲</td>
+                </tr>
+                <tr>
+                  <td>探針 5 / 6 / 7：Barge-in / Delegation hold / Rapid exchange</td>
+                  <td><strong>3/3 · 3/3 · 3/3</strong></td>
+                  <td>3/3 · 3/3 · 3/3</td>
+                  <td>打斷改向、工具等待與快問快答均滿分</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td>探針 8：Cough（通話中突然咳嗽/清嗓）</td>
+                  <td><strong>3 / 3 通過</strong></td>
+                  <td>0 / 3 失敗</td>
+                  <td>Realtime-2 誤識為指令；Live-1 原生忽略</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td><strong>總通過率 (Pass Rate excl. Backchannel)</strong></td>
+                  <td><strong>20 / 21 (95%)</strong></td>
+                  <td>11 / 21 (52%)</td>
+                  <td><strong>+43% 絕對提升（含附和 23/24 vs 11/24）</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Benchmark 2: TTS Call Center MOS & STT Matrix -->
+        <div class="info-card">
+          <h3>
+            <span>報告二：聯絡中心 TTS 多輪盲測 MOS vs 豆包 &amp; 真人</span>
+            <span class="tag blue">REPORTED · Slide 15–17</span>
+          </h3>
+          <p style="margin-bottom:10px;"><strong>測試方法</strong>：真實聯絡中心多輪客服對話盲測（5 維 MOS 打分），對比 Azure `DragonHDFlash`（Cloud GPU 首包 <strong>FBL &lt; 160ms</strong>，$15/1M 字元）與頭部競品（豆包 Vendor1/Vendor2）及真人客服錄音。</p>
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>模型 / 音色</th>
+                  <th>音質</th>
+                  <th>整體印象</th>
+                  <th>情感貼合</th>
+                  <th>韻律控製</th>
+                  <th>自然擬人</th>
+                  <th>總均分</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="highlight-row">
+                  <td><strong>hdflash_xiaoqi (Azure)</strong></td>
+                  <td>4.28</td>
+                  <td><strong>4.25</strong></td>
+                  <td><strong>4.37</strong></td>
+                  <td><strong>4.39</strong></td>
+                  <td><strong>4.40</strong></td>
+                  <td><strong>4.34 🏆</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>hdflash_xiaoke (Azure)</strong></td>
+                  <td><strong>4.32</strong></td>
+                  <td>4.17</td>
+                  <td>4.33</td>
+                  <td>4.32</td>
+                  <td>4.26</td>
+                  <td><strong>4.28</strong></td>
+                </tr>
+                <tr>
+                  <td>Vendor 1 (豆包主力音色)</td>
+                  <td>4.23</td>
+                  <td>4.17</td>
+                  <td>4.32</td>
+                  <td>4.35</td>
+                  <td>4.29</td>
+                  <td>4.27</td>
+                </tr>
+                <tr>
+                  <td>Vendor 2 (競品對照)</td>
+                  <td>4.30</td>
+                  <td>3.93</td>
+                  <td>3.99</td>
+                  <td>4.18</td>
+                  <td>4.09</td>
+                  <td>4.10</td>
+                </tr>
+                <tr>
+                  <td>真人錄音 (Human Baseline)</td>
+                  <td>3.45</td>
+                  <td>3.89</td>
+                  <td>4.29</td>
+                  <td>4.37</td>
+                  <td>4.42</td>
+                  <td>4.08</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin-top:10px;font-size:12px;">
+            💡 <strong>報告三（STT 全球榜單 · Slide 10 &amp; 12）</strong>：Microsoft Azure LLM Speech 在 HuggingFace <strong>Open ASR Leaderboard 多語言平均 WER 排名全球第 1</strong>；最新 <strong>`MAI-Transcribe-2`</strong> 實現 <strong>360x RTFx 吞吐與 $0.10/小時</strong> 目錄價（較 $0.36/h 降低 72%）。
+          </p>
+        </div>
+      </div>
+
+      <!-- Benchmark 4: Custom Speech 12 Beverage Homophones -->
+      <div class="info-card" style="margin-top:16px;">
+        <h3>
+          <span>報告四：新茶飲/連鎖零售 12 款生僻同音商品名 Custom Speech 實測（CER 降低 &gt;10%）</span>
+          <span class="tag teal">REPORTED · Slide 32 + MEASURED Demo Tool</span>
+        </h3>
+        <p>通用大模型與標準 ASR 在面對新茶飲、潮玩與垂直零售自造詞時極易同音誤識。通過 Azure Speech <strong>Custom Speech / Phrase List</strong>（在串接級聯/混合層）以及本 Demo 新增的 <strong>`lookup_beverage_menu` 同音詞歸一工具</strong>（在全雙工旁路層），12 款高頻誤識飲品實現 100% 準確歸一：</p>
+        <div class="homophone-wall">
+          <div class="homo-chip"><span class="homo-bad">✗ 星辰厚乳拿鐵</span><span class="homo-good">✓ 星塵厚乳拿鐵</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 鹽運大紅袍</span><span class="homo-good">✓ 岩韻大紅袍</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 青提青干冰</span><span class="homo-good">✓ 青提青柑冰</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 減脂小奶沫</span><span class="homo-good">✓ 減脂小奶茉</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 青汁紅茶椰青</span><span class="homo-good">✓ 輕芝紅茶椰青</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 粒粒蘭香</span><span class="homo-good">✓ 荔荔蘭香</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 富貴酒釀芋圓</span><span class="homo-good">✓ 富桂酒釀芋圓</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 淘淘氣泡飲</span><span class="homo-good">✓ 桃桃氣泡飲</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 仙氣楊梅手搖冰茶</span><span class="homo-good">✓ 鮮氣楊梅手搖冰茶</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 討喜奶屋</span><span class="homo-good">✓ 桃喜奶烏</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 百香茫茫</span><span class="homo-good">✓ 百香芒芒</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 三拼爸爸奶茶</span><span class="homo-good">✓ 三拼霸霸奶茶</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 04: INDUSTRY PLAYBOOKS & CONTAINER COMPLIANCE -->
+    <section class="module-section" id="mod-playbooks-tw" data-slide-index="3">
+      <header class="module-header">
+        <div>
+          <span class="module-kicker">MODULE 04 · PARTNER SOLUTION PLAYBOOKS &amp; CONTAINER RULES</span>
+          <h2 class="module-title">四大行業落地樣板與本地容器網路/延遲測量紅線</h2>
+          <p class="module-desc">我們將前三個樣板直接內建到了增強版 `gpt-live-1-demo` 的<strong>「培訓場景預設」</strong>中，講師明天可在現場一鍵切換體驗；第四個樣板解答政企/金融客戶最常問的本地容器部署與延遲口徑問題。</p>
+        </div>
+        <div class="badge-row">
+          <span class="tag teal">3 大 Demo 預設已內建</span>
+          <span class="tag amber">2026-09-17 容器專項說明</span>
+        </div>
+      </header>
+
+      <div class="grid-2">
+        <article class="info-card">
+          <h3><span>樣板 A：新茶飲/連鎖咖啡門店智能顧問 (`coffee_retail`)</span><span class="tag teal">Demo Preset 1</span></h3>
+          <ul>
+            <li><strong>核心痛點</strong>：門店環境嘈雜、顧客點單常中途改主意（“換燕麥奶、去冰”）、商品名含大量自造同音字（星塵、岩韻、小奶茉）。</li>
+            <li><strong>推薦架構</strong>：`GPT-Live-1` 全雙工 + 旁路 `lookup_beverage_menu`（12 款同音詞歸一）+ `calculate`（團餐折扣）+ `preview_service_order`（草稿確認）。</li>
+            <li><strong>現場演示亮點</strong>：在助手播報咖啡推薦中途直接插話改查“星辰厚乳拿鐵”并計算 18 杯拼單總價，展示零搶話打斷與精準查表。</li>
+          </ul>
+        </article>
+
+        <article class="info-card">
+          <h3><span>樣板 B：智能座艙多意圖車載語音助手 (`smart_cockpit`)</span><span class="tag blue">Demo Preset 2 · Slide 33</span></h3>
+          <ul>
+            <li><strong>核心痛點</strong>：駕車時主副駕閒聊干擾多，且駕駛員習慣一句話包含多個跨領域指令（車控 + 天氣 + 裡程計算 + 餐飲預約）。</li>
+            <li><strong>推薦架構</strong>：`GPT-Live-1` 全雙工抗噪（Background Speech 3/3）+ 旁路多工具編排（`get_weather` + `calculate` + `preview_service_order`）。</li>
+            <li><strong>現場演示亮點（還原 Slide 33）</strong>：一句話說出<em>“幫我把空調調到24度并打開天窗，另外查一下上海今天天氣和當前時間”</em>，驗證多意圖拆解與車控確認邊界。</li>
+          </ul>
+        </article>
+
+        <article class="info-card">
+          <h3><span>樣板 C：中國企業出海全球聯絡中心 (`contact_center`)</span><span class="tag blue">Demo Preset 3 · Slide 8/9</span></h3>
+          <ul>
+            <li><strong>核心痛點</strong>：東南亞/歐美多語種客服成本高、用戶查單號時常有長時間翻找停頓（Explicit Hold）、退換貨政策需即時查考。</li>
+            <li><strong>推薦架構</strong>：SIP/IC3 媒體閘道或 WebRTC 接入 + `Voice Live API`（137 語種）+ 旁路售後工單預覽與 Bing 聯網查詢。</li>
+            <li><strong>現場演示亮點</strong>：先用中文報修并測試咳嗽/停頓不誤斷，隨後說<em>“Please switch to English and summarize my ticket”</em>，展示無縫雙語切換。</li>
+          </ul>
+        </article>
+
+        <article class="info-card">
+          <h3><span>樣板 D：政企本地容器部署白名單與延遲測量規範</span><span class="tag amber">FDE Compliance Guide</span></h3>
+          <ul>
+            <li><strong>Connected 容器必開 443 白名單</strong>：計費與遙測網域名稱 `*.cognitive.microsoft.com`、`*.cognitiveservices.azure.com`（每 <strong>10–15 分鐘</strong>上報用量，連續 10 次失敗將拒絕服務；<strong>絕不上傳客戶原始音訊與識別文本</strong>）；映像拉取網域名稱 `mcr.microsoft.com`、`*.data.mcr.microsoft.com`。</li>
+            <li><strong>Disconnected 完全離線容器</strong>：僅限向微軟提交白名單審批并簽署離線承諾協議的受限客戶。</li>
+            <li><strong>兩大延遲口徑防坑鐵律</strong>：① 預設 `Speech_SegmentationSilenceTimeoutMs = 500ms`（可調 100–5000ms）是句末靜音分段閾值，<strong>不是 STT 平均識別延遲</strong>；② NTTS 單路 `10x 即時`（5 并發 `3x`）是合成速率，<strong>不是首包延遲 (`SynthesisFirstByteLatencyMs`)</strong>。</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- MODULE 05: 6-MINUTE LIVE DEMO RUNBOOK & FAQ -->
+    <section class="module-section" id="mod-runbook-tw" data-slide-index="4">
+      <header class="module-header">
+        <div>
+          <span class="module-kicker">MODULE 05 · 6-MINUTE LIVE DEMO RUNBOOK, BACKUP VIDEO &amp; FAQ</span>
+          <h2 class="module-title">明日現場 6 分鐘標準演示劇本、一鍵提詞與 6 大高頻問答</h2>
+          <p class="module-desc">嚴格遵循“先聲明邊界 ➔ 再秀全雙工打斷 ➔ 再核驗旁路工具與聯網來源 ➔ 最後收尾三平面架構與成本”的節奏。點擊任一話術可一鍵複製。</p>
+        </div>
+        <div class="badge-row">
+          <span class="tag teal">點擊話術一鍵複製</span>
+          <span class="tag blue">內建離線錄影兜底</span>
+        </div>
+      </header>
+
+      <!-- Preflight Checklist -->
+      <div class="info-card" style="margin-bottom:16px;">
+        <h3><span>✅ 課前 5 分鐘講師預檢清單（點擊可勾選）</span><span class="tag teal">Preflight Check</span></h3>
+        <div class="grid-4" style="margin-top:10px;font-size:12.5px;">
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer;"><input type="checkbox" checked> 1. 佩戴有線耳機或啟用硬體 AEC，避免會場音箱回聲自激</label>
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer;"><input type="checkbox" checked> 2. 確認無其他瀏覽器分頁佔用單工作階段併發鎖 (409 保護)</label>
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer;"><input type="checkbox" checked> 3. 先點“測試麥克風”確認音量條跳動，再點“連接工作階段”</label>
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer;"><input type="checkbox" checked> 4. 展開下方“真實環境演示錄影”隨時應對會場 UDP/WebRTC 阻斷</label>
+        </div>
+      </div>
+
+      <!-- 6-Minute Script Timeline -->
+      <div class="script-timeline">
+        <div class="script-step">
+          <div class="script-time">00:00 – 00:45<br><span class="tag amber">Step 1 · 邊界開場</span></div>
+          <div>
+            <strong>架構定位聲明（必講）</strong>：指著頁面頂部的 `WebRTC` 與 `憑據隻在伺服端` 徽章說明：瀏覽器隻負責麥克風音訊與信令，模型憑據由伺服端受控識別 (Managed Identity)管理；語音層負責低延遲全雙工聽說，確定性工具走旁路後端。
+          </div>
+          <a class="btn" href="./?lang=zh-TW" data-demo-link>打開 Demo 臺</a>
+        </div>
+
+        <div class="script-step">
+          <div class="script-time">00:45 – 01:45<br><span class="tag teal">Step 2 · 自然對話</span></div>
+          <div>
+            <strong>建立全雙工基線與附和體驗</strong>：選擇「連鎖咖啡與新茶飲顧問」預設，點擊連接工作階段，等助手說話時輕聲附和“嗯哼、對”，觀察助手不被誤打斷。
+            <div class="script-quote" id="prompt1-tw">你好，我是門店新來的店長，幫我推薦一款今天適合下午提神的招牌飲品，再搭配一款甜點。</div>
+          </div>
+          <button class="btn" type="button" data-copy-target="prompt1-tw">📋 複製話術</button>
+        </div>
+
+        <div class="script-step">
+          <div class="script-time">01:45 – 02:45<br><span class="tag teal">Step 3 · 中途打斷+同音詞</span></div>
+          <div>
+            <strong>核心高潮：Barge-in 中途打斷改向 + Slide 32 新茶飲同音詞檢索</strong>：不等助手把上一段說完，直接插話提問（故意帶同音字“星辰/鹽運”）：
+            <div class="script-quote" id="prompt2-tw">等一下，我顧客有乳糖不耐受，幫我查一下菜單裡的“星辰厚乳拿鐵”和“鹽運大紅袍”多少錢、能不能換燕麥奶？</div>
+          </div>
+          <button class="btn" type="button" data-copy-target="prompt2-tw">📋 複製話術</button>
+        </div>
+
+        <div class="script-step">
+          <div class="script-time">02:45 – 03:45<br><span class="tag blue">Step 4 · 時鐘短路+算式</span></div>
+          <div>
+            <strong>驗證旁路確定性工具與事務確認邊界</strong>：觀察“後端答案”卡片與“查詢來源與工具記錄”中的 `lookup_beverage_menu`、`calculate (575)` 與 `preview_service_order (preview_requires_confirmation)`：
+            <div class="script-quote" id="prompt3-tw">現在幾點了？順便幫我算一下 18 乘 25 加 125 等於多少，再幫我生成一份 18 杯星塵厚乳拿鐵的預訂草稿。</div>
+          </div>
+          <button class="btn" type="button" data-copy-target="prompt3-tw">📋 複製話術</button>
+        </div>
+
+        <div class="script-step">
+          <div class="script-time">03:45 – 04:45<br><span class="tag blue">Step 5 · 天氣+聯網溯源</span></div>
+          <div>
+            <strong>驗證 Open-Meteo 天氣與 Bing 原生 `web_search` 來源連結</strong>：引導現場工程師查看可點擊的來源 URL，強調“口頭回答不讀長 URL，頁面沉澱可核查來源”：
+            <div class="script-quote" id="prompt4-tw">幫我查一下上海未來兩天的天氣，再聯網搜尋一條最近關於 Microsoft Foundry 或 Azure AI Speech 的公開動態并附上來源。</div>
+          </div>
+          <button class="btn" type="button" data-copy-target="prompt4-tw">📋 複製話術</button>
+        </div>
+
+        <div class="script-step">
+          <div class="script-time">04:45 – 06:00<br><span class="tag teal">Step 6 · 雙語切換與收尾</span></div>
+          <div>
+            <strong>驗證跨語種自適應 + 斷開釋放計費</strong>：直接用英文要求總結，展示結束後立即點擊<strong>「斷開」</strong>，向夥伴說明 `$0.05/min` 會話時長計費護欄：
+            <div class="script-quote" id="prompt5-tw">Please switch to English and give me a two-sentence summary of our order draft and weather check.</div>
+          </div>
+          <button class="btn" type="button" data-copy-target="prompt5-tw">📋 複製話術</button>
+        </div>
+      </div>
+
+      <!-- Offline Backup Video + 6 FAQs -->
+      <div class="grid-2" style="margin-top:18px;">
+        <div class="info-card">
+          <h3><span>🎬 現場網路降級兜底：真實環境端到端演示錄影</span><span class="tag amber">Offline Backup</span></h3>
+          <p style="margin-bottom:10px;">若培訓會場防火牆攔截 WebRTC UDP 連接埠，可直接在下方播放已錄製的 Azure 真實環境演示視訊（`GPT-Live-Azure-demo.mp4`），包含完整打斷、天氣、算式、聯網與雙語切換實況：</p>
+          <video controls preload="metadata" style="width:100%;border-radius:12px;border:1px solid var(--border-subtle);background:#000;" src="GPT-Live-Azure-demo.mp4">
+            您的瀏覽器不支援內嵌視訊播放，請直接打開同目錄下的 GPT-Live-Azure-demo.mp4。
+          </video>
+        </div>
+
+        <div class="info-card">
+          <h3><span>💬 合作夥伴與客戶最常問的 6 大尖銳問題（標準應答口徑）</span><span class="tag blue">6 Core FAQs</span></h3>
+          <ul style="font-size:12.4px;gap:8px;">
+            <li><strong>Q1：這和普通串接級聯語音機器人有什麼本質區別？</strong><br>A：`GPT-Live-1` 是原生全雙工邊說邊聽（8 探針 95% vs 52%），同時通過旁路 WSS 把時間、算式、天氣和搜尋交給受控後端，兼顧擬人交互與事實準確。</li>
+            <li><strong>Q2：用戶在語音裡說“取消訂單”，訂單真的取消了嗎？</strong><br>A：<strong>沒有。</strong>本 Demo 不連接真實訂單寫庫；工具 `preview_service_order` 顯式返回 `preview_requires_confirmation`，生產環境必須接審批與冪等狀態機。</li>
+            <li><strong>Q3：瀏覽器直連 WebRTC，會不會泄露 Azure 模型金鑰？</strong><br>A：<strong>不會。</strong>`gpt-live-1` 不下發客戶端臨時 Key；由 App Service 通過 Managed Identity 在後端完成 `/live/sessions` 握手，瀏覽器僅交換 SDP。</li>
+            <li><strong>Q4：用戶中途打斷助手，後臺正在跑的工具會自動回滾嗎？</strong><br>A：<strong>不會。</strong>語音打斷隻停止客戶端播報，已發出的後端請求需靠 `taskVersion` 與事務確認邊界保護。</li>
+            <li><strong>Q5：`GlobalStandard` 是否代表數據 100% 物理留在資源組所在區域？</strong><br>A：<strong>不是。</strong>`GlobalStandard` 提供全球高吞吐調度；如有嚴格數據駐留合規要求，需選用區域級部署、DataZone 或中國區（CN North 3）。</li>
+            <li><strong>Q6：演示結束後把 Web App 停掉，是不是就不花錢了？</strong><br>A：語音會話斷開即停止 `$0.05/min` 計費；但 <strong>停止 Web App 不會停止 App Service Plan (B1 $0.017/h) 計費</strong>，長期不用需刪除或縮容 Plan。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 06: INTERACTIVE FINOPS CALCULATOR & RESOURCE HUB -->
+    <section class="module-section" id="mod-finops-tw" data-slide-index="5">
+      <header class="module-header">
+        <div>
+          <span class="module-kicker">MODULE 06 · INTERACTIVE FINOPS CALCULATOR &amp; RESOURCE HUB</span>
+          <h2 class="module-title">互動式語音方案成本測算器與工程資源速查</h2>
+          <p class="module-desc">基於 2026-09-22 官方 Azure Retail Prices API 實測單價與 FY27 Deck 目錄價，拖動滑塊即可為客戶現場測算不同語音管線層級的月度 TCO。</p>
+        </div>
+        <div class="badge-row">
+          <span class="tag teal">Retail API 已核驗單價</span>
+          <span class="tag amber">估算僅供架構規劃，非帳單承諾</span>
+        </div>
+      </header>
+
+      
+      <div class="calc-grid" data-calc-root="zh-TW">
+        <div class="info-card">
+          <h3><span>🎛️ 調整業務量與架構層級參數</span><span class="tag blue">Interactive Sliders</span></h3>
+          <div class="calc-control" style="margin-top:12px;">
+            <label><span>選擇 Voice Live 語音管線層級</span></label>
+            <select data-calc-tier>
+              <option value="tier1">Tier ① 全雙工旗艦：GPT-Live-1 ($3.00/h = $0.05/min) + gpt-4.1-mini 旁路</option>
+              <option value="tier3">Tier ③ 混合式客服：GPT Realtime 音訊理解 + DragonHDFlash TTS ($15/1M chars)</option>
+              <option value="tier4">Tier ④ 串接級聯式高性價比：MAI-Transcribe-2 ($0.10/h) + gpt-4.1-mini + DragonHDFlash</option>
+            </select>
+          </div>
+          <div class="calc-control">
+            <label><span>月度通話 / 演示總場次 (Sessions / Month)</span><span data-calc-sessions-val>300 場</span></label>
+            <input type="range" data-calc-sessions min="10" max="10000" step="10" value="300">
+          </div>
+          <div class="calc-control">
+            <label><span>平均單場通話時長 (Minutes / Session)</span><span data-calc-minutes-val>6 分鐘</span></label>
+            <input type="range" data-calc-minutes min="1" max="30" step="1" value="6">
+          </div>
+          <div class="calc-control">
+            <label><span>平均單場後端推理 Tokens (`gpt-4.1-mini` Input+Output)</span><span data-calc-tokens-val>6,000 Tokens</span></label>
+            <input type="range" data-calc-tokens min="1000" max="50000" step="1000" value="6000">
+          </div>
+          <div class="calc-control">
+            <label><span>App Service Linux B1 運行時長 ($0.017/h)</span><span data-calc-hours-val>730 小時</span></label>
+            <input type="range" data-calc-hours min="20" max="730" step="10" value="730">
+          </div>
+        </div>
+        <div class="calc-result-box">
+          <div style="font-family:var(--font-mono);font-size:11px;color:#ffffff;text-transform:uppercase;letter-spacing:0.08em;">Estimated Monthly TCO (USD · Retail Baseline)</div>
+          <div class="calc-total" data-calc-total>$103.52 / 月</div>
+          <div class="calc-line"><span>1. 即時語音通道費用 (Voice Session / STT+TTS)</span><strong data-calc-voice>$90.00</strong></div>
+          <div class="calc-line"><span>2. 旁路推理與工具調用 (`gpt-4.1-mini` Global)</span><strong data-calc-llm>$1.26</strong></div>
+          <div class="calc-line"><span>3. 應用托管底座 (Linux App Service B1)</span><strong data-calc-host>$12.41</strong></div>
+          <div class="calc-line"><span>4. 折合單場演示 / 通話平均成本</span><strong data-calc-per-session>$0.345 / 場 ($0.058 / 分鐘)</strong></div>
+          <p style="margin:12px 0 0;font-size:11.5px;color:#d6ecff;line-height:1.5;">
+            📌 <strong>計費核驗說明</strong>：`gpt-live-1` 對應 Azure Retail Meter `Live 1 Gl Unit`（East US 2 公開單價 $3.00/h）；串接級聯式採用 `MAI-Transcribe-2` ($0.10/h) 時，同等 1,800 分鐘（30 小時）語音轉寫加 TTS 成本可降至約 <strong>$27.30/月</strong>。
+          </p>
+        </div>
+      </div>
+
+      <!-- Official Repositories & Links -->
+      <div class="grid-3" style="margin-top:18px;">
+        <div class="info-card">
+          <h3><span>🔗 官方程式碼庫與評測套件</span><span class="tag blue">GitHub Repos</span></h3>
+          <ul>
+            <li><strong>本培訓配套 GPT-Live Demo</strong>：<a href="https://github.com/turbo998/gpt-live-1-demo" target="_blank" rel="noopener noreferrer" style="color:var(--foundry-teal);">turbo998/gpt-live-1-demo</a></li>
+            <li><strong>Voice Live 官方示例集</strong>：<a href="https://github.com/Azure-Samples/voicelive-samples" target="_blank" rel="noopener noreferrer" style="color:var(--azure-blue-light);">Azure-Samples/voicelive-samples</a></li>
+            <li><strong>ASR 準確率與延遲評測工具</strong>：<a href="https://github.com/Azure-Samples/test-copilot-asr-benchmarking" target="_blank" rel="noopener noreferrer" style="color:var(--azure-blue-light);">test-copilot-asr-benchmarking</a></li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h3><span>🧭 微軟內部與夥伴體驗入口</span><span class="tag teal">Playgrounds</span></h3>
+          <ul>
+            <li><strong>Microsoft Foundry Portal</strong>：`ai.azure.com`（模型目錄、Voice Live 與 Agent 編排）</li>
+            <li><strong>Azure Voice Playground</strong>：包含 `GPT-Live-1` 全雙工、多語言 ASR 與 HD Flash TTS 線上試聽</li>
+            <li><strong>7-Card 4:5 評測卡獨立頁</strong>：<a href="benchmark-cards.html" style="color:var(--foundry-teal);">點擊打開 `benchmark-cards.html`</a></li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h3><span>📦 明日培訓交付物清單</span><span class="tag amber">Ready to Present</span></h3>
+          <ul>
+            <li><strong>`training.html`</strong>：本互動式培訓主頁面（支援幻燈片投屏模式）</li>
+            <li><strong>`benchmark-cards.html`</strong>：7-Card 4:5 豎版高密度評測報告卡</li>
+            <li><strong>增強版即時語音工作臺 (`/`)</strong>：含 3 大行業預設、同音詞菜單工具、三平面透視與 8 探針打卡器</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="container" id="lang-container-en" data-lang-container="en" hidden>
+
+    <!-- MODULE 01: EXECUTIVE SUMMARY -->
+    <section class="module-section active-slide" id="mod-exec-en" data-slide-index="0">
+      <header class="module-header">
+        <div>
+          <span class="module-kicker">MODULE 01 · EXECUTIVE SUMMARY &amp; PARADIGM SHIFT</span>
+          <h1 class="module-title">From Serial Voice Bots to Full-Duplex Conversation + Sideband Controlled Execution</h1>
+          <p class="module-desc">Why do legacy cascaded voice bots repeatedly fail in noisy retail stores, smart cockpits, and contact centers? This module gives partner engineers a clear architectural mental model of <strong>Azure Voice Live API</strong> and <strong>GPT-Live-1</strong>.</p>
+        </div>
+        <div class="badge-row">
+          <span class="tag teal">Full-Duplex Listen-While-Speaking</span>
+          <span class="tag blue">137 Locales · 30+ Regions (incl. China)</span>
+          <span class="tag amber">System-1 / System-2 Decoupling</span>
+        </div>
+      </header>
+
+      <div class="grid-3">
+        <article class="info-card">
+          <h3><span>1. Three Engineering Bottlenecks of Legacy Voice Bots</span><span class="tag red">Legacy Pain</span></h3>
+          <ul>
+            <li><strong>False Cut-Offs &amp; Over-Talking</strong>: Energy-threshold VAD treats natural backchannels ("uh-huh, right"), mid-sentence thinking pauses, coughs, or bystander chatter as barge-in commands, fragmenting the conversation.</li>
+            <li><strong>Cascaded Handoff Latency &amp; Paralinguistic Loss</strong>: Serial <code>STT ➔ LLM ➔ TTS</code> pipelines accumulate latency and strip away user emotion, hesitation, and prosodic emphasis the moment audio becomes plain text.</li>
+            <li><strong>Audio Model Hallucinations &amp; Uncontrolled Actions</strong>: Allowing an end-to-end audio model to improvise inventory, arithmetic, or order modifications verbally leads to pricing errors and unverified "phantom cancellations".</li>
+          </ul>
+        </article>
+
+        <article class="info-card">
+          <h3><span>2. Core Definition of Azure Voice Live API</span><span class="tag blue">Realtime Interface</span></h3>
+          <ul>
+            <li><strong>What It Is</strong>: A high-performance, production-grade <strong>Realtime LLM Interface Layer</strong> that gives any cloud LLM (1,000+ Foundry models or customer BYOM) plug-and-play real-time listening, speaking, and Agent orchestration.</li>
+            <li><strong>What It Is Not</strong>: It is <strong>NOT</strong> a single LLM, <strong>NOT</strong> a closed turnkey chatbot, and <strong>NOT</strong> a replacement CCaaS platform—it empowers partner vertical applications rather than competing with them.</li>
+            <li><strong>Four Evolvable Pipeline Tiers</strong>: Under one unified API contract, seamlessly choose between <strong>Full-Duplex (<code>GPT-Live-1</code>), Speech-to-Speech (<code>GPT Realtime</code>), Hybrid, and Cascaded</strong> pipelines.</li>
+          </ul>
+        </article>
+
+        <article class="info-card">
+          <h3><span>3. Fast-Brain / Slow-Brain Philosophy of GPT-Live</span><span class="tag teal">Reference Pattern</span></h3>
+          <ul>
+            <li><strong>Fast Brain (Direct Browser WebRTC to <code>gpt-live-1</code>)</strong>: Handles sub-second full-duplex listening, natural spoken responses, backchannel absorption, and instant barge-in cut-off.</li>
+            <li><strong>Slow Brain (Sideband WSS + <code>gpt-4.1-mini</code> Responses)</strong>: Executes deterministic time short-circuits, safe arithmetic, Open-Meteo weather disambiguation, homophone beverage menu lookup, and grounded Bing search.</li>
+            <li><strong>Controlled Handoff (<code>SpeechDelivery</code> State Machine)</strong>: Splits background results into 220-char chunks injected as <code>commentary</code>, waits for user quiet before nudging spoken <code>instructions</code>, and falls back to text replay on timeout.</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="kpi-strip">
+        <div class="kpi-tile">
+          <div class="kpi-num">20 / 21 (95%)</div>
+          <div class="kpi-title">GPT-Live-1 Noise &amp; Turn-Taking Pass Rate</div>
+          <div class="kpi-sub">8 real-world probes × 3 trials vs. GPT-Realtime-2's 11/21 (52%), eliminating backchannel, thinking pause, cough, and background speech failures (Slide 6)</div>
+        </div>
+        <div class="kpi-tile">
+          <div class="kpi-num">P50 590ms</div>
+          <div class="kpi-title">Paytm Production Latency</div>
+          <div class="kpi-sub">Hybrid Voice Live architecture powers Paytm's &gt;200K calls/day and 1,200+ peak concurrency at P50 590ms / P90 840ms (Slide 21)</div>
+        </div>
+        <div class="kpi-tile">
+          <div class="kpi-num">4.34 MOS / #1</div>
+          <div class="kpi-title">DragonHDFlash &amp; Open ASR #1</div>
+          <div class="kpi-sub">Multi-turn call-center blind MOS of 4.34 beats Doubao (4.27) and human recordings (4.08); Azure LLM Speech ranks #1 on Open ASR Leaderboard (Slide 12/17)</div>
+        </div>
+        <div class="kpi-tile">
+          <div class="kpi-num">360x · $0.10/h</div>
+          <div class="kpi-title">MAI-Transcribe-2 Price-Performance</div>
+          <div class="kpi-sub">Next-gen multimodal transcription reaches 360x RTFx throughput at $0.10/hr list price; GPT-Live-1 metered at $0.05/min (Slide 10 &amp; Retail API)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 02: 3-DIAGRAM ARCHITECTURE VALUE DEEP-DIVE -->
+    <section class="module-section" id="mod-arch-en" data-slide-index="1">
+      <header class="module-header">
+        <div>
+          <span class="module-kicker">MODULE 02 · COMPLETE ARCHITECTURE VALUE DEEP-DIVE (CORE FOCUS)</span>
+          <h2 class="module-title">Engineering Value, Protocol Mechanics &amp; Red Lines Across the Three Core Architecture Diagrams</h2>
+          <p class="module-desc">Switch between the three tabs below to unpack the complete engineering rationale from <strong>1) Product One-Pager Overview ➔ 2) Four-Tier Voice Pipelines &amp; Unified Task Delegation ➔ 3) Three-Plane Azure Production Reference Architecture</strong>. Click any diagram to zoom full-screen.</p>
+        </div>
+        <div class="badge-row">
+          <span class="tag blue">Click any diagram for full-screen zoom</span>
+          <span class="tag teal">Pain ➔ Mechanism ➔ Value ➔ Red Lines</span>
+        </div>
+      </header>
+
+      <!-- 3 Architecture Tabs -->
+      <div class="arch-tabs" role="tablist">
+        <button class="arch-tab-btn active" type="button" data-arch-tab="arch1-en">
+          <span class="arch-tab-step">DIAGRAM 01 · PANORAMA &amp; INGRESS</span>
+          <span class="arch-tab-name">Azure Voice Live API One-Page Overview</span>
+          <span class="arch-tab-summary">ONE MODULE · THREE PROTOCOLS · TWO MODEL PATHS: Omnichannel ingress, built-in Audio DSP, Agent Harness &amp; dual model paths</span>
+        </button>
+        <button class="arch-tab-btn" type="button" data-arch-tab="arch2-en">
+          <span class="arch-tab-step">DIAGRAM 02 · 4-TIER PIPELINE &amp; DELEGATION</span>
+          <span class="arch-tab-name">Four Voice Pipeline Tiers + Unified Task Delegation</span>
+          <span class="arch-tab-summary">Full-Duplex GPT-Live-1 / S2S / Hybrid / Cascaded comparison + right-hand Fast/Slow-Brain task delegation</span>
+        </button>
+        <button class="arch-tab-btn" type="button" data-arch-tab="arch3-en">
+          <span class="arch-tab-step">DIAGRAM 03 · 3-PLANE DEMO ARCHITECTURE</span>
+          <span class="arch-tab-name">GPT-Live Three-Plane Reference (West US 2 + East US 2)</span>
+          <span class="arch-tab-summary">Managed Identity zero-secret handshake, direct Browser WebRTC media, Node.js sideband WSS attach &amp; SpeechDelivery</span>
+        </button>
+      </div>
+
+      <!-- PANE 1: Voice Live One Pager -->
+      <div class="arch-pane active" id="arch1-en">
+        <div class="arch-showcase">
+          <figure class="arch-figure">
+            <img src="assets/arch-1-voice-live-overview.png" alt="Azure Voice Live API One-Page Overview" data-zoom-src="assets/arch-1-voice-live-overview.png" data-zoom-caption="Diagram 01: Azure Voice Live API Panorama (One Module · Three Protocols · Two Model Paths)">
+            <figcaption class="arch-figcaption">
+              <span><strong>Diagram 1: Azure Voice Live API Panorama</strong> (137 Locales · &lt;1s Latency · 1000+ LLMs · 3 Protocols · 2 Model Paths)</span>
+              <button class="btn" type="button" data-zoom-btn="assets/arch-1-voice-live-overview.png">🔍 Full-Screen Zoom</button>
+            </figcaption>
+          </figure>
+
+          <div class="value-4d">
+            <div class="value-box pain">
+              <h4>① What Partner Engineering Pain Does It Solve?</h4>
+              <p>Enterprise customers operate across web browsers, mobile apps, SIP telephony (Genesys/Twilio/ACS), and automotive/IoT devices. Historically, adding a channel or swapping an underlying LLM forced partners to rewrite audio codecs, echo cancellation, VAD segmentation, and tool-calling glue code.</p>
+            </div>
+            <div class="value-box mech">
+              <h4>② Core Architectural Mechanics (Left to Right)</h4>
+              <ul>
+                <li><strong>Omnichannel &amp; 3 Protocols (<code>WebSocket / WebRTC / SIP</code> + 4 SDKs)</strong>: Web/mobile apps use WebRTC for low latency and client AEC; backend services use WebSocket; PSTN/SIP trunks connect natively via the M365-grade <strong>IC3 Media Gateway</strong>.</li>
+                <li><strong>Real-Time Audio DSP Layer</strong>: Built-in cloud <strong>Full-Duplex Semantic Turn Detection (Semantic VAD / EoU)</strong>, playback-reference AEC, and deep noise suppression.</li>
+                <li><strong><code>VOICE LIVE AGENT</code> Runtime Harness</strong>: Native support for <code>Sub-agents</code>, <code>Function Calling</code>, <code>MCP Tools</code>, <code>Foundry Agents</code>, <code>Proactive Messaging</code>, and <code>Silent Context Management</code>.</li>
+                <li><strong>Two Model Paths</strong>: Connect directly to the <strong>Foundry Model Catalog (1,000+ OSS &amp; proprietary models)</strong> or plug in customer self-hosted/fine-tuned endpoints via <strong>BYOM</strong>.</li>
+              </ul>
+            </div>
+            <div class="value-box biz">
+              <h4>③ Commercial &amp; Delivery Value for Customers</h4>
+              <p><strong>Integrate Once, Deploy Globally</strong>: Spans <strong>137 locales</strong> and 30+ global regions (<strong>including Azure China 21Vianet: China East 2 / North 2 / North 3</strong>), with synchronized photo/video Avatar rendering—shrinking multi-channel voice agent delivery from months to weeks.</p>
+            </div>
+            <div class="value-box redline">
+              <h4>④ Positioning Boundary for Solution Architects</h4>
+              <p>Emphasize to customers: Voice Live API is <strong>not a single LLM and not a black-box replacement for existing CRM/CCaaS platforms</strong>; it is the standardized real-time voice runtime that enables any business application to listen, speak naturally, and invoke tools safely.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANE 2: 4-Tier Pipeline + Unified Task Delegation -->
+      <div class="arch-pane" id="arch2-en">
+        <div class="arch-showcase">
+          <figure class="arch-figure">
+            <img src="assets/arch-2-voice-live-4tier-pipeline.png" alt="Azure Voice Live Four-Tier Pipeline and Unified Task Delegation" data-zoom-src="assets/arch-2-voice-live-4tier-pipeline.png" data-zoom-caption="Diagram 02: Azure Voice Live 4-Tier Voice Pipelines (Full-Duplex / S2S / Hybrid / Cascaded) + Unified Task Delegation">
+            <figcaption class="arch-figcaption">
+              <span><strong>Diagram 2: Four Voice Pipeline Tiers + Right-Hand Unified Task Delegation</strong> (Slide 7 Core Architecture)</span>
+              <button class="btn" type="button" data-zoom-btn="assets/arch-2-voice-live-4tier-pipeline.png">🔍 Full-Screen Zoom</button>
+            </figcaption>
+          </figure>
+
+          <div class="value-4d">
+            <div class="value-box pain">
+              <h4>① What Architecture Trade-Off Does It Solve?</h4>
+              <p>Different workloads weight conversational naturalness, custom brand voice, domain-specific vocabulary accuracy, and per-minute cost very differently. No single end-to-end model can simultaneously deliver $0.10/hr ultra-low STT cost and custom brand TTS, while pure cascaded pipelines cannot listen while speaking.</p>
+            </div>
+            <div class="value-box mech">
+              <h4>② How to Select Among the Four Voice Pipeline Tiers (Left Plane)</h4>
+              <ul>
+                <li><strong>① Full-Duplex (<code>GPT-Live-1</code>)</strong>: Single model jointly reasons over simultaneous input and output audio streams, achieving a <strong>95% (20/21)</strong> noise/turn-taking pass rate—ideal for flagship retail advisors, hands-free smart cockpits, and coaching.</li>
+                <li><strong>② Speech-to-Speech (<code>GPT Realtime · Azure Realtime</code>)</strong>: Native multimodal end-to-end speech interaction.</li>
+                <li><strong>③ Hybrid (<code>Semantic VAD·EoU + GPT Realtime 2.1/1.5 + Azure Speech TTS</code>)</strong>: Understands audio natively via multimodal LLM while speaking with <strong>DragonHDFlash / Custom Voice</strong> (proven in Paytm production at 200K+ calls/day, P50 590ms).</li>
+                <li><strong>④ Cascaded (<code>Semantic VAD·EoU + Azure STT + Foundry/BYO LLM + Azure TTS</code>)</strong>: Maximum terminology control (Custom Speech 12/12 beverage homophone fix) + lowest STT cost (<code>MAI-Transcribe-2</code> at $0.10/hr) + any text LLM (GPT/Claude/Gemini/OSS).</li>
+              </ul>
+            </div>
+            <div class="value-box biz">
+              <h4>③ Architectural Value of Unified Task Delegation (Right Plane)</h4>
+              <p>Regardless of which voice pipeline tier runs on the left, the right plane uses unified <strong>Task Delegation</strong> to route deep reasoning, RAG, web search, and transactional tools to <strong>Foundry Agents, GPT/Claude/Gemini, OSS, or customer backends</strong>—cleanly decoupling the Fast Voice Brain from the Slow Business Brain.</p>
+            </div>
+            <div class="value-box redline">
+              <h4>④ Partner Architecture Golden Rule</h4>
+              <p>Never get stuck debating "end-to-end vs. cascaded" on Day 1: under the unified Voice Live API contract, use <strong>Tier ① Full-Duplex for premium concierge, Tier ③ Hybrid for high-concurrency brand hotlines, and Tier ④ Cascaded for heavy domain jargon or cost-sensitive scale</strong>—while reusing 100% of backend tool code.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANE 3: GPT-Live Three-Plane Reference Demo Architecture -->
+      <div class="arch-pane" id="arch3-en">
+        <div class="arch-showcase">
+          <figure class="arch-figure">
+            <img src="assets/arch-3-gpt-live-three-plane.png" alt="GPT-Live Three-Plane Reference Architecture" data-zoom-src="assets/arch-3-gpt-live-three-plane.png" data-zoom-caption="Diagram 03: GPT-Live Three-Plane Production Reference Architecture (West US 2 Linux App Service B1 + East US 2 Foundry gpt-live-1 & gpt-4.1-mini)">
+            <figcaption class="arch-figcaption">
+              <span><strong>Diagram 3: GPT-Live Three-Plane Reference Architecture</strong> (Direct Browser WebRTC + Managed Identity Handshake + Node.js Sideband WSS)</span>
+              <button class="btn" type="button" data-zoom-btn="assets/arch-3-gpt-live-three-plane.png">🔍 Full-Screen Zoom</button>
+            </figcaption>
+          </figure>
+
+          <div class="value-4d">
+            <div class="value-box pain">
+              <h4>① Why Is the Reference Demo Designed This Way? (3 Production Challenges)</h4>
+              <p>1) Since <code>gpt-live-1</code> does not issue ephemeral browser client keys, how do we guarantee zero credential leakage in the frontend?<br>
+                 2) If raw audio were proxied through Node.js, how would we avoid server bandwidth bottlenecks and jitter?<br>
+                 3) When a backend tool returns a multi-paragraph answer, how is it safely handed back to an active voice model?</p>
+            </div>
+            <div class="value-box mech">
+              <h4>② Three-Plane Separation of Concerns</h4>
+              <ul>
+                <li><strong>Plane 1 · Session Handshake &amp; Managed Identity (HTTPS + SDP)</strong>: Browser posts its SDP offer to protected Linux App Service B1 (<code>West US 2</code>); backend uses <strong>Azure Managed Identity</strong> (<code>Cognitive Services OpenAI User</code>) to create the <code>East US 2</code> <code>/live/sessions</code> session and complete WebRTC SDP exchange—zero keys in browser.</li>
+                <li><strong>Plane 2 · Direct Real-Time Media Plane (Browser ⇄ WebRTC ⇄ <code>gpt-live-1</code>)</strong>: Once SDP completes, browser mic/speaker connects peer-to-peer with <code>gpt-live-1</code> in <code>East US 2</code> over WebRTC audio + <code>oai-events</code> data channel—<strong>audio never hairpins through App Service</strong>.</li>
+                <li><strong>Plane 3 · Sideband Control &amp; Controlled Delegation (WSS <code>/live/sessions/{id}/attach</code>)</strong>: Node.js attaches a sideband WebSocket listening for <code>session.delegation.created</code>; standalone clock queries short-circuit via <code>fastTimeAnswer</code> (0 LLM tokens), while weather/math/menu/Bing search route to <code>gpt-4.1-mini</code> (<code>/responses</code>, <code>store:false</code>) and return via <code>SpeechDelivery</code>.</li>
+              </ul>
+            </div>
+            <div class="value-box biz">
+              <h4>③ Cross-Region Topology Note (West US 2 App + East US 2 Models)</h4>
+              <p>Because WebRTC audio flows directly between the user's browser and <code>East US 2</code> models, App Service participates only during session setup and sideband tool triggers. Moving the web app closer to users speeds up page load and SDP setup, but <strong>voice latency is governed by physical network distance to the model region</strong>.</p>
+            </div>
+            <div class="value-box redline">
+              <h4>④ Four Engineering Red Lines Every Partner Engineer Must Know</h4>
+              <ul>
+                <li><strong>Voice Barge-In ≠ Transaction Rollback</strong>: Interrupting speech stops playback on the client; it does not roll back in-flight backend requests.</li>
+                <li><strong>Spoken Reply ≠ Authoritative Business State</strong>: Always treat structured records in the "Sources &amp; Tool Audit" panel as the source of truth.</li>
+                <li><strong>GlobalStandard ≠ Regional Data Residency Guarantee</strong>: Workloads with strict residency mandates require regional or sovereign deployments.</li>
+                <li><strong>Stopping the Web App ≠ Stopping App Service Plan Billing</strong>: Linux B1 Plan ($0.017/hr) continues billing until scaled down or deleted.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4-Tier Architecture Comparison Matrix -->
+      <div class="data-table-wrap" style="margin-top:16px;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Pipeline Tier</th>
+              <th>Core Component Stack</th>
+              <th>E2E Latency &amp; Noise Resilience</th>
+              <th>Voice &amp; Domain Jargon Control</th>
+              <th>Retail Cost Baseline (USD)</th>
+              <th>Primary Best-Fit Scenarios</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="highlight-row">
+              <td><strong>① Full-Duplex</strong></td>
+              <td>Foundry <code>GPT-Live-1</code> + Sideband Task Delegation</td>
+              <td>Listen-while-speaking · 8-Probe Pass Rate <strong>95% (20/21)</strong></td>
+              <td>13 built-in voices (Marin, etc.) · Sideband tool normalization</td>
+              <td><strong>$3.00 / hr ($0.05/min)</strong> + sideband LLM tokens</td>
+              <td>Flagship retail concierge, wake-word-free cockpit, executive coaching</td>
+            </tr>
+            <tr>
+              <td><strong>② Speech-to-Speech (S2S)</strong></td>
+              <td><code>GPT Realtime</code> / <code>Azure Realtime</code></td>
+              <td>Sub-second E2E · 8-Probe Pass Rate 52% (11/21)</td>
+              <td>Built-in multimodal voices</td>
+              <td>Metered by Realtime audio input/output tokens</td>
+              <td>General low-latency voice chat &amp; paralinguistic emotion sensing</td>
+            </tr>
+            <tr>
+              <td><strong>③ Hybrid</strong></td>
+              <td><code>Semantic VAD·EoU</code> + <code>GPT Realtime</code> + <code>Azure TTS (DragonHDFlash / Custom)</code></td>
+              <td>Paytm Production <strong>P50 590ms / P90 840ms</strong></td>
+              <td><strong>700+ voices / HD Flash (MOS 4.34) / Custom Brand Voice</strong></td>
+              <td>Realtime audio input + TTS <strong>$15–$22 / 1M chars</strong></td>
+              <td>High-concurrency brand hotlines (e.g., Paytm 200K+ calls/day)</td>
+            </tr>
+            <tr>
+              <td><strong>④ Cascaded</strong></td>
+              <td><code>Semantic VAD·EoU</code> + <code>Azure STT (Custom / MAI-2)</code> + <code>Any LLM</code> + <code>Azure TTS</code></td>
+              <td>Segmentation-dependent · STT throughput up to <strong>360x RTFx</strong></td>
+              <td>Maximum control: <strong>Custom Speech Phrase List (&gt;10% CER drop)</strong> + BYOM</td>
+              <td>STT from <strong>$0.10/hr (<code>MAI-2</code>)</strong> + text tokens + TTS</td>
+              <td>Specialty beverage/medical/industrial jargon, high-volume cost-sensitive bots</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- MODULE 03: CITED BENCHMARK REPORTS -->
+    <section class="module-section" id="mod-bench-en" data-slide-index="2">
+      <header class="module-header">
+        <div>
+          <span class="module-kicker">MODULE 03 · CITED TEST &amp; BENCHMARK REPORTS</span>
+          <h2 class="module-title">Four Cited Benchmark Suites: Full-Duplex 8-Probes, Open ASR #1, Custom Speech Homophones &amp; TTS Blind MOS</h2>
+          <p class="module-desc">Every cited number strictly distinguishes <strong>REPORTED (from official FY27 Product Updates slides)</strong> from <strong>MEASURED (from automated repo tests &amp; Azure Retail Prices API)</strong>, and is rendered in the exact <code>turbo998/benchmark-harness-engineering</code> 7-Card 4:5 carousel format.</p>
+        </div>
+        <div class="badge-row">
+          <a class="btn primary" href="benchmark-cards.html?lang=en" data-bench-link="">🃏 Open Standalone 7-Card 4:5 Benchmark Deck</a>
+        </div>
+      </header>
+
+      <!-- Benchmark Harness Engineering 7-Card 4:5 Quick Preview Strip -->
+      <div class="info-card" style="margin-bottom:16px;border-color:rgba(99,102,241,0.45);background:linear-gradient(145deg, rgba(30,41,59,0.92), rgba(15,23,42,0.95));">
+        <h3>
+          <span>📐 7-Card 4:5 Visual Report Deck Preview (Aligned to <code>turbo998/benchmark-harness-engineering</code>)</span>
+          <span class="tag blue">4:5 Carousel Deck · 7 Cards</span>
+        </h3>
+        <p style="margin-bottom:12px;">The benchmark report is structured according to <a href="https://github.com/turbo998/benchmark-harness-engineering/blob/main/docs/research/visual-report-card-format.md" target="_blank" rel="noopener noreferrer" style="color:var(--azure-blue-light);"><code>visual-report-card-format.md</code></a> and <a href="https://github.com/turbo998/benchmark-harness-engineering/blob/main/src/benchmark_harness/cards.py" target="_blank" rel="noopener noreferrer" style="color:var(--azure-blue-light);"><code>src/benchmark_harness/cards.py</code></a> (cool slate <code>#f8fafc</code> surface, 10px indigo-blue gradient bar, headline-as-finding, <code>Auto / Confirm / Human</code> action bands, and embedded JSON dataset):</p>
+        <div class="grid-4" style="grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;">
+          <a href="benchmark-cards.html?lang=en#card-1" data-bench-link="#card-1" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#818cf8;font-weight:700;">1 / 7 · OVERVIEW (HANDS-ON)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">Running GPT-Live-1 in a Real Voice Benchmark</div>
+            <div style="font-size:11px;color:var(--ink-muted);">Workbench overview: 20/21 (95%) vs 52% · 3 confidence shapes &amp; action bands</div>
+          </a>
+          <a href="benchmark-cards.html?lang=en#card-2" data-bench-link="#card-2" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#34d399;font-weight:700;">2 / 7 · DEEP_DIVE (CASE BREAKDOWN)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">Same Voice Session, Three Very Different Confidence Shapes</div>
+            <div style="font-size:11px;color:var(--ink-muted);">NOUL Noise Filter (98%) · CHOICE Homophone Fix (92%) · SCORE Hold (67%)</div>
+          </a>
+          <a href="benchmark-cards.html?lang=en#card-3" data-bench-link="#card-3" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#60a5fa;font-weight:700;">3 / 7 · SCORECARD (8 PROBES)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">8 Full-Duplex Probes × 3 Trials: 23/24 Hits</div>
+            <div style="font-size:11px;color:var(--ink-muted);">100% on backchannel/pause/background/cough; single ✕ on Explicit Hold</div>
+          </a>
+          <a href="benchmark-cards.html?lang=en#card-4" data-bench-link="#card-4" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#fbbf24;font-weight:700;">4 / 7 · PROTOCOL (UNDER THE HOOD)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">One Sideband Attach, Full Fast/Slow-Brain Trace</div>
+            <div style="font-size:11px;color:var(--ink-muted);">Dark code trace: <code>session.delegation.created</code> ➔ <code>SpeechDelivery</code></div>
+          </a>
+          <a href="benchmark-cards.html?lang=en#card-5" data-bench-link="#card-5" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#34d399;font-weight:700;">5 / 7 · ROBUSTNESS (HOMOPHONES)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">Testing Beverage Homophones: All 12 SKUs Normalized</div>
+            <div style="font-size:11px;color:var(--ink-muted);">Baseline vs Voice Live: Stardust Thick-Milk Latte +78.0 pts, Rock-Rhyme +77.0 pts</div>
+          </a>
+          <a href="benchmark-cards.html?lang=en#card-6" data-bench-link="#card-6" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#60a5fa;font-weight:700;">6 / 7 · LATENCY (590ms P50)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">Sub-Second Production Latency: Paytm P50 590ms, HDFlash 155ms</div>
+            <div style="font-size:11px;color:var(--ink-muted);">Paired horizontal bars: 2.8x faster than legacy cascade, 4.34 blind MOS</div>
+          </a>
+          <a href="benchmark-cards.html?lang=en#card-7" data-bench-link="#card-7" style="text-decoration:none;padding:11px 13px;border-radius:12px;border:1px solid rgba(148,189,232,0.22);background:rgba(12,28,49,0.85);color:#fff;display:block;">
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:#f87171;font-weight:700;">7 / 7 · TAKEAWAYS (MY TAKE)</div>
+            <div style="font-size:12.5px;font-weight:700;margin:4px 0;">Treat GPT-Live as a Fast/Slow-Brain Runtime, Not a Raw Voice Toy</div>
+            <div style="font-size:11px;color:var(--ink-muted);">✅ Good fit vs ⛔ Not for + companion dataset <code>data/reported/voice-live-gpt-live-1/</code></div>
+          </a>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Benchmark 1: GPT-Live-1 vs GPT-Realtime-2 -->
+        <div class="info-card">
+          <h3>
+            <span>Report 1: GPT-Live-1 vs. GPT-Realtime-2 Full-Duplex Benchmark</span>
+            <span class="tag teal">REPORTED · Slide 6</span>
+          </h3>
+          <p style="margin-bottom:10px;"><strong>Methodology</strong>: 5 subjective interaction dimensions (1–5 scale) + 8 real-world acoustic/conversational probes (3 consecutive trials per probe = 24 trials total; 21 trials excluding Backchannel).</p>
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Metric / Probe</th>
+                  <th>GPT-Live-1</th>
+                  <th>GPT-Realtime-2</th>
+                  <th>Key Finding</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Subjective: Naturalness / Turn-Taking / Length Fit / Adaptability / Empathy</td>
+                  <td><strong>4.7 / 5.0 / 5.0 / 4.7 / 4.7</strong></td>
+                  <td>4.0 / 5.0 / 3.3 / 3.0 / 3.3</td>
+                  <td>+1.7 lead on Length Fit &amp; Adaptability</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td>Probe 1: Backchannel * ("uh-huh / right" while agent speaks)</td>
+                  <td><strong>3 / 3 Pass</strong></td>
+                  <td>0 / 3 Fail</td>
+                  <td>Realtime-2 self-interrupts; Live-1 continues smoothly</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td>Probe 2: Thinking pause (mid-sentence hesitation)</td>
+                  <td><strong>3 / 3 Pass</strong></td>
+                  <td>0 / 3 Fail</td>
+                  <td>Realtime-2 cuts user off; Live-1 waits patiently</td>
+                </tr>
+                <tr>
+                  <td>Probe 3: Explicit hold ("Hold on while I check my card")</td>
+                  <td>2 / 3 Pass</td>
+                  <td>2 / 3 Pass</td>
+                  <td>Only boundary case: long silence benefits from UI hold state</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td>Probe 4: Background speech (bystander chatter)</td>
+                  <td><strong>3 / 3 Pass</strong></td>
+                  <td>0 / 3 Fail</td>
+                  <td>Live-1 suppresses non-primary background speakers</td>
+                </tr>
+                <tr>
+                  <td>Probes 5 / 6 / 7: Barge-in / Delegation hold / Rapid exchange</td>
+                  <td><strong>3/3 · 3/3 · 3/3</strong></td>
+                  <td>3/3 · 3/3 · 3/3</td>
+                  <td>100% pass on interruption, tool wait, and rapid Q&amp;A</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td>Probe 8: Cough (sudden cough / throat clearing)</td>
+                  <td><strong>3 / 3 Pass</strong></td>
+                  <td>0 / 3 Fail</td>
+                  <td>Realtime-2 misfires; Live-1 ignores acoustic noise natively</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td><strong>Overall Pass Rate (excl. Backchannel)</strong></td>
+                  <td><strong>20 / 21 (95%)</strong></td>
+                  <td>11 / 21 (52%)</td>
+                  <td><strong>+43% absolute gain (23/24 vs. 11/24 incl. backchannel)</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Benchmark 2: TTS Call Center MOS & STT Matrix -->
+        <div class="info-card">
+          <h3>
+            <span>Report 2: Call-Center Multi-Turn TTS Blind MOS vs. Doubao &amp; Human</span>
+            <span class="tag blue">REPORTED · Slide 15–17</span>
+          </h3>
+          <p style="margin-bottom:10px;"><strong>Methodology</strong>: Blind 5-dimension MOS evaluation on multi-turn customer service dialogues comparing Azure <code>DragonHDFlash</code> (Cloud GPU <strong>FBL &lt; 160ms</strong>, $15/1M chars) against top competitors (Doubao Vendor1/Vendor2) and human agent recordings.</p>
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Voice / Model</th>
+                  <th>Audio Quality</th>
+                  <th>Overall</th>
+                  <th>Emotion Fit</th>
+                  <th>Prosody</th>
+                  <th>Human-Likeness</th>
+                  <th>Mean MOS</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="highlight-row">
+                  <td><strong>hdflash_xiaoqi (Azure)</strong></td>
+                  <td>4.28</td>
+                  <td><strong>4.25</strong></td>
+                  <td><strong>4.37</strong></td>
+                  <td><strong>4.39</strong></td>
+                  <td><strong>4.40</strong></td>
+                  <td><strong>4.34 🏆</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>hdflash_xiaoke (Azure)</strong></td>
+                  <td><strong>4.32</strong></td>
+                  <td>4.17</td>
+                  <td>4.33</td>
+                  <td>4.32</td>
+                  <td>4.26</td>
+                  <td><strong>4.28</strong></td>
+                </tr>
+                <tr>
+                  <td>Vendor 1 (Doubao Flagship)</td>
+                  <td>4.23</td>
+                  <td>4.17</td>
+                  <td>4.32</td>
+                  <td>4.35</td>
+                  <td>4.29</td>
+                  <td>4.27</td>
+                </tr>
+                <tr>
+                  <td>Vendor 2 (Competitor Baseline)</td>
+                  <td>4.30</td>
+                  <td>3.93</td>
+                  <td>3.99</td>
+                  <td>4.18</td>
+                  <td>4.09</td>
+                  <td>4.10</td>
+                </tr>
+                <tr>
+                  <td>Human Recording Baseline</td>
+                  <td>3.45</td>
+                  <td>3.89</td>
+                  <td>4.29</td>
+                  <td>4.37</td>
+                  <td>4.42</td>
+                  <td>4.08</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin-top:10px;font-size:12px;">
+            💡 <strong>Report 3 (Global STT Leaderboard · Slide 10 &amp; 12)</strong>: Microsoft Azure LLM Speech ranks <strong>#1 Globally on the HuggingFace Open ASR Leaderboard</strong> (multilingual average WER); the new <strong><code>MAI-Transcribe-2</code></strong> delivers <strong>360x RTFx throughput at $0.10/hour</strong> (72% lower than $0.36/hr).
+          </p>
+        </div>
+      </div>
+
+      <!-- Benchmark 4: Custom Speech 12 Beverage Homophones -->
+      <div class="info-card" style="margin-top:16px;">
+        <h3>
+          <span>Report 4: 12 Specialty Tea &amp; Coffee Homophone SKUs with Custom Speech (&gt;10% CER Reduction)</span>
+          <span class="tag teal">REPORTED · Slide 32 + MEASURED Demo Tool</span>
+        </h3>
+        <p>Generic ASR and foundation models frequently mis-transcribe branded specialty tea and retail coined names due to Mandarin homophones. By combining Azure Speech <strong>Custom Speech / Phrase List</strong> (in Hybrid/Cascaded tiers) with our demo's sideband <strong><code>lookup_beverage_menu</code> homophone resolver</strong> (in the Full-Duplex tier), all 12 high-error beverage SKUs normalize with 100% accuracy:</p>
+        <div class="homophone-wall">
+          <div class="homo-chip"><span class="homo-bad">✗ 星辰厚乳拿铁 (Star)</span><span class="homo-good">✓ 星尘厚乳拿铁 (Stardust)</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 盐运大红袍 (Salt)</span><span class="homo-good">✓ 岩韵大红袍 (Rock-Rhyme)</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 青提青干冰 (Dry Ice)</span><span class="homo-good">✓ 青提青柑冰 (Green Citrus)</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 减脂小奶沫 (Foam)</span><span class="homo-good">✓ 减脂小奶茉 (Jasmine)</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 青汁红茶椰青 (Green Juice)</span><span class="homo-good">✓ 轻芝红茶椰青 (Light Cheese)</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 粒粒兰香 (Grain)</span><span class="homo-good">✓ 荔荔兰香 (Lychee Orchid)</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 富贵酒酿芋圆 (Wealth)</span><span class="homo-good">✓ 富桂酒酿芋圆 (Osmanthus)</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 淘淘气泡饮 (TaoTao)</span><span class="homo-good">✓ 桃桃气泡饮 (Peach Fizz)</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 仙气杨梅手摇冰茶 (Fairy)</span><span class="homo-good">✓ 鲜气杨梅手摇冰茶 (Fresh Bayberry)</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 讨喜奶屋 (Milk House)</span><span class="homo-good">✓ 桃喜奶乌 (Peach Oolong)</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 百香茫茫 (Vast)</span><span class="homo-good">✓ 百香芒芒 (Passion Mango)</span></div>
+          <div class="homo-chip"><span class="homo-bad">✗ 三拼爸爸奶茶 (Papa)</span><span class="homo-good">✓ 三拼霸霸奶茶 (Baba Trio)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 04: INDUSTRY PLAYBOOKS & CONTAINER COMPLIANCE -->
+    <section class="module-section" id="mod-playbooks-en" data-slide-index="3">
+      <header class="module-header">
+        <div>
+          <span class="module-kicker">MODULE 04 · PARTNER SOLUTION PLAYBOOKS &amp; CONTAINER RULES</span>
+          <h2 class="module-title">Four Industry Solution Playbooks &amp; On-Prem Container Network / Latency Rules</h2>
+          <p class="module-desc">The first three playbooks are built directly into our enhanced <code>gpt-live-1-demo</code> as one-click <strong>Training Scenario Presets</strong> for tomorrow's live session; the fourth playbook addresses the most common enterprise compliance questions around Speech Containers and latency metrics.</p>
+        </div>
+        <div class="badge-row">
+          <span class="tag teal">3 Demo Presets Built-In</span>
+          <span class="tag amber">2026-09-17 Container Compliance Brief</span>
+        </div>
+      </header>
+
+      <div class="grid-2">
+        <article class="info-card">
+          <h3><span>Playbook A: Specialty Tea &amp; Coffee Store Concierge (<code>coffee_retail</code>)</span><span class="tag teal">Demo Preset 1</span></h3>
+          <ul>
+            <li><strong>Core Pain</strong>: Noisy store environments, frequent mid-sentence order changes ("switch to oat milk, no ice"), and coined homophone SKU names (Stardust, Rock-Rhyme, Little Jasmine).</li>
+            <li><strong>Recommended Stack</strong>: <code>GPT-Live-1</code> Full-Duplex + sideband <code>lookup_beverage_menu</code> (12 homophone SKUs) + <code>calculate</code> (group discount) + <code>preview_service_order</code> (draft confirmation).</li>
+            <li><strong>Live Demo Highlight</strong>: Interrupt the assistant mid-recommendation to ask about "Xingchen Thick-Milk Latte" and calculate an 18-cup group order—proving zero over-talking and exact catalog pricing.</li>
+          </ul>
+        </article>
+
+        <article class="info-card">
+          <h3><span>Playbook B: Multi-Intent Automotive Smart Cockpit (<code>smart_cockpit</code>)</span><span class="tag blue">Demo Preset 2 · Slide 33</span></h3>
+          <ul>
+            <li><strong>Core Pain</strong>: Passenger chatter in the cabin and compound single-breath driver utterances spanning climate control, weather, range math, and dining reservations.</li>
+            <li><strong>Recommended Stack</strong>: <code>GPT-Live-1</code> noise resilience (Background Speech 3/3) + sideband multi-tool orchestration (<code>get_weather</code> + <code>calculate</code> + <code>preview_service_order</code>).</li>
+            <li><strong>Live Demo Highlight (Slide 33)</strong>: Say in one breath: <em>"Set the AC to 24 degrees and open the sunroof, plus check Shanghai's weather today and the current time"</em> to verify multi-intent parsing and confirmation boundaries.</li>
+          </ul>
+        </article>
+
+        <article class="info-card">
+          <h3><span>Playbook C: Cross-Border Global Contact Center (<code>contact_center</code>)</span><span class="tag blue">Demo Preset 3 · Slide 8/9</span></h3>
+          <ul>
+            <li><strong>Core Pain</strong>: High multilingual staffing costs across SEA/EU/US, long pauses while customers look up serial/order numbers (Explicit Hold), and policy checks requiring grounded search.</li>
+            <li><strong>Recommended Stack</strong>: SIP/IC3 Media Gateway or WebRTC + <code>Voice Live API</code> (137 locales) + sideband RMA ticket preview and grounded Bing search.</li>
+            <li><strong>Live Demo Highlight</strong>: Report a device issue in Mandarin with natural pauses/coughs, then say <em>"Please switch to English and summarize my ticket"</em> for seamless bilingual handoff.</li>
+          </ul>
+        </article>
+
+        <article class="info-card">
+          <h3><span>Playbook D: Enterprise Speech Container Allowlist &amp; Latency Rules</span><span class="tag amber">FDE Compliance Guide</span></h3>
+          <ul>
+            <li><strong>Connected Container Outbound Port 443 Allowlist</strong>: Billing &amp; telemetry domains <code>*.cognitive.microsoft.com</code> and <code>*.cognitiveservices.azure.com</code> (reports usage every <strong>10–15 minutes</strong>; 10 consecutive failures deny service; <strong>never uploads customer raw audio or transcripts</strong>); image pull domains <code>mcr.microsoft.com</code> and <code>*.data.mcr.microsoft.com</code>.</li>
+            <li><strong>Disconnected Air-Gapped Containers</strong>: Restricted strictly to approved enterprise customers with signed offline commitment agreements.</li>
+            <li><strong>Two Latency Measurement Guardrails</strong>: ① Default <code>Speech_SegmentationSilenceTimeoutMs = 500ms</code> (tunable 100–5000ms) is the end-of-utterance silence threshold, <strong>NOT average STT recognition latency</strong>; ② NTTS single-stream <code>10x real-time</code> (<code>3x</code> at 5 concurrent streams) is synthesis throughput speed, <strong>NOT first-byte latency (<code>SynthesisFirstByteLatencyMs</code>)</strong>.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- MODULE 05: 6-MINUTE LIVE DEMO RUNBOOK & FAQ -->
+    <section class="module-section" id="mod-runbook-en" data-slide-index="4">
+      <header class="module-header">
+        <div>
+          <span class="module-kicker">MODULE 05 · 6-MINUTE LIVE DEMO RUNBOOK, BACKUP VIDEO &amp; FAQ</span>
+          <h2 class="module-title">6-Minute Live Instructor Script, One-Click Spoken Prompts &amp; 6 Core FAQs</h2>
+          <p class="module-desc">Follow the proven 4-beat cadence: <strong>1) State Architectural Boundaries ➔ 2) Show Full-Duplex Barge-In ➔ 3) Verify Sideband Tools &amp; Grounded Citations ➔ 4) Close with Three-Plane Architecture &amp; FinOps</strong>. Click any prompt to copy.</p>
+        </div>
+        <div class="badge-row">
+          <span class="tag teal">One-Click Prompt Copy</span>
+          <span class="tag blue">Built-In Offline Video Fallback</span>
+        </div>
+      </header>
+
+      <!-- Preflight Checklist -->
+      <div class="info-card" style="margin-bottom:16px;">
+        <h3><span>✅ 5-Minute Instructor Preflight Checklist (Interactive)</span><span class="tag teal">Preflight Check</span></h3>
+        <div class="grid-4" style="margin-top:10px;font-size:12.5px;">
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer;"><input type="checkbox" checked> 1. Wear a wired headset or enable hardware AEC to prevent speaker echo feedback</label>
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer;"><input type="checkbox" checked> 2. Ensure no other browser tab holds the single-session concurrency lock (HTTP 409 guard)</label>
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer;"><input type="checkbox" checked> 3. Click "Test Microphone" to verify meter movement before clicking "Connect Session"</label>
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer;"><input type="checkbox" checked> 4. Keep the recorded production video below ready in case venue Wi-Fi blocks UDP/WebRTC</label>
+        </div>
+      </div>
+
+      <!-- 6-Minute Script Timeline -->
+      <div class="script-timeline">
+        <div class="script-step">
+          <div class="script-time">00:00 – 00:45<br><span class="tag amber">Step 1 · Boundaries</span></div>
+          <div>
+            <strong>Architectural Framing (Mandatory Opening)</strong>: Point to the top <code>WebRTC</code> and <code>Server-Side Managed Identity</code> badges: explain that the browser handles only mic audio and SDP signaling, model credentials stay on the server via Managed Identity, the voice plane handles low-latency full-duplex speech, and deterministic tools execute on the sideband backend.
+          </div>
+          <a class="btn" href="./?lang=en" data-demo-link>Open Demo Console</a>
+        </div>
+
+        <div class="script-step">
+          <div class="script-time">00:45 – 01:45<br><span class="tag teal">Step 2 · Backchannel</span></div>
+          <div>
+            <strong>Establish Full-Duplex Baseline &amp; Backchannel Absorption</strong>: Select the "Specialty Coffee &amp; Tea Concierge" preset, connect the session, and softly say "uh-huh, right" while the assistant speaks—showing it does not falsely cut off.
+            <div class="script-quote" id="prompt1-en">Hi, I'm the new store manager. Recommend a signature afternoon pick-me-up drink for today and pair it with a light dessert.</div>
+          </div>
+          <button class="btn" type="button" data-copy-target="prompt1-en">📋 Copy Prompt</button>
+        </div>
+
+        <div class="script-step">
+          <div class="script-time">01:45 – 02:45<br><span class="tag teal">Step 3 · Barge-In + SKU</span></div>
+          <div>
+            <strong>Climax: Mid-Sentence Barge-In + Slide 32 Homophone Menu Lookup</strong>: Before the assistant finishes speaking, interrupt directly using homophone beverage names ("星辰厚乳拿铁 / 盐运大红袍"):
+            <div class="script-quote" id="prompt2-en">Hold on—my customer is lactose intolerant. Check the menu price for "星辰厚乳拿铁" (Stardust Latte) and "盐运大红袍" (Rock-Rhyme Oolong), and whether we can swap to oat milk.</div>
+          </div>
+          <button class="btn" type="button" data-copy-target="prompt2-en">📋 Copy Prompt</button>
+        </div>
+
+        <div class="script-step">
+          <div class="script-time">02:45 – 03:45<br><span class="tag blue">Step 4 · Clock + Math</span></div>
+          <div>
+            <strong>Verify Deterministic Sideband Tools &amp; Confirmation Boundary</strong>: Inspect <code>lookup_beverage_menu</code>, <code>calculate (575)</code>, and <code>preview_service_order (preview_requires_confirmation)</code> in the Backend Answer and Tool Audit panels:
+            <div class="script-quote" id="prompt3-en">What time is it right now? Also calculate 18 times 25 plus 125, and create a draft group order for 18 cups of Stardust Thick-Milk Latte with oat milk.</div>
+          </div>
+          <button class="btn" type="button" data-copy-target="prompt3-en">📋 Copy Prompt</button>
+        </div>
+
+        <div class="script-step">
+          <div class="script-time">03:45 – 04:45<br><span class="tag blue">Step 5 · Weather + Search</span></div>
+          <div>
+            <strong>Verify Open-Meteo Weather &amp; Grounded Bing <code>web_search</code> Citations</strong>: Show engineers the clickable source URLs—highlighting that the voice reply stays concise while full URLs are preserved visually:
+            <div class="script-quote" id="prompt4-en">Check the weather forecast for Shanghai over the next two days, and search the web for a recent public update on Microsoft Foundry or Azure AI Speech with source links.</div>
+          </div>
+          <button class="btn" type="button" data-copy-target="prompt4-en">📋 Copy Prompt</button>
+        </div>
+
+        <div class="script-step">
+          <div class="script-time">04:45 – 06:00<br><span class="tag teal">Step 6 · Bilingual + Disconnect</span></div>
+          <div>
+            <strong>Verify Cross-Language Switching + Disconnect to Stop Billing</strong>: Ask for an English summary, then immediately click <strong>Disconnect</strong> and explain the <code>$0.05/min</code> session billing guardrail:
+            <div class="script-quote" id="prompt5-en">Please switch to English and give me a two-sentence summary of our order draft and weather check.</div>
+          </div>
+          <button class="btn" type="button" data-copy-target="prompt5-en">📋 Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- Offline Backup Video + 6 FAQs -->
+      <div class="grid-2" style="margin-top:18px;">
+        <div class="info-card">
+          <h3><span>🎬 Venue Firewall Fallback: Recorded Production E2E Demo Video</span><span class="tag amber">Offline Backup</span></h3>
+          <p style="margin-bottom:10px;">If venue Wi-Fi blocks outbound WebRTC UDP ports, play the pre-recorded Azure production walkthrough (<code>GPT-Live-Azure-demo.mp4</code>) covering barge-in, weather, math, grounded search, and bilingual switching:</p>
+          <video controls preload="metadata" style="width:100%;border-radius:12px;border:1px solid var(--border-subtle);background:#000;" src="GPT-Live-Azure-demo.mp4">
+            Your browser does not support embedded video playback. Please open GPT-Live-Azure-demo.mp4 directly.
+          </video>
+        </div>
+
+        <div class="info-card">
+          <h3><span>💬 Top 6 Tough Partner &amp; Customer Questions (Standard Answers)</span><span class="tag blue">6 Core FAQs</span></h3>
+          <ul style="font-size:12.4px;gap:8px;">
+            <li><strong>Q1: How is this fundamentally different from a standard cascaded voice bot?</strong><br>A: <code>GPT-Live-1</code> performs native full-duplex listen-while-speaking (95% vs. 52% on 8 noise probes), while delegating clock, math, weather, and search over sideband WSS to a controlled backend—combining natural prosody with factual rigor.</li>
+            <li><strong>Q2: When a user says "cancel my order" on the call, is the order actually cancelled?</strong><br>A: <strong>No.</strong> This demo never mutates a production database directly; <code>preview_service_order</code> explicitly returns <code>preview_requires_confirmation</code>. Production deployments must enforce approval and idempotency state machines.</li>
+            <li><strong>Q3: Does direct Browser WebRTC expose Azure model API keys?</strong><br>A: <strong>No.</strong> <code>gpt-live-1</code> does not issue ephemeral client keys; App Service authenticates via Managed Identity on the backend to establish <code>/live/sessions</code>, and the browser exchanges only SDP.</li>
+            <li><strong>Q4: Does interrupting the assistant automatically roll back a running backend tool?</strong><br>A: <strong>No.</strong> Barge-in only halts client audio playback; in-flight backend tasks are guarded by <code>taskVersion</code> and explicit transaction confirmation boundaries.</li>
+            <li><strong>Q5: Does <code>GlobalStandard</code> guarantee 100% physical data residency in the resource group's region?</strong><br>A: <strong>No.</strong> <code>GlobalStandard</code> optimizes global throughput routing; strict residency mandates require Regional, DataZone, or sovereign (e.g., China North 3) deployments.</li>
+            <li><strong>Q6: If I stop the Web App after the demo, does all Azure billing stop?</strong><br>A: Disconnecting the voice session stops <code>$0.05/min</code> model billing, but <strong>stopping a Web App does NOT stop App Service Plan (Linux B1 $0.017/hr) billing</strong>—scale down or delete the Plan when unused.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 06: INTERACTIVE FINOPS CALCULATOR & RESOURCE HUB -->
+    <section class="module-section" id="mod-finops-en" data-slide-index="5">
+      <header class="module-header">
+        <div>
+          <span class="module-kicker">MODULE 06 · INTERACTIVE FINOPS CALCULATOR &amp; RESOURCE HUB</span>
+          <h2 class="module-title">Interactive Voice Solution TCO Calculator &amp; Engineering Resource Hub</h2>
+          <p class="module-desc">Grounded in verified 2026-09-22 Azure Retail Prices API meters and FY27 deck list prices. Note: interactive sliders are synced with the FinOps calculator logic across languages.</p>
+        </div>
+        <div class="badge-row">
+          <span class="tag teal">Verified Retail API Meters</span>
+          <span class="tag amber">Planning Estimate Only · Not a Billing Quote</span>
+        </div>
+      </header>
+
+      
+      <div class="calc-grid" data-calc-root="en" style="margin-bottom:18px;">
+        <div class="info-card">
+          <h3><span>🎛️ Adjust Workload Volume &amp; Pipeline Tier</span><span class="tag blue">Interactive Sliders</span></h3>
+          <div class="calc-control" style="margin-top:12px;">
+            <label><span>Select Voice Live Pipeline Tier</span></label>
+            <select data-calc-tier>
+              <option value="tier1">Tier ① Full-Duplex Flagship: GPT-Live-1 ($3.00/h = $0.05/min) + gpt-4.1-mini Sideband</option>
+              <option value="tier3">Tier ③ Hybrid Contact Center: GPT Realtime Audio + DragonHDFlash TTS ($15/1M chars)</option>
+              <option value="tier4">Tier ④ Cascaded High-Efficiency: MAI-Transcribe-2 ($0.10/h) + gpt-4.1-mini + DragonHDFlash</option>
+            </select>
+          </div>
+          <div class="calc-control">
+            <label><span>Monthly Calls / Demo Sessions (Sessions / Month)</span><span data-calc-sessions-val>300 sessions</span></label>
+            <input type="range" data-calc-sessions min="10" max="10000" step="10" value="300">
+          </div>
+          <div class="calc-control">
+            <label><span>Average Session Duration (Minutes / Session)</span><span data-calc-minutes-val>6 min</span></label>
+            <input type="range" data-calc-minutes min="1" max="30" step="1" value="6">
+          </div>
+          <div class="calc-control">
+            <label><span>Average Sideband LLM Tokens (`gpt-4.1-mini` Input+Output)</span><span data-calc-tokens-val>6,000 Tokens</span></label>
+            <input type="range" data-calc-tokens min="1000" max="50000" step="1000" value="6000">
+          </div>
+          <div class="calc-control">
+            <label><span>App Service Linux B1 Runtime Hours ($0.017/h)</span><span data-calc-hours-val>730 hrs</span></label>
+            <input type="range" data-calc-hours min="20" max="730" step="10" value="730">
+          </div>
+        </div>
+        <div class="calc-result-box">
+          <div style="font-family:var(--font-mono);font-size:11px;color:#ffffff;text-transform:uppercase;letter-spacing:0.08em;">Estimated Monthly TCO (USD · Retail Baseline)</div>
+          <div class="calc-total" data-calc-total>$103.67 / mo</div>
+          <div class="calc-line"><span>1. Real-Time Voice Channel (Voice Session / STT+TTS)</span><strong data-calc-voice>$90.00</strong></div>
+          <div class="calc-line"><span>2. Sideband Reasoning &amp; Tools (`gpt-4.1-mini` Global)</span><strong data-calc-llm>$1.26</strong></div>
+          <div class="calc-line"><span>3. App Hosting Base (Linux App Service B1)</span><strong data-calc-host>$12.41</strong></div>
+          <div class="calc-line"><span>4. Average Cost per Session / Minute</span><strong data-calc-per-session>$0.346 / session ($0.058 / min)</strong></div>
+          <p style="margin:12px 0 0;font-size:11.5px;color:#d6ecff;line-height:1.5;">
+            📌 <strong>Meter Verification</strong>: <code>gpt-live-1</code> maps to Azure Retail Meter <code>Live 1 Gl Unit</code> (East US 2 public rate $3.00/hr); switching to Cascaded with <code>MAI-Transcribe-2</code> ($0.10/hr) lowers 1,800 minutes (30 hours) of STT + TTS to ~<strong>$27.30/mo</strong>.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="info-card">
+          <h3><span>💵 Verified Unit Price Baseline (USD)</span><span class="tag teal">Retail API</span></h3>
+          <ul>
+            <li><strong>Tier ① Full-Duplex (<code>GPT-Live-1</code>)</strong>: <strong>$3.00 / hr ($0.05 / min)</strong> via meter <code>Live 1 Gl Unit</code> (East US 2) + sideband <code>gpt-4.1-mini</code> tokens (~$0.70 / 1M blended).</li>
+            <li><strong>Tier ③ Hybrid (<code>GPT Realtime + DragonHDFlash</code>)</strong>: ~$0.032 / min blended audio + HD Flash TTS at <strong>$15 / 1M chars</strong>.</li>
+            <li><strong>Tier ④ Cascaded (<code>MAI-Transcribe-2 + LLM + TTS</code>)</strong>: STT at <strong>$0.10 / hr</strong> + text LLM tokens + TTS (~$18/month for 30 hours of audio).</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h3><span>🔗 Official Repositories &amp; Benchmark Suites</span><span class="tag blue">GitHub Repos</span></h3>
+          <ul>
+            <li><strong>Partner Training &amp; GPT-Live Demo</strong>: <a href="https://github.com/turbo998/gpt-live-1-demo" target="_blank" rel="noopener noreferrer" style="color:var(--foundry-teal);">turbo998/gpt-live-1-demo</a></li>
+            <li><strong>Benchmark Harness Spec</strong>: <a href="https://github.com/turbo998/benchmark-harness-engineering" target="_blank" rel="noopener noreferrer" style="color:var(--azure-blue-light);">turbo998/benchmark-harness-engineering</a></li>
+            <li><strong>Official Voice Live Samples</strong>: <a href="https://github.com/Azure-Samples/voicelive-samples" target="_blank" rel="noopener noreferrer" style="color:var(--azure-blue-light);">Azure-Samples/voicelive-samples</a></li>
+            <li><strong>ASR Accuracy &amp; Latency Harness</strong>: <a href="https://github.com/Azure-Samples/test-copilot-asr-benchmarking" target="_blank" rel="noopener noreferrer" style="color:var(--azure-blue-light);">test-copilot-asr-benchmarking</a></li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h3><span>📦 Complete Training Deliverable Package</span><span class="tag amber">Ready to Present</span></h3>
+          <ul>
+            <li><strong><code>training.html</code></strong>: Trilingual interactive training portal (<code>zh-CN</code> / <code>zh-TW</code> / <code>en</code>) with Slide Mode</li>
+            <li><strong><code>benchmark-cards.html</code></strong>: 7-Card 4:5 carousel report built to the exact <code>benchmark-harness-engineering</code> spec</li>
+            <li><strong>Enhanced Live Voice Workbench (<code>/</code>)</strong>: 4 presets, 12-SKU homophone menu tool, 3-plane inspector &amp; 8-probe checklist</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Lightbox Modal for Architecture Diagrams -->
+  <div class="lightbox" id="lightboxModal" hidden>
+    <img id="lightboxImg" src="" alt="Architecture Diagram Full-Screen Preview">
+    <div class="lightbox-bar">
+      <span id="lightboxCaption"></span>
+      <button class="btn primary" id="closeLightboxBtn" type="button">✕ 关闭全屏预览 (Esc)</button>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const UI_STRINGS = {
+        "zh-CN": {
+          pageTitle: "GPT-Live (gpt-live-1) & Azure Voice Live API · 合作伙伴工程师技术培训 H5",
+          brandTitle: "GPT-Live (`gpt-live-1`) & Voice Live API 合作伙伴工程师技术培训",
+          brandSub: "FY27 产品更新 · 三大架构图价值深潜 · 7-Card 权威评测基准 · 6 分钟现场实操手册",
+          chapters: ["01 定位与演进", "02 三大架构图深潜", "03 引用测试报告", "04 行业样板与容器规范", "05 现场 Demo 剧本与 FAQ", "06 成本测算与资源"],
+          slideBtn: "🖥️ 投屏幻灯片模式",
+          scrollBtn: "📜 切换长页阅读模式",
+          benchBtn: "📊 7-Card 4:5 评测卡",
+          demoBtn: "🎙️ 启动增强版语音 Demo",
+          prevSlide: "◀ 上一节",
+          nextSlide: "下一节 ▶",
+          exitSlide: "退出幻灯片",
+          closeZoom: "✕ 关闭全屏预览 (Esc)",
+          copied: "✓ 已复制",
+          sessionsUnit: " 场",
+          minutesUnit: " 分钟",
+          hoursUnit: " 小时",
+          monthUnit: " / 月",
+          perSessionFmt: (ps, pm) => `$${ps} / 场 ($${pm} / 分钟)`
+        },
+        "zh-TW": {
+          pageTitle: "GPT-Live (gpt-live-1) & Azure Voice Live API · 合作夥伴工程師技術培訓 H5",
+          brandTitle: "GPT-Live (`gpt-live-1`) & Voice Live API 合作夥伴工程師技術培訓",
+          brandSub: "FY27 產品更新 · 三大架構圖價值深潛 · 7-Card 權威評測基準 · 6 分鐘現場實操手冊",
+          chapters: ["01 定位與演進", "02 三大架構圖深潛", "03 引用測試報告", "04 行業樣板與容器規範", "05 現場 Demo 劇本與 FAQ", "06 成本測算與資源"],
+          slideBtn: "🖥️ 投屏簡報模式",
+          scrollBtn: "📜 切換長頁閱讀模式",
+          benchBtn: "📊 7-Card 4:5 評測卡",
+          demoBtn: "🎙️ 啟動增強版語音 Demo",
+          prevSlide: "◀ 上一節",
+          nextSlide: "下一節 ▶",
+          exitSlide: "退出簡報模式",
+          closeZoom: "✕ 關閉全螢幕預覽 (Esc)",
+          copied: "✓ 已複製",
+          sessionsUnit: " 場",
+          minutesUnit: " 分鐘",
+          hoursUnit: " 小時",
+          monthUnit: " / 月",
+          perSessionFmt: (ps, pm) => `$${ps} / 場 ($${pm} / 分鐘)`
+        },
+        "en": {
+          pageTitle: "GPT-Live (gpt-live-1) & Azure Voice Live API · Partner Engineer Technical Training H5",
+          brandTitle: "GPT-Live (`gpt-live-1`) & Voice Live API Partner Engineer Technical Training",
+          brandSub: "FY27 Product Updates · 3-Diagram Architecture Deep-Dive · 7-Card Benchmark Deck · 6-Min Live Runbook",
+          chapters: ["01 Executive Summary", "02 3-Diagram Architecture", "03 Cited Benchmarks", "04 Playbooks & Containers", "05 6-Min Runbook & FAQ", "06 FinOps & Resources"],
+          slideBtn: "🖥️ Slide Deck Mode",
+          scrollBtn: "📜 Long-Page Scroll Mode",
+          benchBtn: "📊 7-Card 4:5 Benchmark",
+          demoBtn: "🎙️ Launch Live Voice Demo",
+          prevSlide: "◀ Prev",
+          nextSlide: "Next ▶",
+          exitSlide: "Exit Slides",
+          closeZoom: "✕ Close Full-Screen (Esc)",
+          copied: "✓ Copied",
+          sessionsUnit: " sessions",
+          minutesUnit: " min",
+          hoursUnit: " hrs",
+          monthUnit: " / mo",
+          perSessionFmt: (ps, pm) => `$${ps} / session ($${pm} / min)`
+        }
+      };
+
+      let currentLang = "zh-CN";
+      let currentSlide = 0;
+
+      function getActiveContainer() {
+        return document.querySelector(`[data-lang-container="${currentLang}"]`);
+      }
+
+      function getActiveSections() {
+        const c = getActiveContainer();
+        return c ? Array.from(c.querySelectorAll('.module-section')) : [];
+      }
+
+      // 1. Architecture Diagram Tabs (scoped per container)
+      document.querySelectorAll('[data-lang-container]').forEach((container) => {
+        const archBtns = Array.from(container.querySelectorAll('[data-arch-tab]'));
+        const archPanes = Array.from(container.querySelectorAll('.arch-pane'));
+        archBtns.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const target = btn.dataset.archTab;
+            archBtns.forEach((b) => b.classList.toggle('active', b === btn));
+            archPanes.forEach((p) => p.classList.toggle('active', p.id === target));
+          });
+        });
+      });
+
+      // 2. Lightbox Zoom for Architecture Diagrams
+      const lightbox = document.getElementById('lightboxModal');
+      const lightboxImg = document.getElementById('lightboxImg');
+      const lightboxCaption = document.getElementById('lightboxCaption');
+      const closeLightboxBtn = document.getElementById('closeLightboxBtn');
+
+      function openZoom(src, caption) {
+        lightboxImg.src = src;
+        lightboxCaption.textContent = caption || '';
+        lightbox.hidden = false;
+      }
+
+      document.querySelectorAll('[data-zoom-src]').forEach((img) => {
+        img.addEventListener('click', () => openZoom(img.dataset.zoomSrc, img.dataset.zoomCaption));
+      });
+      document.querySelectorAll('[data-zoom-btn]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const fig = btn.closest('.arch-figure');
+          const img = fig && fig.querySelector('img');
+          openZoom(btn.dataset.zoomBtn, img ? img.dataset.zoomCaption : '');
+        });
+      });
+      closeLightboxBtn.addEventListener('click', () => { lightbox.hidden = true; });
+      lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.hidden = true; });
+
+      // 3. Copy Script Prompts
+      document.querySelectorAll('[data-copy-target]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const el = document.getElementById(btn.dataset.copyTarget);
+          if (!el) return;
+          try {
+            await navigator.clipboard.writeText(el.textContent.trim());
+            const old = btn.textContent;
+            btn.textContent = UI_STRINGS[currentLang].copied;
+            setTimeout(() => { btn.textContent = old; }, 1500);
+          } catch (_) {}
+        });
+      });
+
+      // 4. Interactive FinOps Calculator (bound for each language container)
+      document.querySelectorAll('[data-calc-root]').forEach((root) => {
+        const lang = root.dataset.calcRoot || 'zh-CN';
+        const ui = UI_STRINGS[lang] || UI_STRINGS['zh-CN'];
+        const calcTier = root.querySelector('[data-calc-tier]');
+        const calcSessions = root.querySelector('[data-calc-sessions]');
+        const calcMinutes = root.querySelector('[data-calc-minutes]');
+        const calcTokens = root.querySelector('[data-calc-tokens]');
+        const calcHostHours = root.querySelector('[data-calc-hours]');
+
+        function updateCalc() {
+          const tier = calcTier.value;
+          const sessions = Number(calcSessions.value);
+          const minutes = Number(calcMinutes.value);
+          const tokens = Number(calcTokens.value);
+          const hostHours = Number(calcHostHours.value);
+
+          root.querySelector('[data-calc-sessions-val]').textContent = sessions.toLocaleString() + ui.sessionsUnit;
+          root.querySelector('[data-calc-minutes-val]').textContent = minutes + ui.minutesUnit;
+          root.querySelector('[data-calc-tokens-val]').textContent = tokens.toLocaleString() + ' Tokens';
+          root.querySelector('[data-calc-hours-val]').textContent = hostHours + ui.hoursUnit;
+
+          const totalMinutes = sessions * minutes;
+          const totalHours = totalMinutes / 60;
+
+          let voiceUsd = 0;
+          if (tier === 'tier1') {
+            voiceUsd = totalHours * 3.0;
+          } else if (tier === 'tier3') {
+            voiceUsd = totalMinutes * 0.032;
+          } else {
+            voiceUsd = totalHours * 0.10 + totalMinutes * 0.0135;
+          }
+
+          const totalTokens = sessions * tokens;
+          const llmUsd = (totalTokens / 1_000_000) * 0.70;
+          const hostUsd = hostHours * 0.017;
+          const totalUsd = voiceUsd + llmUsd + hostUsd;
+          const perSession = sessions > 0 ? totalUsd / sessions : 0;
+          const perMin = totalMinutes > 0 ? totalUsd / totalMinutes : 0;
+
+          root.querySelector('[data-calc-voice]').textContent = '$' + voiceUsd.toFixed(2);
+          root.querySelector('[data-calc-llm]').textContent = '$' + llmUsd.toFixed(2);
+          root.querySelector('[data-calc-host]').textContent = '$' + hostUsd.toFixed(2);
+          root.querySelector('[data-calc-total]').textContent = '$' + totalUsd.toFixed(2) + ui.monthUnit;
+          root.querySelector('[data-calc-per-session]').textContent = ui.perSessionFmt(perSession.toFixed(3), perMin.toFixed(3));
+        }
+
+        [calcTier, calcSessions, calcMinutes, calcTokens, calcHostHours].forEach((el) => {
+          el.addEventListener('input', updateCalc);
+          el.addEventListener('change', updateCalc);
+        });
+        updateCalc();
+      });
+
+      // 5. Slide Presentation Mode & Language Switching
+      const chapterLinks = Array.from(document.querySelectorAll('.chapter-link'));
+      const toggleSlideModeBtn = document.getElementById('toggleSlideModeBtn');
+      const prevSlideBtn = document.getElementById('prevSlideBtn');
+      const nextSlideBtn = document.getElementById('nextSlideBtn');
+      const exitSlideBtn = document.getElementById('exitSlideBtn');
+      const slideCounter = document.getElementById('slideCounter');
+
+      function showSlide(index) {
+        const sections = getActiveSections();
+        if (!sections.length) return;
+        currentSlide = (index + sections.length) % sections.length;
+        sections.forEach((sec, i) => sec.classList.toggle('active-slide', i === currentSlide));
+        chapterLinks.forEach((link, i) => link.classList.toggle('active', i === currentSlide));
+        slideCounter.textContent = (currentSlide + 1) + ' / ' + sections.length;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function setLanguage(lang) {
+        if (!UI_STRINGS[lang]) lang = 'zh-CN';
+        currentLang = lang;
+        document.documentElement.lang = lang;
+        document.body.dataset.lang = lang;
+        const ui = UI_STRINGS[lang];
+        document.title = ui.pageTitle;
+        document.getElementById('navBrandTitle').textContent = ui.brandTitle;
+        document.getElementById('navBrandSub').textContent = ui.brandSub;
+
+        const isSlide = document.body.dataset.mode === 'slide';
+        const demoBase = window.__demoOrigin || '.';
+        toggleSlideModeBtn.textContent = isSlide ? ui.scrollBtn : ui.slideBtn;
+        document.getElementById('navBenchBtn').textContent = ui.benchBtn;
+        document.getElementById('navBenchBtn').href = `benchmark-cards.html?lang=${lang}`;
+        document.getElementById('navDemoBtn').textContent = ui.demoBtn;
+        document.getElementById('navDemoBtn').href = `${demoBase}/?lang=${lang}`;
+        document.querySelectorAll('[data-demo-link]').forEach((a) => {
+          a.href = `${demoBase}/?lang=${lang}`;
+        });
+        document.querySelectorAll('[data-bench-link]').forEach((a) => {
+          const hash = a.dataset.benchLink || '';
+          a.href = `benchmark-cards.html?lang=${lang}${hash}`;
+        });
+        prevSlideBtn.textContent = ui.prevSlide;
+        nextSlideBtn.textContent = ui.nextSlide;
+        exitSlideBtn.textContent = ui.exitSlide;
+        closeLightboxBtn.textContent = ui.closeZoom;
+
+        const suffix = lang === 'zh-CN' ? '' : (lang === 'zh-TW' ? '-tw' : '-en');
+        chapterLinks.forEach((link, i) => {
+          link.textContent = ui.chapters[i] || link.textContent;
+          link.href = `#${link.dataset.modBase}${suffix}`;
+        });
+
+        document.querySelectorAll('[data-lang-container]').forEach((c) => {
+          c.hidden = c.dataset.langContainer !== lang;
+        });
+        document.querySelectorAll('[data-lang-btn]').forEach((b) => {
+          b.classList.toggle('active', b.dataset.langBtn === lang);
+        });
+
+        showSlide(currentSlide);
+        try {
+          localStorage.setItem('gpt_live_training_lang', lang);
+          localStorage.setItem('gpt_live_demo_lang', lang);
+          localStorage.setItem('voice-demo-ui-language', lang);
+        } catch (_) {}
+      }
+
+      document.querySelectorAll('[data-lang-btn]').forEach((btn) => {
+        btn.addEventListener('click', () => setLanguage(btn.dataset.langBtn));
+      });
+
+      toggleSlideModeBtn.addEventListener('click', () => {
+        const isSlide = document.body.dataset.mode === 'slide';
+        document.body.dataset.mode = isSlide ? 'scroll' : 'slide';
+        const ui = UI_STRINGS[currentLang];
+        toggleSlideModeBtn.textContent = isSlide ? ui.slideBtn : ui.scrollBtn;
+        if (!isSlide) showSlide(currentSlide);
+      });
+
+      prevSlideBtn.addEventListener('click', () => showSlide(currentSlide - 1));
+      nextSlideBtn.addEventListener('click', () => showSlide(currentSlide + 1));
+      exitSlideBtn.addEventListener('click', () => {
+        document.body.dataset.mode = 'scroll';
+        toggleSlideModeBtn.textContent = UI_STRINGS[currentLang].slideBtn;
+      });
+
+      chapterLinks.forEach((link, idx) => {
+        link.addEventListener('click', (e) => {
+          chapterLinks.forEach((l, i) => l.classList.toggle('active', i === idx));
+          if (document.body.dataset.mode === 'slide') {
+            e.preventDefault();
+            showSlide(idx);
+          }
+        });
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (!lightbox.hidden && e.key === 'Escape') {
+          lightbox.hidden = true;
+          return;
+        }
+        if (document.body.dataset.mode !== 'slide') return;
+        if (e.target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') showSlide(currentSlide + 1);
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') showSlide(currentSlide - 1);
+        else if (e.key === 'Escape') exitSlideBtn.click();
+      });
+
+      const params = new URLSearchParams(window.location.search);
+      const qLang = params.get('lang');
+      let savedLang = null;
+      try { savedLang = localStorage.getItem('gpt_live_training_lang'); } catch (_) {}
+      if (qLang && UI_STRINGS[qLang]) setLanguage(qLang);
+      else if (savedLang && UI_STRINGS[savedLang]) setLanguage(savedLang);
+      else setLanguage('zh-CN');
+
+      fetch('demo-host.json', { cache: 'no-store' })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((info) => {
+          if (info && typeof info.demoOrigin === 'string' && /^https:\/\//.test(info.demoOrigin)) {
+            window.__demoOrigin = info.demoOrigin.replace(/\/+$/, '');
+            setLanguage(currentLang);
+          }
+        })
+        .catch(() => {});
+    })();
+  </script>
+</body>
+</html>

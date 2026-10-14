@@ -11,9 +11,10 @@ test('page catalogs cover referenced keys and keep interpolation parameters alig
   const html=readFileSync(new URL(`../public/${page==='main'?'index':'setup'}.html`,import.meta.url),'utf8');
   for(const match of html.matchAll(new RegExp(`["'](${page}\\.[\\w.]+)["']`,'g')))assert.ok(catalog[match[1]],`Missing ${match[1]}`);
   for(const [key,entry]of Object.entries(catalog)){
-   assert.equal(typeof entry.en,'string',key);assert.equal(typeof entry['zh-CN'],'string',key);
+   assert.equal(typeof entry.en,'string',key);assert.equal(typeof entry['zh-CN'],'string',key);assert.equal(typeof entry['zh-TW'],'string',key);
    const params=value=>[...value.matchAll(/\{([\w.-]+)\}/g)].map(m=>m[1]).sort();
    assert.deepEqual(params(entry.en),params(entry['zh-CN']),key);
+   assert.deepEqual(params(entry.en),params(entry['zh-TW']),key);
   }
  }
 });

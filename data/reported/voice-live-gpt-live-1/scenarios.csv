@@ -1,0 +1,13 @@
+scenario,question,decider_answer,reported_probability_pct,pointed_right_way,action
+1. Backchannel ('uh-huh'),Keep speaking without self-cutoff?,3/3 Passed,100,True,Auto
+2. Mid-sentence thinking pause,Wait for user to finish thought?,3/3 Passed,100,True,Auto
+3. Explicit hold ('wait a sec'),Hold floor across extended pause?,2/3 Passed,67,False,Confirm
+4. Background speech,Ignore bystander side-talk?,3/3 Passed,100,True,Auto
+5. Mid-speech barge-in,Halt TTS & pivot topic immediately?,3/3 Passed,100,True,Auto
+6. Tool delegation hold,Filler speech + sidecar tool handoff?,3/3 Passed,100,True,Auto
+7. Rapid-fire exchange,Zero overlap in fast Q&A turns?,3/3 Passed,100,True,Auto
+8. Cough / throat clearing,Ignore non-lexical acoustic impulse?,3/3 Passed,100,True,Auto
+Beverage homophone lookup,12 specialty tea names normalized?,12/12 Exact,100,True,Auto
+Deterministic math & time,18*22*0.85 & Intl time short-circuit?,¥336.60 Exact,100,True,Auto
+Order / cockpit mutation gate,Auto-commit state during barge-in?,Draft Only,62,True,Confirm
+SpeechDelivery >220c chunking,Wait for user quiet before TTS?,Queued / Fallback,88,True,Confirm

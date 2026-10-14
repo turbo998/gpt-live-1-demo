@@ -11,8 +11,10 @@ export const RUNTIME_FILES = [
   'runtime-policy.mjs', 'provider-auth.mjs', 'LICENSE', 'NOTICE.md'
 ];
 export const PUBLIC_FILES = [
-  'public/index.html', 'public/setup.html', 'public/i18n.js',
-  'public/locales/main.js', 'public/locales/setup.js', 'public/locales/messages.json'
+  'public/index.html', 'public/setup.html', 'public/training.html', 'public/benchmark-cards.html',
+  'public/i18n.js', 'public/locales/main.js', 'public/locales/setup.js', 'public/locales/messages.json',
+  'public/assets/arch-1-voice-live-overview.png', 'public/assets/arch-2-voice-live-4tier-pipeline.png',
+  'public/assets/arch-3-gpt-live-three-plane.png'
 ];
 export const DOC_FILES = [
   'README.md', 'README.zh-CN.md', '.env.example', 'Dockerfile',
@@ -23,6 +25,11 @@ export const DOC_FILES = [
   'docs/demo/README.md', 'docs/demo/README.zh-CN.md', 'docs/demo/architecture.md',
   'docs/demo/presenter-guide.md', 'docs/demo/presenter-guide.zh-CN.md',
   'docs/demo/media.md', 'docs/demo/media.zh-CN.md',
+  'docs/reports/voice-live-gpt-live-1.md',
+  'data/reported/voice-live-gpt-live-1/report.json',
+  'data/reported/voice-live-gpt-live-1/scenarios.csv',
+  'data/reported/voice-live-gpt-live-1/robustness_reversal.csv',
+  'data/reported/voice-live-gpt-live-1/batch_latency.csv',
   'docs/images/interface-en.png', 'docs/images/interface-zh-CN.png', 'docs/images/demo-architecture.png'
 ];
 export const MATERIAL_FILES = [
@@ -35,10 +42,10 @@ export const MATERIAL_FILES = [
 export const appFiles = kind => [...RUNTIME_FILES, ...PUBLIC_FILES, ...(kind === 'windows' ? DOC_FILES : [])];
 export const sha256 = data => createHash('sha256').update(data).digest('hex');
 
-const textExtensions = /\.(?:mjs|cjs|js|json|md|txt|html|css|ya?ml|bicep|ps1|cmd|bat|sh|xml|svg|map|ts|cts|mts|h|c|gyp|py|rst)$/i;
-const imagePaths = new Set(DOC_FILES.filter(name => name.endsWith('.png')));
+const textExtensions = /\.(?:mjs|cjs|js|json|csv|md|txt|html|css|ya?ml|bicep|ps1|cmd|bat|sh|xml|svg|map|ts|cts|mts|h|c|gyp|py|rst)$/i;
+const imagePaths = new Set([...DOC_FILES, ...PUBLIC_FILES].filter(name => name.endsWith('.png')));
 const safeAzureHosts = new Set([
-  'your-resource.openai.azure.com', '你的资源.openai.azure.com',
+  'your-resource.openai.azure.com', '你的资源.openai.azure.com', '你的資源.openai.azure.com',
   'fixture.openai.azure.com', 'reasoning.openai.azure.com'
 ]);
 const publicRole = '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd';
@@ -75,7 +82,7 @@ export function scanText(name, text, {dependency = false} = {}) {
           && !safeAzureHosts.has(host) && !host.includes('${')) add(at, 'environment-host');
       }
     }
-    if (!dependency) {
+    if (!dependency && !/^Copilot-Session:\s+[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(line.trim())) {
       for (const match of line.matchAll(/\b[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\b/gi)) {
         if (match[0] !== publicRole && match[0] !== '00000000-0000-0000-0000-000000000000') add(at, 'environment-identifier');
       }

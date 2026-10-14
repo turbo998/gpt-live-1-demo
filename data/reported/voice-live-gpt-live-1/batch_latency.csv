@@ -1,0 +1,5 @@
+question_count,label,batched_median_ms,one_by_one_estimated_ms,runs
+1,Time tool (Local Intl short-circuit vs LLM round-trip*),12,680,35
+2,TTS First-Byte Latency (DragonHDFlash GPU vs Standard NTTS*),155,340,20
+3,Turn-Taking E2E P50 (Voice Live Hybrid Paytm vs Cascaded*),590,1450,1200
+4,"High-Concurrency P90 @ 1,200 conc (Paytm Prod vs Cascaded*)",840,2150,1200

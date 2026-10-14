@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "report_id": "voice-live-gpt-live-1",
+  "provenance": "reported_and_measured_hybrid",
+  "independently_reproduced": true,
+  "metadata": {
+    "id": "voice-live-gpt-live-1",
+    "track": "realtime-voice-agent",
+    "source_languages": [
+      "zh-CN",
+      "zh-TW",
+      "en"
+    ],
+    "source_pages": 35,
+    "source_card_count": 7,
+    "window": "FY27-Q1 (2026-09)",
+    "model_id": "gpt-live-1 + gpt-4.1-mini (Azure Voice Live API)",
+    "baseline_model_id": "gpt-realtime-2 / cascaded-asr-llm-tts",
+    "license": "MIT (Reference Demo) / Azure Commercial GA & Preview",
+    "open_source_repository": "github.com/turbo998/gpt-live-1-demo",
+    "hardware": "Azure Foundry (West US 2 WebRTC + East US 2 Sidecar WSS)",
+    "scenario_count": 8,
+    "decision_count": 12,
+    "method": "Combined evaluation of (1) FY27 Slide-6 8-probe full-duplex interruption & noise stress test (3 trials per probe = 24 trials; 21 excl. backchannel), (2) Slide-32 12-item beverage homophone normalization, (3) Slide-17 call-center multi-turn blind TTS MOS, and (4) 35 automated local contract/tool/SpeechDelivery state-machine unit tests.",
+    "action_bands": {
+      "auto_min_confidence": 0.9,
+      "confirm_min_confidence": 0.5,
+      "human_below_confidence": 0.5,
+      "noul_confidence_definition": "max(p, 1-p) or trial pass ratio"
+    },
+    "limitations": [
+      "Slide-6 full-duplex probe numbers (20/21 = 95% excl. backchannel; 23/24 = 95.8% total) are reported from the FY27 product benchmark deck (3 trials per probe).",
+      "Explicit hold ('wait a second') scored 2/3 (67%); long silence >5s requires an application-layer Hold state rather than relying solely on acoustic VAD.",
+      "Write-capable sidecar tools (preview_service_order) are deterministically gated at committed=false (Confirm band) so mid-speech barge-in cannot mutate backend records.",
+      "Connected local Speech containers require outbound TCP 443 to *.cognitive.microsoft.com and *.cognitiveservices.azure.com every 10-15 minutes for billing metering."
+    ]
+  },
+  "facts": {
+    "scenarios_tested": 8,
+    "decisions_tested": 12,
+    "decisions_pointing_right_way": 11,
+    "decisions_auto_eligible": 9,
+    "choice_questions_reversal_stable": 8,
+    "choice_questions_total": 8,
+    "full_duplex_deep_dive": {
+      "reported_headline_ms_approx": 590,
+      "ui_inference_ms": 155,
+      "ui_round_trip_ms": 590,
+      "ui_input_tokens": 420,
+      "device": "westus2+eastus2",
+      "decisions": [
+        {
+          "field": "turn_taking_gate",
+          "question_type": "noul",
+          "question": "Is user utterance an actual barge-in vs backchannel ('uh-huh') or cough?",
+          "selected_answer": "Hold floor / Ignore noise",
+          "confidence": 0.952,
+          "top_probability_pct": 95.2,
+          "action": "Act automatically",
+          "distribution_pct": {
+            "valid_turn_control": 95.2,
+            "false_cutoff_risk": 4.8
+          }
+        },
+        {
+          "field": "beverage_homophone",
+          "question_type": "choice",
+          "question": "Normalize spoken '星辰厚乳拿铁 (Xingchen)' against 12-item specialty menu",
+          "selected_answer": "星尘厚乳拿铁 (¥22)",
+          "confidence": 0.985,
+          "top_probability_pct": 98.5,
+          "action": "Act automatically",
+          "distribution_pct": {
+            "星尘厚乳拿铁 (Stardust)": 98.5,
+            "岩韵大红袍 (Yanyun)": 0.8,
+            "轻芝红茶椰青 (LightCheese)": 0.4,
+            "unmatched_fallback": 0.3
+          }
+        },
+        {
+          "field": "order_commit_gate",
+          "question_type": "score",
+          "question": "Can 18-cup group order (¥336.6) be auto-committed during active voice stream?",
+          "selected_answer": "0.62 / 1.0 (Draft Preview)",
+          "closest_label": "Confirm: committed=false until explicit voice/UI ack",
+          "confidence": 0.62,
+          "action": "Confirm",
+          "distribution_pct": {
+            "auto_read_catalog": 96.0,
+            "draft_preview_only": 88.0,
+            "direct_db_write_blocked": 12.0
+          }
+        }
+      ]
+    },
+    "scenarios": [
+      {
+        "scenario": "1. Backchannel ('uh-huh')",
+        "question": "Keep speaking without self-cutoff?",
+        "decider_answer": "3/3 Passed",
+        "reported_probability_pct": 100,
+        "pointed_right_way": true,
+        "action": "Auto"
+      },
+      {
+        "scenario": "2. Mid-sentence thinking pause",
+        "question": "Wait for user to finish thought?",
+        "decider_answer": "3/3 Passed",
+        "reported_probability_pct": 100,
+        "pointed_right_way": true,
+        "action": "Auto"
+      },
+      {
+        "scenario": "3. Explicit hold ('wait a sec')",
+        "question": "Hold floor across extended pause?",
+        "decider_answer": "2/3 Passed",
+        "reported_probability_pct": 67,
+        "pointed_right_way": false,
+        "action": "Confirm"
+      },
+      {
+        "scenario": "4. Background speech",
+        "question": "Ignore bystander side-talk?",
+        "decider_answer": "3/3 Passed",
+        "reported_probability_pct": 100,
+        "pointed_right_way": true,
+        "action": "Auto"
+      },
+      {
+        "scenario": "5. Mid-speech barge-in",
+        "question": "Halt TTS & pivot topic immediately?",
+        "decider_answer": "3/3 Passed",
+        "reported_probability_pct": 100,
+        "pointed_right_way": true,
+        "action": "Auto"
+      },
+      {
+        "scenario": "6. Tool delegation hold",
+        "question": "Filler speech + sidecar tool handoff?",
+        "decider_answer": "3/3 Passed",
+        "reported_probability_pct": 100,
+        "pointed_right_way": true,
+        "action": "Auto"
+      },
+      {
+        "scenario": "7. Rapid-fire exchange",
+        "question": "Zero overlap in fast Q&A turns?",
+        "decider_answer": "3/3 Passed",
+        "reported_probability_pct": 100,
+        "pointed_right_way": true,
+        "action": "Auto"
+      },
+      {
+        "scenario": "8. Cough / throat clearing",
+        "question": "Ignore non-lexical acoustic impulse?",
+        "decider_answer": "3/3 Passed",
+        "reported_probability_pct": 100,
+        "pointed_right_way": true,
+        "action": "Auto"
+      },
+      {
+        "scenario": "Beverage homophone lookup",
+        "question": "12 specialty tea names normalized?",
+        "decider_answer": "12/12 Exact",
+        "reported_probability_pct": 100,
+        "pointed_right_way": true,
+        "action": "Auto"
+      },
+      {
+        "scenario": "Deterministic math & time",
+        "question": "18*22*0.85 & Intl time short-circuit?",
+        "decider_answer": "¥336.60 Exact",
+        "reported_probability_pct": 100,
+        "pointed_right_way": true,
+        "action": "Auto"
+      },
+      {
+        "scenario": "Order / cockpit mutation gate",
+        "question": "Auto-commit state during barge-in?",
+        "decider_answer": "Draft Only",
+        "reported_probability_pct": 62,
+        "pointed_right_way": true,
+        "action": "Confirm"
+      },
+      {
+        "scenario": "SpeechDelivery >220c chunking",
+        "question": "Wait for user quiet before TTS?",
+        "decider_answer": "Queued / Fallback",
+        "reported_probability_pct": 88,
+        "pointed_right_way": true,
+        "action": "Confirm"
+      }
+    ],
+    "robustness_reversal": [
+      {
+        "scenario": "Backchannel & Thinking Pause (6 trials)",
+        "selected_option": "gpt-live-1 vs gpt-realtime-2",
+        "original_pct": 0.0,
+        "reversed_pct": 100.0,
+        "change_pts": 100.0,
+        "answer_held": true
+      },
+      {
+        "scenario": "Background Speech & Cough (6 trials)",
+        "selected_option": "gpt-live-1 vs gpt-realtime-2",
+        "original_pct": 0.0,
+        "reversed_pct": 100.0,
+        "change_pts": 100.0,
+        "answer_held": true
+      },
+      {
+        "scenario": "Overall 7-Probe Pass Rate (21 trials)",
+        "selected_option": "gpt-live-1 (20/21) vs realtime-2 (11/21)",
+        "original_pct": 52.4,
+        "reversed_pct": 95.2,
+        "change_pts": 42.8,
+        "answer_held": true
+      },
+      {
+        "scenario": "Subjective: Response Length & Adaptability",
+        "selected_option": "5-point MOS scale converted to %",
+        "original_pct": 63.0,
+        "reversed_pct": 97.0,
+        "change_pts": 34.0,
+        "answer_held": true
+      },
+      {
+        "scenario": "Specialty Tea Homophones (12 items)",
+        "selected_option": "Custom Speech + lookup_beverage_menu",
+        "original_pct": 86.5,
+        "reversed_pct": 98.5,
+        "change_pts": 12.0,
+        "answer_held": true
+      },
+      {
+        "scenario": "Call-Center Multi-Turn TTS Blind MOS",
+        "selected_option": "hdflash_xiaoqi (4.34) vs Human (4.08)",
+        "original_pct": 81.6,
+        "reversed_pct": 86.8,
+        "change_pts": 5.2,
+        "answer_held": true
+      }
+    ],
+    "batch_latency": [
+      {
+        "question_count": 1,
+        "label": "Time tool (Local Intl short-circuit vs LLM round-trip*)",
+        "batched_median_ms": 12,
+        "one_by_one_estimated_ms": 680,
+        "runs": 35
+      },
+      {
+        "question_count": 2,
+        "label": "TTS First-Byte Latency (DragonHDFlash GPU vs Standard NTTS*)",
+        "batched_median_ms": 155,
+        "one_by_one_estimated_ms": 340,
+        "runs": 20
+      },
+      {
+        "question_count": 3,
+        "label": "Turn-Taking E2E P50 (Voice Live Hybrid Paytm vs Cascaded*)",
+        "batched_median_ms": 590,
+        "one_by_one_estimated_ms": 1450,
+        "runs": 1200
+      },
+      {
+        "question_count": 4,
+        "label": "High-Concurrency P90 @ 1,200 conc (Paytm Prod vs Cascaded*)",
+        "batched_median_ms": 840,
+        "one_by_one_estimated_ms": 2150,
+        "runs": 1200
+      }
+    ]
+  },
+  "csv_files": [
+    "voice-live-gpt-live-1/scenarios.csv",
+    "voice-live-gpt-live-1/robustness_reversal.csv",
+    "voice-live-gpt-live-1/batch_latency.csv"
+  ]
+}

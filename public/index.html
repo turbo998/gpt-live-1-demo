@@ -1082,14 +1082,22 @@
         <label class="ui-language-control" for="uiLanguageSelect"><span data-i18n="main.ui.language">界面语言</span>
           <select id="uiLanguageSelect" aria-label="界面语言" data-i18n-aria-label="main.ui.language">
             <option value="zh-CN" data-i18n="main.ui.zh">简体中文</option>
+            <option value="zh-TW" data-i18n="main.ui.zhTW">繁體中文</option>
             <option value="en" data-i18n="main.ui.en">English</option>
           </select>
         </label>
+        <a class="badge accent" href="training.html" style="text-decoration:none" data-i18n="main.nav.trainingPortal">📘 合作伙伴培训与架构深潜 H5</a>
+        <a class="badge" href="benchmark-cards.html" style="text-decoration:none;border-color:rgba(113,224,192,0.35);color:#eef8ff" data-i18n="main.nav.benchmarkCards">📊 7-Card 权威评测报告</a>
         <span class="badge accent">WebRTC</span>
         <span class="badge" data-i18n="main.badge.realtime">实时语音</span>
         <span class="badge" data-i18n="main.badge.serverCredentials">凭据只在服务端</span>
       </div>
     </header>
+
+    <div class="card" id="azureDemoBanner" hidden style="margin-bottom:18px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-color:rgba(113,224,192,0.45);background:linear-gradient(135deg,rgba(14,44,68,0.92),rgba(10,28,46,0.92))">
+      <div style="font-size:13px;color:#eef8ff;line-height:1.55" data-i18n="main.azureDemo.banner">☁️ 当前为 GitHub Pages 静态演示与架构预览页。实时语音 WebRTC 与 Azure Foundry 后端运行在已部署的 Azure App Service 实例上：</div>
+      <a class="button primary" id="azureDemoLink" href="./" style="min-height:38px;padding:8px 16px;text-decoration:none;white-space:nowrap" data-i18n="main.azureDemo.cta">🎙️ 进入 Azure 实时语音演示环境 →</a>
+    </div>
 
     <main class="workspace">
       <section class="card control-card" aria-labelledby="controlTitle">
@@ -1204,13 +1212,26 @@
               <h3 id="settingsTitle" data-i18n="main.settings.title">会话设置</h3>
               <p data-i18n="main.settings.subtitle">连接前调整，保存后下次会话生效。</p>
             </div>
-            <a class="button secondary settings-link" id="connectionSettingsLink" href="/setup" data-i18n="main.settings.connectionLink">连接设置</a>
+            <a class="button secondary settings-link" id="connectionSettingsLink" href="setup.html" data-i18n="main.settings.connectionLink">连接设置</a>
           </div>
           <div class="settings-status" id="configStatus" role="status" aria-live="polite">正在加载服务配置…<button id="reloadConfigButton" type="button" hidden data-i18n="main.settings.reload">重新加载</button></div>
           <div class="settings-grid" id="settingsGrid">
             <div class="settings-field">
+              <label for="scenarioPresetSelect" data-i18n="main.preset.label">培训演示场景预设（一键填入提示词与话术）</label>
+              <select id="scenarioPresetSelect">
+                <option value="default" data-i18n="main.preset.default">通用全能语音助手（默认）</option>
+                <option value="coffee_retail" data-i18n="main.preset.coffee">☕ 新茶饮与连锁咖啡顾问（Slide 32 同音词 + 团单算式）</option>
+                <option value="smart_cockpit" data-i18n="main.preset.cockpit">🚗 智能座舱多意图车载助手（Slide 33 车控 + 天气 + 导航）</option>
+                <option value="contact_center" data-i18n="main.preset.contact">🎧 出海全球联络中心客服（Slide 8/9 中英双语 + 售后工单）</option>
+              </select>
+            </div>
+            <div class="settings-field">
               <label for="voiceSelect" data-i18n="main.settings.voice">语音音色</label>
               <select id="voiceSelect" disabled aria-describedby="settingsNote"></select>
+            </div>
+            <div class="settings-field full" id="presetCuesContainer" style="padding:10px 12px;border-radius:12px;border:1px solid rgba(113,224,192,0.22);background:rgba(7,17,29,0.36)">
+              <div style="font-size:11px;font-weight:700;color:#71e0c0;margin-bottom:6px" data-i18n="main.preset.cuesTitle">🎙️ 现场推荐开口话术（点击可复制）：</div>
+              <div id="presetCuesList" style="display:grid;gap:6px;font-size:12px;color:#dbe9f6"></div>
             </div>
             <details class="advanced-settings">
               <summary data-i18n="main.settings.advanced">高级配置</summary>
@@ -1270,6 +1291,40 @@
           <p class="settings-note" id="settingsNote" data-i18n="main.settings.note">连接设置由服务端管理，凭据不会写入浏览器。会话连接期间设置会锁定；如需更换服务或模型，请打开“连接设置”。</p>
         </section>
 
+        <details class="card technical-card" id="archInspectorDetails" open>
+          <summary><span data-i18n="main.arch.summary">三平面架构实时透视 · 8 项抗扰探针打卡 · 实时成本估算</span><span class="sr-only" data-i18n="main.events.toggle">展开或收起</span></summary>
+          <div style="padding:14px 20px 18px;display:grid;gap:12px;font-size:12px;color:#b8cde0">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px">
+              <div style="padding:10px 12px;border-radius:11px;border:1px solid rgba(174,207,235,0.14);background:rgba(7,17,29,0.34)">
+                <strong style="color:#71e0c0;display:block;margin-bottom:4px" data-i18n="main.arch.plane1Title">平面 1 · 托管身份会话握手</strong>
+                <span data-i18n="main.arch.plane1Desc">HTTPS POST /api/session → 后端 Entra 托管身份创建 /live/sessions，浏览器零密钥。</span>
+              </div>
+              <div style="padding:10px 12px;border-radius:11px;border:1px solid rgba(174,207,235,0.14);background:rgba(7,17,29,0.34)">
+                <strong style="color:#71e0c0;display:block;margin-bottom:4px" data-i18n="main.arch.plane2Title">平面 2 · WebRTC 媒体直连</strong>
+                <span data-i18n="main.arch.plane2Desc">浏览器麦克风/扬声器直连 East US 2 gpt-live-1 全双工边说边听，不绕行应用服务器。</span>
+              </div>
+              <div style="padding:10px 12px;border-radius:11px;border:1px solid rgba(174,207,235,0.14);background:rgba(7,17,29,0.34)">
+                <strong style="color:#71e0c0;display:block;margin-bottom:4px" data-i18n="main.arch.plane3Title">平面 3 · 旁路 WSS 任务委派</strong>
+                <span data-i18n="main.arch.plane3Desc">Node.js 挂载 /attach 监听 delegation，调度时钟短路与 gpt-4.1-mini 工具，经 SpeechDelivery 回传。</span>
+              </div>
+            </div>
+            <div style="padding:10px 12px;border-radius:11px;border:1px solid rgba(113,224,192,0.2);background:rgba(7,17,29,0.28)">
+              <div style="font-weight:700;color:#eef8ff;margin-bottom:8px" data-i18n="main.arch.probesTitle">Slide 6 全双工 8 项干扰探针现场核验清单（GPT-Live-1 20/21 = 95% vs Realtime-2 52%）</div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:6px">
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"> 1. Backchannel 附和“嗯哼” (3/3)</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"> 2. Thinking pause 思考停顿 (3/3)</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"> 3. Explicit hold 稍等一下 (2/3)</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"> 4. Background 旁人说话 (3/3)</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"> 5. Barge-in 中途打断改向 (3/3)</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"> 6. Delegation 工具等待 (3/3)</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"> 7. Rapid 快问快答 (3/3)</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"> 8. Cough 突然咳嗽抗扰 (3/3)</label>
+              </div>
+            </div>
+            <div style="font-size:11px;color:#93aec6" data-i18n="main.arch.finopsTitle">实时单场成本基线（East US 2 公开目录价）：gpt-live-1 $3.00/h ($0.05/min) · App Service B1 $0.017/h · 语音打断不等于事务回滚</div>
+          </div>
+        </details>
+
         <details class="card technical-card" id="technicalDetails">
           <summary><span data-i18n="main.events.title">技术事件日志</span><span class="sr-only" data-i18n="main.events.toggle">展开或收起</span></summary>
           <ol class="event-log" id="eventLog" aria-label="技术事件日志" data-i18n-aria-label="main.events.title"></ol>
@@ -1283,8 +1338,8 @@
 
   <audio id="remoteAudio" autoplay playsinline class="sr-only" aria-label="GPT-Live 语音回复" data-i18n-aria-label="main.audio.aria"></audio>
 
-  <script src="/i18n.js"></script>
-  <script src="/locales/main.js"></script>
+  <script src="i18n.js"></script>
+  <script src="locales/main.js"></script>
 
   <script>
     (() => {
@@ -1340,8 +1395,9 @@
 
       function refreshLocalizedUi() {
         if (window.AppI18n && typeof window.AppI18n.apply === "function") window.AppI18n.apply(document);
-        document.documentElement.lang = window.AppI18n && typeof window.AppI18n.getLanguage === "function" && window.AppI18n.getLanguage() === "en" ? "en" : "zh-CN";
-        if (uiLanguageSelect && window.AppI18n && typeof window.AppI18n.getLanguage === "function") uiLanguageSelect.value = window.AppI18n.getLanguage();
+        const activeLang = window.AppI18n && typeof window.AppI18n.getLanguage === "function" ? window.AppI18n.getLanguage() : "zh-CN";
+        document.documentElement.lang = activeLang === "en" ? "en" : (activeLang === "zh-TW" ? "zh-TW" : "zh-CN");
+        if (uiLanguageSelect) uiLanguageSelect.value = activeLang;
         renderTranscript("user");
         renderTranscript("assistant");
         renderBackendAnswers(backendAnswerRecords);
@@ -1660,6 +1716,41 @@
         return "";
       }
 
+      let staticDemoOrigin = "";
+      async function activateStaticPagesPreview() {
+        try {
+          const r = await fetch("demo-host.json", { cache: "no-store" });
+          if (r.ok) {
+            const info = await r.json();
+            if (info && typeof info.demoOrigin === "string" && /^https:\/\//.test(info.demoOrigin)) {
+              staticDemoOrigin = info.demoOrigin.replace(/\/+$/, "");
+            }
+          }
+        } catch (_) {}
+        const defaults = configDefaults({});
+        configCatalog = {
+          voices: [{ id: "marin", label: "Marin · 默认" }, { id: "cedar", label: "Cedar" }],
+          webSearchAvailable: true,
+          backendReady: true,
+          backendModel: "gpt-4.1-mini"
+        };
+        const stored = readStoredConfig();
+        sessionConfig = normalizeConfig(Object.assign({}, defaults, stored), defaults);
+        configReady = true;
+        applyConfigToInputs();
+        const banner = $("#azureDemoBanner");
+        const demoLink = $("#azureDemoLink");
+        const settingsLink = $("#connectionSettingsLink");
+        const activeLang = window.AppI18n && typeof window.AppI18n.getLanguage === "function" ? window.AppI18n.getLanguage() : "zh-CN";
+        if (banner && staticDemoOrigin) {
+          banner.hidden = false;
+          if (demoLink) demoLink.href = staticDemoOrigin + "/?lang=" + encodeURIComponent(activeLang);
+          if (settingsLink) settingsLink.href = staticDemoOrigin + "/setup?lang=" + encodeURIComponent(activeLang);
+        }
+        setConfigStatus(t("main.settings.loaded"), "", false);
+        setPhase("idle");
+      }
+
       async function loadConfig() {
         if (configLoadInFlight) return configLoadInFlight;
         configReady = false;
@@ -1667,6 +1758,10 @@
         setConfigStatus(t("main.settings.loading"), "", false);
         configLoadInFlight = (async () => {
           try {
+            if (location.hostname.endsWith(".github.io")) {
+              await activateStaticPagesPreview();
+              return;
+            }
             const response = await window.AppI18n.apiFetch(CONFIG_ENDPOINT, { headers: { Accept: "application/json" } });
             if (response.status === 401 || response.status === 403) {
               window.location.assign("/setup#login");
@@ -2278,7 +2373,7 @@
         }
         const toolLog = $("#backendToolLog");
         toolLog.replaceChildren();
-        const names = {get_current_time:t("main.backend.tool.time"),get_weather:t("main.backend.tool.weather"),calculate:t("main.backend.tool.calculate"),web_search:t("main.backend.tool.search"),backend:t("main.backend.tool.backend")};
+        const names = {get_current_time:t("main.backend.tool.time"),get_weather:t("main.backend.tool.weather"),calculate:t("main.backend.tool.calculate"),lookup_beverage_menu:t("main.backend.tool.menu"),preview_service_order:t("main.backend.tool.order"),web_search:t("main.backend.tool.search"),backend:t("main.backend.tool.backend")};
         for (const tool of (payload.tools || []).slice(-12)) {
           const row = document.createElement("div");
           const time = new Date(tool.at).toLocaleTimeString(window.AppI18n && typeof window.AppI18n.getLanguage === "function" && window.AppI18n.getLanguage() === "en" ? "en-US" : "zh-CN",{hour12:false});
@@ -2877,7 +2972,14 @@
         cleanupAttempt(attempt);
       }
 
-      connectButton.addEventListener("click", () => { void connect(); });
+      connectButton.addEventListener("click", () => {
+        if (staticDemoOrigin) {
+          const activeLang = window.AppI18n && typeof window.AppI18n.getLanguage === "function" ? window.AppI18n.getLanguage() : "zh-CN";
+          window.location.assign(staticDemoOrigin + "/?lang=" + encodeURIComponent(activeLang));
+          return;
+        }
+        void connect();
+      });
       disconnectButton.addEventListener("click", () => { void disconnect(); });
       muteButton.addEventListener("click", toggleMute);
       microphoneSelect.addEventListener("change", () => {
@@ -2908,6 +3010,85 @@
         renderTranscript("assistant");
       });
       if (reloadConfigButton) reloadConfigButton.addEventListener("click", () => { void loadConfig(); });
+
+      const scenarioPresetSelect = $("#scenarioPresetSelect");
+      const presetCuesList = $("#presetCuesList");
+      const SCENARIO_PRESETS = {
+        default: {
+          city: "上海",
+          instructions: "请用自然、简洁的中文先给结论，再说明关键依据；适合口头播报。",
+          cues: [
+            "1. 你好，帮我用三句话介绍一下全双工语音助手和传统串行语音机器人的区别，说完前我会随时打断你。",
+            "2. 现在几点了？顺便帮我算一下 (18 * 25) + 125 等于多少，再查一下上海今天天气。",
+            "3. Please switch to English and summarize our conversation in two sentences."
+          ]
+        },
+        coffee_retail: {
+          city: "上海",
+          instructions: "你是连锁精品咖啡与新茶饮门店智能店长顾问。顾客点单时主动调用饮品菜单工具纠偏同音商品名（如星尘/星辰厚乳拿铁、岩韵/盐运大红袍、减脂小奶茉、桃喜奶乌），支持算式报价与生成待确认预订草稿。",
+          cues: [
+            "1. [全双工打断+同音词] 等一下，我顾客乳糖不耐受，帮我查一下菜单里的“星辰厚乳拿铁”和“盐运大红袍”多少钱、能不能换燕麦奶？",
+            "2. [算式+订单草稿] 帮我算一下 18 杯换燕麦奶的星尘厚乳拿铁（每杯 28 元）一共多少钱，并生成一份预订预览草稿。",
+            "3. [低卡推荐] 菜单里哪款饮品热量最低、不含咖啡因？"
+          ]
+        },
+        smart_cockpit: {
+          city: "上海",
+          instructions: "你是智能汽车座舱多意图语音副驾。当驾驶员一句话包含车控（空调/车窗）、天气查询、续航计算或餐饮预约等多个意图时，依次调用对应工具并用简短清晰的语音播报，涉及车控或预约时生成待确认草稿。",
+          cues: [
+            "1. [Slide 33 一句话多意图] 帮我把空调调到 24 度并打开天窗生成车控预览，另外查一下上海今天天气和当前时间。",
+            "2. [途中顺路点单] 我还有 45 公里到虹桥，按每百公里耗电 16 度算还要多少度电？顺便帮我预订 2 杯减脂小奶茉。",
+            "3. [背景抗噪/咳嗽测试] （在说话中途停顿思考 2 秒或轻咳一声，观察副驾不抢话）"
+          ]
+        },
+        contact_center: {
+          city: "上海",
+          instructions: "你是中国品牌出海全球客服中心智能坐席，支持中英双语无缝切换。协助客户查询当地时间、核对退换货金额计算、联网检索公开政策，并通过 preview_service_order 创建待人工确认的售后工单草稿。",
+          cues: [
+            "1. [售后报修+停顿等待] 你好，我要申请海外订单退换货……（停顿 2 秒）商品是三拼霸霸奶茶礼盒，数量 12 份，帮我建个售后工单草稿。",
+            "2. [无缝切换英语] Please switch to English, check the current time in America/Los_Angeles, and summarize my ticket draft.",
+            "3. [联网检索] 帮我联网查询一条最近关于 Microsoft Foundry 或 Azure Speech 的官方动态并附上来源。"
+          ]
+        }
+      };
+
+      function renderPresetCues(presetKey) {
+        if (!presetCuesList) return;
+        const preset = SCENARIO_PRESETS[presetKey] || SCENARIO_PRESETS.default;
+        presetCuesList.replaceChildren();
+        preset.cues.forEach((cueText) => {
+          const item = document.createElement("button");
+          item.type = "button";
+          item.style.cssText = "text-align:left;padding:7px 10px;border-radius:8px;border:1px solid rgba(174,207,235,0.14);background:rgba(17,36,58,0.55);color:#eef8ff;cursor:pointer;font:inherit;font-size:11.5px;line-height:1.45";
+          item.textContent = cueText;
+          item.addEventListener("click", async () => {
+            const clean = cueText.replace(/^\d+\.\s*(\[[^\]]+\]\s*)?/, "");
+            try {
+              await navigator.clipboard.writeText(clean);
+              const original = item.textContent;
+              item.textContent = "✓ 已复制话术：" + clean;
+              setTimeout(() => { item.textContent = original; }, 1400);
+            } catch (_) {}
+          });
+          presetCuesList.append(item);
+        });
+      }
+
+      if (scenarioPresetSelect) {
+        renderPresetCues(scenarioPresetSelect.value || "default");
+        scenarioPresetSelect.addEventListener("change", () => {
+          const preset = SCENARIO_PRESETS[scenarioPresetSelect.value] || SCENARIO_PRESETS.default;
+          renderPresetCues(scenarioPresetSelect.value);
+          if (!currentAttempt) {
+            if (cityInput && !cityInput.disabled) cityInput.value = preset.city;
+            if (instructionsInput && !instructionsInput.disabled) {
+              instructionsInput.value = preset.instructions;
+              instructionsCount.textContent = instructionsInput.value.length + " / 1500";
+            }
+            saveConfigFromInputs();
+          }
+        });
+      }
       if (uiLanguageSelect) {
         uiLanguageSelect.addEventListener("change", () => {
           if (window.AppI18n && typeof window.AppI18n.setLanguage === "function") window.AppI18n.setLanguage(uiLanguageSelect.value);

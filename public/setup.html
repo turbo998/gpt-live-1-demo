@@ -153,12 +153,13 @@
       <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end">
         <label class="home-link" for="uiLanguageSelect"><span data-i18n="setup.uiLanguage">界面语言</span>
           <select id="uiLanguageSelect" style="width:auto;margin-left:6px;padding:6px 8px" aria-label="界面语言" data-i18n-aria-label="setup.uiLanguage">
-            <option value="zh-CN" data-i18n="setup.uiLanguage.zh">中文</option>
+            <option value="zh-CN" data-i18n="setup.uiLanguage.zh">简体中文</option>
+            <option value="zh-TW" data-i18n="setup.uiLanguage.zhTW">繁體中文</option>
             <option value="en" data-i18n="setup.uiLanguage.en">English</option>
           </select>
         </label>
         <button class="home-link" id="logoutButton" type="button" hidden data-i18n="setup.logout">退出设置</button>
-        <a class="home-link" href="/" data-i18n="setup.home">返回对话 →</a>
+        <a class="home-link" href="./" data-i18n="setup.home">返回对话 →</a>
       </div>
     </header>
 
@@ -353,8 +354,8 @@
     <p class="footer-note project-credit"><span data-i18n="setup.footer.author">维护者</span>：turbo998 · <a href="https://github.com/turbo998/gpt-live-1-demo" target="_blank" rel="noopener noreferrer" data-i18n="setup.footer.repository">GitHub 项目仓库</a></p>
   </div>
 
-  <script src="/i18n.js"></script>
-  <script src="/locales/setup.js"></script>
+  <script src="i18n.js"></script>
+  <script src="locales/setup.js"></script>
   <script>
     (() => {
       "use strict";

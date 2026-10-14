@@ -8,6 +8,8 @@ test('tool definitions use strict Responses function schemas', () => {
     'get_current_time',
     'get_weather',
     'calculate',
+    'lookup_beverage_menu',
+    'preview_service_order',
   ]);
   for (const tool of toolDefinitions) {
     assert.equal(tool.type, 'function');
@@ -17,6 +19,33 @@ test('tool definitions use strict Responses function schemas', () => {
     assert.deepEqual(tool.parameters.required, Object.keys(tool.parameters.properties));
   }
   assert.deepEqual(toolDefinitions[1].parameters.properties.days.type, ['integer', 'null']);
+});
+
+test('lookup_beverage_menu normalizes Slide 32 homophone beverage names', async () => {
+  const result = await executeTool('lookup_beverage_menu', {
+    query: '星辰厚乳拿铁、盐运大红袍',
+    category: null,
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.homophone_normalized, true);
+  assert.equal(result.total_matched, 2);
+  assert.deepEqual(result.items.map((item) => item.name), ['星尘厚乳拿铁', '岩韵大红袍']);
+});
+
+test('preview_service_order returns uncommitted preview with explicit barge-in transaction boundary', async () => {
+  const result = await executeTool('preview_service_order', {
+    scenario: 'coffee_retail',
+    item_name: '星辰厚乳拿铁',
+    quantity: 18,
+    notes: '少冰，全部换燕麦奶',
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.committed, false);
+  assert.equal(result.transaction_state, 'preview_requires_confirmation');
+  assert.equal(result.canonical_item_name, '星尘厚乳拿铁');
+  assert.equal(result.homophone_normalized, true);
+  assert.equal(result.unit_price_cny, 28);
+  assert.equal(result.estimated_total_cny, 504);
 });
 
 test('calculate observes precedence, parentheses, powers, percentages, and modulo', async () => {

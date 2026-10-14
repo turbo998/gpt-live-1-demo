@@ -1,0 +1,7 @@
+scenario,selected_option,original_pct,reversed_pct,change_pts,answer_held
+Backchannel & Thinking Pause (6 trials),gpt-live-1 vs gpt-realtime-2,0.0,100.0,100.0,True
+Background Speech & Cough (6 trials),gpt-live-1 vs gpt-realtime-2,0.0,100.0,100.0,True
+Overall 7-Probe Pass Rate (21 trials),gpt-live-1 (20/21) vs realtime-2 (11/21),52.4,95.2,42.8,True
+Subjective: Response Length & Adaptability,5-point MOS scale converted to %,63.0,97.0,34.0,True
+Specialty Tea Homophones (12 items),Custom Speech + lookup_beverage_menu,86.5,98.5,12.0,True
+Call-Center Multi-Turn TTS Blind MOS,hdflash_xiaoqi (4.34) vs Human (4.08),81.6,86.8,5.2,True

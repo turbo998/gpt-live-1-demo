@@ -157,7 +157,7 @@ async function attach(id,config,backend,voice){
   const server=http.createServer(async(req,res)=>{
     res.uiLanguage=requestLanguage(req.headers['accept-language']);
     try{
-      const path=new URL(req.url,'http://local.invalid').pathname;
+      const reqUrl=new URL(req.url,'http://local.invalid'),path=reqUrl.pathname;
       res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');
       res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src 'self' blob:; connect-src 'self'; img-src 'self' data:; frame-ancestors 'none'");
       if(req.method==='GET'&&path==='/api/health')return reply(res,200,{ok:true});
@@ -174,15 +174,15 @@ async function attach(id,config,backend,voice){
       }
       if(req.method==='POST'&&path==='/api/auth/logout'){auth.logout(req,res);return reply(res,200,{ok:true});}
       if(path.startsWith('/api/')&&!auth.authorized(req))return reply(res,401,{error:'请先登录管理员账户',code:'AUTH_REQUIRED'});
-      if(req.method==='GET'&&!path.startsWith('/api/')){
+      if((req.method==='GET'||req.method==='HEAD')&&!path.startsWith('/api/')){
         if(path==='/favicon.ico'){res.writeHead(204);return res.end();}
-        if(path==='/'&&(!store.configured()||!auth.authorized(req)||auth.needsSetupToken())){res.writeHead(302,{Location:'/setup'});return res.end();}
-        const relative=path==='/setup'?'setup.html':path==='/'?'index.html':decodeURIComponent(path).replace(/^\//,'');
+        if(path==='/'&&(!store.configured()||!auth.authorized(req)||auth.needsSetupToken())){res.writeHead(302,{Location:`/setup${reqUrl.search||''}`});return res.end();}
+        const relative=path==='/setup'?'setup.html':path==='/training'?'training.html':path==='/benchmarks'?'benchmark-cards.html':path==='/'?'index.html':decodeURIComponent(path).replace(/^\//,'');
         const file=resolve(publicRoot,relative);
         if(!file.startsWith(resolve(publicRoot)+sep))return reply(res,404,{error:'Not found'});
         const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.png':'image/png'};
         if(!types[extname(file)])return reply(res,404,{error:'Not found'});
-        try{res.setHeader('Content-Type',types[extname(file)]);return res.end(await readFile(file));}catch{return reply(res,404,{error:'Not found'});}
+        try{const content=await readFile(file);res.setHeader('Content-Type',types[extname(file)]);return res.end(req.method==='HEAD'?undefined:content);}catch{return reply(res,404,{error:'Not found'});}
       }
       if(req.method==='GET'&&path==='/api/config'){
         const config=publicConfig(store.get(),store.configured());

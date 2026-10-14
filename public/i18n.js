@@ -3,13 +3,18 @@
   const storageKey='voice-demo-ui-language';
   const entries=new Map();
   let serverMessages={};
-  const normalize=value=>String(value||'').toLowerCase().startsWith('zh')?'zh-CN':'en';
+  const normalize=value=>{const raw=String(value||'').toLowerCase();if(raw==='zh-tw'||raw==='zh-hk'||raw==='zh-hant')return 'zh-TW';return raw.startsWith('zh')?'zh-CN':'en';};
   let language=normalize(navigator.language);
-  try{const saved=localStorage.getItem(storageKey);if(saved==='en'||saved==='zh-CN')language=saved;}catch{}
+  try{
+    const qLang=new URLSearchParams(location.search).get('lang');
+    const saved=localStorage.getItem(storageKey);
+    if(qLang==='en'||qLang==='zh-CN'||qLang==='zh-TW'){language=qLang;localStorage.setItem(storageKey,qLang);}
+    else if(saved==='en'||saved==='zh-CN'||saved==='zh-TW')language=saved;
+  }catch{}
   const format=(text,params)=>String(text).replace(/\{([\w.-]+)\}/g,(match,key)=>params[key]===undefined?match:String(params[key]));
-  function t(key,params={}){const entry=entries.get(key);return format(entry?.[language]??entry?.en??entry?.['zh-CN']??key,params);}
+  function t(key,params={}){const entry=entries.get(key);return format(entry?.[language]??entry?.['zh-CN']??entry?.en??key,params);}
   function apply(root=document){
-    document.documentElement.lang=language==='en'?'en':'zh-CN';
+    document.documentElement.lang=language==='en'?'en':(language==='zh-TW'?'zh-TW':'zh-CN');
     for(const [attribute,target]of [['data-i18n',null],['data-i18n-placeholder','placeholder'],['data-i18n-title','title'],['data-i18n-aria-label','aria-label']]){
       const nodes=[...(root.matches?.(`[${attribute}]`)?[root]:[]),...root.querySelectorAll(`[${attribute}]`)];
       for(const element of nodes){const key=element.getAttribute(attribute);if(!entries.has(key))continue;const value=t(key);if(target)element.setAttribute(target,value);else element.textContent=value;}
@@ -36,6 +41,6 @@
   window.AppI18n={register,t,getLanguage:()=>language,setLanguage,apply,apiFetch,error};
   window.addEventListener('storage',event=>{if(event.key===storageKey&&event.newValue&&normalize(event.newValue)!==language){language=normalize(event.newValue);notify();}});
   document.addEventListener('DOMContentLoaded',()=>apply());
-  fetch('/locales/messages.json').then(r=>r.ok?r.json():{}).then(value=>{serverMessages=value;notify();}).catch(()=>{});
+  fetch('locales/messages.json').then(r=>r.ok?r.json():{}).then(value=>{serverMessages=value;notify();}).catch(()=>{});
   apply();
 })();

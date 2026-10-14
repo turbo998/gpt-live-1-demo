@@ -38,7 +38,136 @@ const WMO_DESCRIPTIONS = new Map([
   [99, '雷暴伴大冰雹'],
 ]);
 
-const TOOL_NAMES = new Set(['get_current_time', 'get_weather', 'calculate']);
+const TOOL_NAMES = new Set([
+  'get_current_time',
+  'get_weather',
+  'calculate',
+  'lookup_beverage_menu',
+  'preview_service_order',
+]);
+
+const BEVERAGE_CATALOG = Object.freeze([
+  {
+    name: '星尘厚乳拿铁',
+    aliases: ['星辰厚乳拿铁', '星尘拿铁', '星辰拿铁'],
+    category: 'coffee',
+    price_cny: 25,
+    calories_kcal: 245,
+    caffeine: 'medium',
+    options: ['标准冰', '少冰', '去冰', '热', '换燕麦奶(+¥3)', '半糖'],
+    highlight: '冷萃厚乳基底配肯尼亚深烘浓缩，可换燕麦奶（乳糖友好）',
+  },
+  {
+    name: '岩韵大红袍',
+    aliases: ['盐运大红袍', '言韵大红袍', '大红袍牛乳茶'],
+    category: 'tea',
+    price_cny: 22,
+    calories_kcal: 160,
+    caffeine: 'medium-high',
+    options: ['标准冰', '少冰', '去冰', '热', '三分糖', '无糖'],
+    highlight: '武夷山岩骨花香乌龙原叶现泡，回甘醇厚',
+  },
+  {
+    name: '青提青柑冰',
+    aliases: ['青提青干冰', '青提柑冰', '青柑冰茶'],
+    category: 'fruit_tea',
+    price_cny: 19,
+    calories_kcal: 135,
+    caffeine: 'low',
+    options: ['标准冰', '少冰', '五分糖', '三分糖'],
+    highlight: '阳光玫瑰青提手捣配新会小青柑，清爽解腻',
+  },
+  {
+    name: '减脂小奶茉',
+    aliases: ['减脂小奶沫', '小奶茉', '小奶沫'],
+    category: 'milk_tea',
+    price_cny: 18,
+    calories_kcal: 128,
+    caffeine: 'low-medium',
+    options: ['标准冰', '少冰', '去冰', '热', '零卡糖', '换脱脂奶'],
+    highlight: '七窨茉莉绿茶配脱脂轻乳，低卡轻负担',
+  },
+  {
+    name: '轻芝红茶椰青',
+    aliases: ['青汁红茶椰青', '轻芝椰青', '红茶椰青'],
+    category: 'fruit_tea',
+    price_cny: 23,
+    calories_kcal: 175,
+    caffeine: 'medium',
+    options: ['标准冰', '少冰', '去芝士奶盖'],
+    highlight: '泰国香水椰青水融合锡兰红茶与轻盈咸芝士奶盖',
+  },
+  {
+    name: '荔荔兰香',
+    aliases: ['粒粒兰香', '丽丽兰香'],
+    category: 'fruit_tea',
+    price_cny: 21,
+    calories_kcal: 150,
+    caffeine: 'low-medium',
+    options: ['标准冰', '少冰', '三分糖'],
+    highlight: '妃子笑荔枝果肉搭配兰香乌龙茶底',
+  },
+  {
+    name: '富桂酒酿芋圆',
+    aliases: ['富贵酒酿芋圆', '桂花酒酿芋圆'],
+    category: 'specialty',
+    price_cny: 24,
+    calories_kcal: 290,
+    caffeine: 'none',
+    options: ['热', '温', '标准冰', '少冰'],
+    highlight: '金桂酿造孝感米酒配手搓荔浦小芋圆（无咖啡因）',
+  },
+  {
+    name: '桃桃气泡饮',
+    aliases: ['淘淘气泡饮', '逃逃气泡饮', '蜜桃气泡水'],
+    category: 'sparkling',
+    price_cny: 17,
+    calories_kcal: 110,
+    caffeine: 'none',
+    options: ['标准冰', '少冰'],
+    highlight: '阳山水蜜桃果汁融合绵密气泡水（零咖啡因）',
+  },
+  {
+    name: '鲜气杨梅手摇冰茶',
+    aliases: ['仙气杨梅手摇冰茶', '杨梅手摇冰茶'],
+    category: 'fruit_tea',
+    price_cny: 22,
+    calories_kcal: 145,
+    caffeine: 'low',
+    options: ['标准冰', '少冰', '三分糖'],
+    highlight: '仙居东魁杨梅鲜果手摇配茉莉毛尖',
+  },
+  {
+    name: '桃喜奶乌',
+    aliases: ['讨喜奶屋', '桃喜乌龙奶茶'],
+    category: 'milk_tea',
+    price_cny: 20,
+    calories_kcal: 195,
+    caffeine: 'medium',
+    options: ['标准冰', '少冰', '去冰', '热', '换燕麦奶(+¥3)'],
+    highlight: '白桃果香乌龙配丝滑牧场牛乳',
+  },
+  {
+    name: '百香芒芒',
+    aliases: ['百香茫茫', '百香果芒果冰茶'],
+    category: 'fruit_tea',
+    price_cny: 18,
+    calories_kcal: 140,
+    caffeine: 'low',
+    options: ['标准冰', '少冰', '五分糖'],
+    highlight: '台农芒果泥配黄金百香果与四季春茶底',
+  },
+  {
+    name: '三拼霸霸奶茶',
+    aliases: ['三拼爸爸奶茶', '三拼奶茶'],
+    category: 'milk_tea',
+    price_cny: 21,
+    calories_kcal: 320,
+    caffeine: 'medium',
+    options: ['标准冰', '少冰', '去冰', '热', '三分糖'],
+    highlight: '黑糖珍珠+芋圆+仙草冻经典三拼锡兰牛乳茶',
+  },
+]);
 
 const nullableString = {
   type: ['string', 'null'],
@@ -88,6 +217,38 @@ export const toolDefinitions = [
     },
     strict: true,
   },
+  {
+    type: 'function',
+    name: 'lookup_beverage_menu',
+    description: '查询门店新茶饮与精品咖啡菜单（含 12 款招牌饮品价格、热量、咖啡因、换燕麦奶/甜度选项），自动纠偏常见语音同音误识（如星辰厚乳拿铁→星尘厚乳拿铁、盐运大红袍→岩韵大红袍）。',
+    parameters: {
+      type: 'object',
+      properties: {
+        query: nullableString,
+        category: nullableString,
+      },
+      required: ['query', 'category'],
+      additionalProperties: false,
+    },
+    strict: true,
+  },
+  {
+    type: 'function',
+    name: 'preview_service_order',
+    description: '生成门店饮品预订、智能座舱控制预约或全球客服售后工单的待确认预览草稿（仅生成预览，不直接落库扣款；明确展示语音打断不等于事务回滚）。',
+    parameters: {
+      type: 'object',
+      properties: {
+        scenario: { type: 'string', minLength: 1, maxLength: 40 },
+        item_name: { type: 'string', minLength: 1, maxLength: 120 },
+        quantity: { type: 'integer', minimum: 1, maximum: 500 },
+        notes: nullableString,
+      },
+      required: ['scenario', 'item_name', 'quantity', 'notes'],
+      additionalProperties: false,
+    },
+    strict: true,
+  },
 ];
 
 function errorResult(code, message, details = undefined) {
@@ -109,6 +270,8 @@ function validateArgs(name, args) {
     get_current_time: ['time_zone'],
     get_weather: ['location', 'days'],
     calculate: ['expression'],
+    lookup_beverage_menu: ['query', 'category'],
+    preview_service_order: ['scenario', 'item_name', 'quantity', 'notes'],
   }[name];
   if (!allowed) return errorResult('unknown_tool', `未知工具：${name}。`);
 
@@ -785,6 +948,124 @@ function calculate(args) {
   }
 }
 
+function matchBeverageItem(rawText) {
+  const q = String(rawText || '').trim().toLowerCase();
+  if (!q) return null;
+  for (const item of BEVERAGE_CATALOG) {
+    if (item.name.toLowerCase() === q || q.includes(item.name.toLowerCase()) || item.name.toLowerCase().includes(q)) {
+      return { item, homophoneNormalized: false, matchedAlias: null };
+    }
+    for (const alias of item.aliases) {
+      if (alias.toLowerCase() === q || q.includes(alias.toLowerCase()) || alias.toLowerCase().includes(q)) {
+        return { item, homophoneNormalized: true, matchedAlias: alias };
+      }
+    }
+  }
+  return null;
+}
+
+function lookupBeverageMenu(args) {
+  const validation = validateArgs('lookup_beverage_menu', args);
+  if (validation) return validation;
+  const queryValidation = validateNullableString(args.query, 'query', 80);
+  if (queryValidation) return queryValidation;
+  const categoryValidation = validateNullableString(args.category, 'category', 40);
+  if (categoryValidation) return categoryValidation;
+
+  const query = typeof args.query === 'string' ? args.query.trim() : null;
+  const category = typeof args.category === 'string' ? args.category.trim().toLowerCase() : null;
+  const matchedCorrections = [];
+  let items = [...BEVERAGE_CATALOG];
+
+  if (category) {
+    items = items.filter((item) => item.category === category);
+  }
+
+  if (query) {
+    const tokens = query.split(/[、，,/\s和与及]+/u).map((s) => s.trim()).filter(Boolean);
+    const matchedSet = new Map();
+    for (const token of (tokens.length ? tokens : [query])) {
+      const hit = matchBeverageItem(token);
+      if (hit) {
+        matchedSet.set(hit.item.name, hit.item);
+        if (hit.homophoneNormalized) {
+          matchedCorrections.push({
+            spoken_or_input: token,
+            matched_alias: hit.matchedAlias,
+            canonical_name: hit.item.name,
+          });
+        }
+      }
+    }
+    if (matchedSet.size > 0) {
+      items = Array.from(matchedSet.values());
+    }
+  }
+
+  return {
+    ok: true,
+    query: query || 'all',
+    category: category || 'all',
+    total_matched: items.length,
+    homophone_normalized: matchedCorrections.length > 0,
+    corrections: matchedCorrections,
+    items: items.map((item) => ({
+      name: item.name,
+      category: item.category,
+      price_cny: item.price_cny,
+      calories_kcal: item.calories_kcal,
+      caffeine: item.caffeine,
+      options: item.options,
+      highlight: item.highlight,
+    })),
+  };
+}
+
+function previewServiceOrder(args) {
+  const validation = validateArgs('preview_service_order', args);
+  if (validation) return validation;
+  if (typeof args.scenario !== 'string' || !args.scenario.trim()) {
+    return errorResult('invalid_arguments', 'scenario 不能为空字符串。');
+  }
+  if (args.scenario.length > 40) return errorResult('invalid_arguments', 'scenario 超过 40 个字符。');
+  if (typeof args.item_name !== 'string' || !args.item_name.trim()) {
+    return errorResult('invalid_arguments', 'item_name 不能为空字符串。');
+  }
+  if (args.item_name.length > 120) return errorResult('invalid_arguments', 'item_name 超过 120 个字符。');
+  const notesValidation = validateNullableString(args.notes, 'notes', 300);
+  if (notesValidation) return notesValidation;
+  if (!Number.isInteger(args.quantity) || args.quantity < 1 || args.quantity > 500) {
+    return errorResult('invalid_arguments', 'quantity 需要介于 1 和 500');
+  }
+
+  const scenario = args.scenario.trim();
+  const itemName = args.item_name.trim();
+  const notes = typeof args.notes === 'string' ? args.notes.trim() : null;
+  const quantity = args.quantity;
+  const beverageHit = matchBeverageItem(itemName);
+  const canonicalItemName = beverageHit ? beverageHit.item.name : itemName;
+  const unitPriceCny = beverageHit ? beverageHit.item.price_cny : null;
+  const oatMilkAddon = notes && /燕麦奶/u.test(notes) ? 3 : 0;
+  const effectiveUnitCny = unitPriceCny !== null ? unitPriceCny + oatMilkAddon : null;
+  const estimatedTotalCny = effectiveUnitCny !== null ? effectiveUnitCny * quantity : null;
+
+  return {
+    ok: true,
+    draft_id: `DRAFT-${scenario.toUpperCase().slice(0, 6)}-${quantity}`,
+    scenario,
+    requested_item: itemName,
+    canonical_item_name: canonicalItemName,
+    homophone_normalized: Boolean(beverageHit && beverageHit.homophoneNormalized),
+    quantity,
+    unit_price_cny: effectiveUnitCny,
+    estimated_total_cny: estimatedTotalCny,
+    notes,
+    committed: false,
+    transaction_state: 'preview_requires_confirmation',
+    barge_in_rollback_note: '语音打断仅停止当前语音播报，不会自动回滚或提交真实订单；需用户在界面或后续确认后才执行正式落库。',
+  };
+}
+
 export async function executeTool(name, args, context = {
   timeZone: DEFAULT_TIME_ZONE,
   city: '',
@@ -794,6 +1075,8 @@ export async function executeTool(name, args, context = {
   const ctx = normalizeContext(context);
   if (name === 'get_current_time') return getCurrentTime(args, ctx);
   if (name === 'get_weather') return getWeather(args, ctx);
+  if (name === 'lookup_beverage_menu') return lookupBeverageMenu(args);
+  if (name === 'preview_service_order') return previewServiceOrder(args);
   return calculate(args);
 }
 

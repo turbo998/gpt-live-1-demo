@@ -8,6 +8,13 @@ This is an unofficial example application. It expects a live voice deployment th
 
 Project: <https://github.com/turbo998/gpt-live-1-demo> · [Attribution](NOTICE.md)
 
+## Partner Training & Benchmark Portal (GitHub Pages)
+
+- **Partner Engineer Technical Training H5 (`zh-CN` / `zh-TW` / `en`)**: <https://turbo998.github.io/gpt-live-1-demo/training.html>
+- **7-Card 4:5 Visual Benchmark Report (`zh-CN` / `zh-TW` / `en`)**: <https://turbo998.github.io/gpt-live-1-demo/benchmark-cards.html>
+- **Interactive Workbench & Architecture Preview**: <https://turbo998.github.io/gpt-live-1-demo/>
+- **Benchmark Dataset & Markdown Report**: [`docs/reports/voice-live-gpt-live-1.md`](docs/reports/voice-live-gpt-live-1.md) · [`data/reported/voice-live-gpt-live-1/`](data/reported/voice-live-gpt-live-1/report.json)
+
 ![English interface: session controls, live transcripts, and voice settings](docs/images/interface-en.png)
 
 *English interface. Switch between English and Simplified Chinese from the selector at the top.*

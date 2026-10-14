@@ -8,6 +8,13 @@
 
 项目地址：<https://github.com/turbo998/gpt-live-1-demo> · [来源说明](NOTICE.md)
 
+## 合作伙伴技术培训与基准测试门户（GitHub Pages）
+
+- **合作伙伴工程师技术培训 H5 门户（简体 / 繁體 / English）**：<https://turbo998.github.io/gpt-live-1-demo/training.html>
+- **7-Card 4:5 视觉基准测试报告（简体 / 繁體 / English）**：<https://turbo998.github.io/gpt-live-1-demo/benchmark-cards.html>
+- **交互工作台与三平面架构预览**：<https://turbo998.github.io/gpt-live-1-demo/>
+- **基准测试数据集与 Markdown 报告**：[`docs/reports/voice-live-gpt-live-1.md`](docs/reports/voice-live-gpt-live-1.md) · [`data/reported/voice-live-gpt-live-1/`](data/reported/voice-live-gpt-live-1/report.json)
+
 ![中文界面：会话控制、实时转写与音色设置](docs/images/interface-zh-CN.png)
 
 *中文界面，可通过顶部选择器切换中文和 English。*
