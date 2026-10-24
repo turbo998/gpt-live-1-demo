@@ -21,7 +21,7 @@
     "check:release": "node scripts/check-release.mjs"
   },
   "dependencies": {
-    "@azure/identity": "^4.13.0",
+    "@azure/identity": "^4.13.3",
     "ws": "^8.18.3"
   }
 }
