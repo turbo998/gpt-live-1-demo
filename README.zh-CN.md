@@ -12,6 +12,8 @@
 
 - **合作伙伴工程师技术培训 H5 门户（简体 / 繁體 / English）**：<https://turbo998.github.io/gpt-live-1-demo/training.html>
 - **7-Card 4:5 视觉基准测试报告（简体 / 繁體 / English）**：<https://turbo998.github.io/gpt-live-1-demo/benchmark-cards.html>
+- **在线实录演示视频（`GPT-Live-Azure-demo.mp4`，4 分 20 秒）**：<https://turbo998.github.io/voice/GPT-Live-Azure-demo.mp4> · [Release v0.4.0 下载](https://github.com/turbo998/gpt-live-1-demo/releases/download/v0.4.0/GPT-Live-Azure-demo.mp4)
+- **客户与合作伙伴售前演示手册**：[`docs/demo/presenter-guide.zh-CN.md`](docs/demo/presenter-guide.zh-CN.md) · [`English Guide`](docs/demo/presenter-guide.md) · [`架构说明`](docs/demo/architecture.md)
 - **交互工作台与三平面架构预览**：<https://turbo998.github.io/gpt-live-1-demo/>
 - **基准测试数据集与 Markdown 报告**：[`docs/reports/voice-live-gpt-live-1.md`](docs/reports/voice-live-gpt-live-1.md) · [`data/reported/voice-live-gpt-live-1/`](data/reported/voice-live-gpt-live-1/report.json)
 
@@ -22,8 +24,8 @@
 ## 普通用户最快开始
 
 从 [GitHub Releases](https://github.com/turbo998/gpt-live-1-demo/releases/tag/v0.4.0)
-获取 **v0.4.0 Windows x64 ZIP**。发行资产还包括 Azure 应用 ZIP、中英文 Word 手册、
-纯文档 ZIP 和 `SHA256SUMS.txt`，**不包含视频**。
+获取 **v0.4.0 Windows x64 ZIP**。发行资产还包括 Azure 应用 ZIP、中英文 Word 手册（`presenter-guide.docx` / `presenter-guide.zh-CN.docx`）、
+纯文档 ZIP、`SHA256SUMS.txt` 以及 4 分 20 秒 Azure 实录演示视频（`GPT-Live-Azure-demo.mp4`，亦可直接在 <https://turbo998.github.io/voice/> 在线播放）。
 也可从下方源码步骤启动，或按[发布指南](docs/RELEASE.zh-CN.md)构建。
 
 1. 下载 `gpt-live-1-demo-0.4.0-windows-x64.zip`，用 `SHA256SUMS.txt` 核对哈希后解压到新文件夹。请让 `Start.cmd`、`runtime` 和 `app` 保持在同一层级。

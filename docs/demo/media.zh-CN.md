@@ -14,9 +14,16 @@
 不能把录像作为英文口语成功验收；自然打断也不证明后台工作被取消。
 断开后的架构旁白不是模型回答，视频总长不等于模型计费会话时长。
 
+## 在线视频播放与发行资产链接
+
+为保持 Git 仓库轻量且不包含大体积二进制媒体文件，`GPT-Live-Azure-demo.mp4`（`12,443,395` 字节，时长 `4 分 20.66 秒`，`1600×1000` H.264 + 48 kHz AAC）不进入 Git 树，而是通过以下渠道提供在线播放与下载：
+
+- **个人主页语音门户在线播放**：<https://turbo998.github.io/voice/>（视频直链：<https://turbo998.github.io/voice/GPT-Live-Azure-demo.mp4>）
+- **GitHub Release (`v0.4.0`) 下载资产**：<https://github.com/turbo998/gpt-live-1-demo/releases/download/v0.4.0/GPT-Live-Azure-demo.mp4>
+
 ## 公开分发门槛
 
-Git 不包含视频，本说明也不自动为视频清关。Release 前须完整审阅所有画面和音轨，
+Git 不包含视频。Release 前须完整审阅所有画面和音轨，
 检查元数据、字幕和附件，只处理副本，再对最终文件完整解码/播放并计算哈希。
 OCR、抽帧、音量检查或解码成功不能单独证明脱敏通过。
 禁止上传原客户 ZIP 或环境所有者私有材料。

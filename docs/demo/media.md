@@ -20,9 +20,16 @@ acceptance. Interruption also does not establish cancellation of backend work.
 Narration after disconnect is not model speech, and total video duration is not
 the billed model-session duration.
 
+## Online Demo Playback & Release Asset
+
+To keep the Git repository lightweight and free of binary media blobs, `GPT-Live-Azure-demo.mp4` (`12,443,395` bytes, `4m20.66s`, `1600x1000` H.264 + 48 kHz AAC) is hosted externally rather than tracked in Git:
+
+- **Online Web Player (Homepage Voice Portal)**: <https://turbo998.github.io/voice/> (direct video stream: <https://turbo998.github.io/voice/GPT-Live-Azure-demo.mp4>)
+- **GitHub Release Asset (`v0.4.0`)**: <https://github.com/turbo998/gpt-live-1-demo/releases/download/v0.4.0/GPT-Live-Azure-demo.mp4>
+
 ## Public distribution gate
 
-No video is included in Git or cleared merely by this document. A release requires
+No video is included in Git. A release requires
 full visual and complete audio review, metadata/subtitle/attachment inspection,
 sanitization of copies only, final decode/playback and hashes of the exact bytes.
 Automated OCR, sampled frames, volume checks and successful decoding are insufficient

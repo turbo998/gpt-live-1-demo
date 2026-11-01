@@ -12,6 +12,8 @@ Project: <https://github.com/turbo998/gpt-live-1-demo> · [Attribution](NOTICE.m
 
 - **Partner Engineer Technical Training H5 (`zh-CN` / `zh-TW` / `en`)**: <https://turbo998.github.io/gpt-live-1-demo/training.html>
 - **7-Card 4:5 Visual Benchmark Report (`zh-CN` / `zh-TW` / `en`)**: <https://turbo998.github.io/gpt-live-1-demo/benchmark-cards.html>
+- **Online Live Demo Video (`GPT-Live-Azure-demo.mp4`, 4m20s)**: <https://turbo998.github.io/voice/GPT-Live-Azure-demo.mp4> · [Release v0.4.0 Download](https://github.com/turbo998/gpt-live-1-demo/releases/download/v0.4.0/GPT-Live-Azure-demo.mp4)
+- **Partner Presales & Live Demo Handbook**: [`docs/demo/presenter-guide.md`](docs/demo/presenter-guide.md) · [`中文手册`](docs/demo/presenter-guide.zh-CN.md) · [`Architecture`](docs/demo/architecture.md)
 - **Interactive Workbench & Architecture Preview**: <https://turbo998.github.io/gpt-live-1-demo/>
 - **Benchmark Dataset & Markdown Report**: [`docs/reports/voice-live-gpt-live-1.md`](docs/reports/voice-live-gpt-live-1.md) · [`data/reported/voice-live-gpt-live-1/`](data/reported/voice-live-gpt-live-1/report.json)
 
@@ -23,8 +25,8 @@ Project: <https://github.com/turbo998/gpt-live-1-demo> · [Attribution](NOTICE.m
 
 Get the **v0.4.0 Windows x64 ZIP** from
 [GitHub Releases](https://github.com/turbo998/gpt-live-1-demo/releases/tag/v0.4.0).
-The release also provides an Azure application ZIP, English/Chinese Word guides,
-a documents-only ZIP and `SHA256SUMS.txt`; it does **not** include a video.
+The release also provides an Azure application ZIP, English/Chinese Word guides (`presenter-guide.docx` / `presenter-guide.zh-CN.docx`),
+a documents-only ZIP, `SHA256SUMS.txt`, and the 4m20s Azure live demo recording (`GPT-Live-Azure-demo.mp4`, also playable online at <https://turbo998.github.io/voice/>).
 You can also start from source below or follow the [release guide](docs/RELEASE.md).
 
 1. Download `gpt-live-1-demo-0.4.0-windows-x64.zip`, verify its hash against `SHA256SUMS.txt`, and extract it to a new folder. Keep `Start.cmd`, `runtime`, and `app` together.
